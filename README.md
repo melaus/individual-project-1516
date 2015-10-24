@@ -65,9 +65,10 @@
 
 
 ## Sample Projects 
+
 * C++
-		* Kinect Fusion Basics - D2D
-		* Kinect Fusion Color Basics - D2D
+    * Kinect Fusion Basics - D2D
+    * Kinect Fusion Color Basics - D2D
     * Kincect Fusion Explorer - D2D
 * C#
     * Kinect Fusion Basics - WPF
