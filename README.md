@@ -79,4 +79,3 @@
 * Kinect Fusion Projects are basic examples
 * Kinect Fusion Explorer Projects are more API-centric
 
-
