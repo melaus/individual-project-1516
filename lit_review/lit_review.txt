@@ -1,0 +1,26 @@
+Introduction
+
+There are many different statistical classification algorithms that can be used for labelling objects through data. This Review tries to understand how these algorithm fit in with the depth data obtained through a Microsoft Kinect Camera, including the relationship between time and accuracy.
+
+
+Kinect Fusion
+
+  Depth Map
+  
+
+
+Classification Algorithms
+
+Support Vector Machines (SVM)
+Random Forest
+Stochastic Gradient Decent (SGD)
+Nearest Neighbours
+Decision Trees
+Gradient Tree Boosting
+Multiclass
+Naive Bayes (GaussianNB)
+Linear Discriminant Analysis
+Quadratic Discriminant Analysis
+
+
+

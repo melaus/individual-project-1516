@@ -1,0 +1,149 @@
+\documentclass[11pt,openright,a4paper]{report}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{geometry}
+\graphicspath{ {images/} }
+
+\geometry{
+  a4paper,
+  top=20mm,
+  bottom=20mm
+}
+
+% title
+\title{
+  Using Machine-learning Techniques to Increase the Efficiency of Kinect Fusion Reconstructions
+  \\~\\
+  \textbf{Literature Review}
+}
+\author{Alan Lau}
+\date{MComp Computer Science\\University of Bath\\October 2015}
+
+% tab spacing
+\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+
+% set chapter format
+\titleformat{\chapter}[hang]{\LARGE\bfseries}{\thechapter\hspace{20pt}}{0pt}{\LARGE\bfseries}
+\titlespacing{\chapter}{0pt}{0pt}{5pt}
+
+% set section format
+\titleformat{\section}[hang]{\Large\bfseries}{\thesection\hspace{20pt}}{0pt}{\Large\bfseries}
+\titlespacing{\section}{0pt}{0pt}{-3pt}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+% title page
+\maketitle
+\newpage
+
+% ToC
+\tableofcontents
+\newpage
+
+% reset page number
+\setcounter{page}{1}
+
+% set pagragraph style
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+
+% introduction 
+\chapter{Introduction}
+This project aims to quicken the time required to create a 3-diemensional reconstruction of objects in a room with just a simple 2-dimentional scan from one angle, using a Microsoft Kinect Camera. To enable such goal, classification, a form of machine-learning, is required. There are many different statistical classification algorithms that can be used for labelling objects through training with similar objects and recognising the category and object belongs when in use. 
+
+A group of New York University researchers have created a depth dataset named the NYU Depth Dataset. A variety of objects are scanned or segmented from a scene. The large number of scans for a class of objects makes it ideal to be used as training data for the classifier. By understanding more about this dataset and how it has been used, it provides a 
+
+This Review tries to explore more about depth maps and the depth dataset, understand how these algorithm fit in with depth data and .
+
+\newpage
+
+
+% Kinect Fusion
+\chapter{Kinect Fusion}
+The Kinect Camera is an RGBD Camera. It has an infrared-based depth camera on top of a conventional coloured camera. This enables extra information about how far an object is from the camera, so an accurate reconstruction is possible.
+\section{Depth Map}
+\section{NYU Depth Dataset V2}
+\newpage
+
+
+% classifiers
+\chapter{Classifiers}
+\section{Classification Algorithms}
+\section{Using Classification Alogorithms for Depth Data}
+% Integrating Kinect Depth Data with a Stochastic Object Classification Framework for Forestry Robot
+% "shopping list table"
+\newpage
+
+% displaying the results
+\chapter{Displaying the Results}
+\subsection{OpenGL}
+
+
+% summary
+\chapter{Summary}
+\newpage
+
+% References
+\begin{thebibliography}{7}
+  \bibitem{msdn-kinect-info}
+    Microsoft Corporation.
+    \textit{Kinect Fusion} [Online]. 
+    Place of publication: Microsoft Developer Network.
+    Available from: \url{https://msdn.microsoft.com/en-us/library/dn188670.aspx}
+    [Accessed 22 October 2015].
+
+  \bibitem{blog-kinect-annc}
+    Kinect for Windows Team, 2013.
+    \textit{Kinect Fusion demonstrated at Microsoft Research TechFest, coming soon to SDK} [Online].
+    Place of publication: Kinect for Windows Blog
+    Available from: \url{http://blogs.msdn.com/b/kinectforwindows/archive/2013/03/06/kinect-fusion-demonstrated-at-microsoft-research-techfest-coming-soon-to-sdk.aspx}
+    [Accessed 22 October 2015].
+
+  \bibitem{blog-semantic-paint}
+    Cameron, S., 2015.
+    \textit{Microsoft Research debuts another project, Semantic Paint} [Online].
+    Place of publication: WinBeta Blog
+    Available from: \url{http://www.winbeta.org/news/microsoft-research-debuts-another-project-semantic-paint}
+    [Accessed 23 October 2015].
+
+  \bibitem{art-DyanmicFusion}
+    Newcombe, R. A. et al., 2015.
+    DynamicFusion: Reconstruction and Tracking of Non-rigid Scenes in Real-Time. 
+    \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, 7-12 June 2015 Boston, Massachusetts.
+    Seatle: University of Washington, pp.343-352.
+    %Available from: \url{http://homes.cs.washington.edu/~newcombe/papers/DynamicFusion.pdf}
+    %[Accessed 23 October 2015].
+
+  \bibitem{art-dense-surface}
+    Newcombe, R A et al., 2011.
+    KinectFusion: Real-time dense surface mapping and tracking.
+    \textit{Mixed and augmented reality (ISMAR), 2011 10th IEEE international symposium}, 26-29 October 2011 Basel, Switzerland.
+    Seatle: University of Washington, pp.127-136
+    %Available from: \url{http://homes.cs.washington.edu/~newcombe/papers/newcombe_etal_ismar2011.pdf}
+    %[Accessed 23 October 2015].
+
+  \bibitem{the-HouseScan}
+    Hambüchen, N., 2014.
+    \textit{HouseScan: Building-scale interior 3D reconstruction with KinectFusion}. 
+    Thesis (MSc).
+    Imperial College, London.
+    %Available from: \url{http://www.doc.ic.ac.uk/teaching/distinguished-projects/2014/n.hambuechen.pdf}
+    %[Accessed 23 October 2015].
+
+  \bibitem{}
+    Silberman, N. et al..
+    \textit{NYU Depth Dataset V2} [Online].
+    Available from: \url{http://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html}
+    [Accessed 23 October 2015].
+
+\end{thebibliography}
+\newpage
+
+
+\end{document}
