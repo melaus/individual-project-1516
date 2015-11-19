@@ -4,13 +4,30 @@
 \usepackage{hyperref}
 \usepackage{titlesec}
 \usepackage{geometry}
+\usepackage{tabularx}
+\usepackage{color}
+\usepackage[table]{xcolor}
+\usepackage{caption}
+
+% bibtex
+%\usepackage[
+  %backend=biber,
+  %style=alphabetic,
+  %sorting=ynt
+%]{biblatex}
+%\addbibresource{mybib.bib}
+
 \graphicspath{ {images/} }
 
+% set margin
 \geometry{
   a4paper,
   top=20mm,
   bottom=20mm
 }
+
+% self-defined colours
+\definecolor{newgrey}{HTML}{e5e5e5}
 
 % title
 \title{
@@ -30,13 +47,22 @@
 
 % set section format
 \titleformat{\section}[hang]{\Large\bfseries}{\thesection\hspace{20pt}}{0pt}{\Large\bfseries}
-\titlespacing{\section}{0pt}{0pt}{-3pt}
+\titlespacing{\section}{0pt}{30pt}{-3pt}
 
+% set subsection format
+\titleformat{\subsection}[hang]{\large\bfseries}{\thesubsection\hspace{20pt}}{0pt}{\large\bfseries}
+\titlespacing{\subsection}{0pt}{10pt}{-3pt}
+
+% set subsubsection format
+\titleformat{\subsubsection}[hang]{\bfseries}{\thesubsubsection\hspace{20pt}}{0pt}{\bfseries}
+\titlespacing{\subsubsection}{0pt}{10pt}{-5pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{document}
+
+\pagenumbering{gobble}
 
 % title page
 \maketitle
@@ -47,6 +73,7 @@
 \newpage
 
 % reset page number
+\pagenumbering{arabic}
 \setcounter{page}{1}
 
 % set pagragraph style
@@ -55,95 +82,145 @@
 
 % introduction 
 \chapter{Introduction}
-This project aims to quicken the time required to create a 3-diemensional reconstruction of objects in a room with just a simple 2-dimentional scan from one angle, using a Microsoft Kinect Camera. To enable such goal, classification, a form of machine-learning, is required. There are many different statistical classification algorithms that can be used for labelling objects through training with similar objects and recognising the category and object belongs when in use. 
+This project aims to quicken the time required to create a 3-diemensional reconstruction of objects in a room with just a simple 2-dimentional scan from one angle, using a Microsoft Kinect Camera. To enable such goal, classification, a form of machine-learning, is proposed to be used. There are many different statistical classification algorithms that can be used for labelling objects through training with similar objects and recognising the category and object belongs when put in use. 
 
-A group of New York University researchers have created a depth dataset named the NYU Depth Dataset. A variety of objects are scanned or segmented from a scene. The large number of scans for a class of objects makes it ideal to be used as training data for the classifier. By understanding more about this dataset and how it has been used, it provides a 
+Being an RGBD camera, not only does the Kinect Camera captures a colour (RGB) image, it also captures depth information via an infrared laser combined with a monochrome camera \cite{kinect-doc}. This information enables a detailed 3-dimentional reconstruction.
 
-This Review tries to explore more about depth maps and the depth dataset, understand how these algorithm fit in with depth data and .
+A group of New York University researchers have created a depth dataset called the \textit{NYU Depth Dataset} \cite{nyu-dataset}, which is freely available online.\footnote{The datasets are available for download at \url{http://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html}} A variety of objects are scanned, labelled or segmented from a scene. The dataset is freely available for various applications in different formats. The number of scans for different classes of objects makes it ideal to be used as training data for the proposed classifier. 
+
+This Review attempts to explore in greater detail about the NYU Dataset and its applications, how depth maps are useful to 3-dimensional reconstruction and how the depth dataset is useful for training. We also attempt to justify the algorithms that will potentially fit to label objects in a reconstructed scene.
 
 \newpage
 
-
-% Kinect Fusion
+% Kinect Fusion 
 \chapter{Kinect Fusion}
-The Kinect Camera is an RGBD Camera. It has an infrared-based depth camera on top of a conventional coloured camera. This enables extra information about how far an object is from the camera, so an accurate reconstruction is possible.
-\section{Depth Map}
-\section{NYU Depth Dataset V2}
+The Kinect Camera was first released for the company's gaming console, XBox 360. It was designed to recognise gestures, faces and voices, providing a more physical way and new dimension to interact with the interface and games than a conventional controller. A Windows-compatible version of the Camera, an SDK and Kinect Fusion were released later, enabling researches and the development of commercial products. [KIN1] 
+
+Augmented reality (AR) and real-time reconstructions are some of the most popular research applications of Kinect Fusion. SemanticPaint [SP] demonstrates the posibility of Kinect Fusion in AR in real-time scenes. It allows parts of the scene to be 'painted' by the user. It also uses segmentation and object recognition to paint similar objects in the same colour. Although this project does not invovle real-time processes, it provides
+
+\section{Kinect Camera Technologies}
+The two generations of Kinect Camera use different 3-dimensional camera technologies to obtain depth information about a scene. Each of these technologies has its pros and cons, which is discussed below. However, the common problem of these technologies is that it does not deal with very bright light. It will cause detail to be lost. [books?]
+
+\subsection{Structured Light}
+Structured light is used in the first generation Kinect Camera (2010). A sequence of known infrared patterns are projected onto the scene. A deformed pattern is formed when objects are 'in the way' of the patterns. The object is then observed from another angle by the monocrhome camera. Through analysing the deformed patterns and obervations, the depth information about the scene can be obtained. \cite{chi-book} \cite{kinect-cam-tech}
+
+\subsection{Time-of-Flight}
+Rather than looking at the deformed pattern, the second generation Kinect Camera (2013) estimates depth information based on the time the infrared beam takes to travel back and forth. The difference between the reference signal and returned signal allows the calculation of a tiem difference, which helps compute the required depth information. [chi-book] 
+
+\subsection{Comparing the Two Systems}
+%TODO:use table to illustrate same issues
+%TODO:differences and improvements
+
+\section{Data Representation}
+
+\subsection{Point Cloud}
+A point cloud stores data points in a cooridinate system. [chi-book] [wiki] In a real-world case (as well as the captured images), a 3-dimensional coordinate system is used. A point cloud can be used to generate a mesh so that it can be used to render a visual image of the reconstruction volume.
+
+\section{Reconstruction}
+
+\subsection{Pipeline}
+A single raw capture with the Camera does not provide a detailed reconstruction. Combining the depth information of many images together enables a super-resolution [3d-paper] reconstruction, making a detailed and high quality reconstruction possible. The following is the full pipeline of how a reconstruction is created from raw depth data:
+
+\begin{enumerate}
+  \item Raw Input Conversion
+    \begin{itemize}
+      \item The raw \textit{depth map} is captured by the infrared-monochrome subsystem of the Camera. This information is not very detailed, as shown in [fig x].  
+      \item It needs to be combined with the \textit{normal map}, which is the surface normals associated with each vertex [spe-book], to provide a more detailed but noisy reconstruction at this stage. [image 0:35 of MSR video]. 
+      \item Further conversion and reconstruction is needed to retain detail, remove noise, and fill in holes missed by the Camera, possibly due to bright light.
+      \item This information is stored as a point cloud and will be combined into one representation later on.
+    \end{itemize}
+
+  \item Camera Pose Tracking
+    \begin{itemize}
+      \item The location and orientation (world pose) of each frame are tracked as the Camera moves around.
+      \item This alignment is constantly traced, allowing all the point clouds to be aligned together. [website]
+      \item The frames captured from different poses, even the smallest movement (e.g. caused by a hand-shake), will allow further quality improvements to the scene, achieving more than what a single raw capture is capable of [ms-3d-paper].
+    \end{itemize}
+
+  \item Fusing 
+    \begin{itemize}
+      \item The depth data converted from the raw input is combined into a single 3-dimensional space per frame.
+      \item A running average of depth is kept. This reduces noise, and creates a refined reconstruction by combinding all the information in one place. [website] [3d-paper]
+    \end{itemize}
+
+  \item Resultant Reconstruction Volume
+    \begin{itemize}
+      \item The resultant point cloud will be of a highly detailed reconstruction of the scene. For example, grills of a millimetre, as shown in [fig x] can be reconstructed properly.
+      \item A rendered image of the 3D reconstruction volume is possible by using methods such as raycasting, providing a visual feedback of the scene, and allows for many possibilities, such as augmented reality applications.
+    \end{itemize}
+\end{enumerate}
+
+
+\subsection{Volumetric (3D) Reconstruction}
+By averaging the surface models and depth data from multiple viewpoints into one volumetric voxel volume, the scene appears to live in a 3-dimensional 'box'. With more data,
+
+\subsection{? (2D) Reconstruction} 
+
+\section{Segmentation}
+In order to identify an object in a scene with many objects, there needs to be a way to single them out individually so that something such as labelling can be done on them. In computer vision, this is called \textit{segementation}. There are many segmentation algorithms available. Some popular ones include \textit{k-means}, \textit{Gaussian}, \textit{mean-shift}, \textit{normalised cuts}, \textit{similarity graph-based segmentation} and \textit{binary Markov random fields using graph cuts}.
+
+
+\large\textbf{K-means}
+
+\subsection{Segmentation in NYU Dataset V2}
+As Kinect was born to support gesture recognition, there is limited support to segmentation of a scene.  
+
 \newpage
 
 
-% classifiers
-\chapter{Classifiers}
-\section{Classification Algorithms}
-\section{Using Classification Alogorithms for Depth Data}
+% NYU Dataset V2
+\chapter{NYU Dataset V2}
+In order for the classifier to produce accurate results, it needs to be trained with an extensive and quality data before it can be used to classifiying objects into classes. The second version of the NYU Depth Dataset provides a wide range of objects and different scenes
 % Integrating Kinect Depth Data with a Stochastic Object Classification Framework for Forestry Robot
 % "shopping list table"
 \newpage
 
-% displaying the results
-\chapter{Displaying the Results}
-\subsection{OpenGL}
+
+% classifiers
+\chapter{Classification}
+The idea of classification is to identify of which group an object belongs to. This relies heavily on a good algorithm that is able to group similar objects together in the first place. In more formal words, a classifier groups objects that has some semantic similarity enough to be classed as the same type. Each class has a label in which these objects are identified as. For example, round objects that can hold liquid can be classed as "bowls", despite being different in colour or and of slightly different shapes.
+
+There are two types of classifiers - \textit{supervised} and \textit{unsupervised}.
+
+\textbf{Supervised}
+
+
+There is a trade-off between speed and precision and recall. We also talk about precision and recall.
+
+
+\section{Classification Projects}
+There are many  
+
+\subsection{\texttt{scikit-learn}}
+\texttt{scikit-learn} is a machine-learning library for Python, which is actively in development. It has quality implementations of popular machine-learning algorithms for multiple machine-learning problems. It is built on \texttt{numpy} and \texttt{scipy}, making it easy for data manipulation \cite{scikit-learn-paper} 
+
+\section{Training}
+
+\subsection{NYU Depth Dataset V2 \cite{nyu-dataset}}
+In order for the classifier to produce accurate results, it needs to be trained with an extensive and quality data before it can be used to classifiying objects into classes. The second version of the NYU Depth Dataset provides a wide range of objects and different scenes
+\newpage
+
+\section{Classification Algorithms}
+There are many popular and useful classification algorithms. 
+
+\subsection{Comparing Algorithms}
+% table of algorithms and features that needs to be considered
+
+In this project, it is reckoned that the performance at classifying a scene is more important than the time required at training. The trade-off between time and precision and recall is little, so it is worth trying both SVM and Random Forest to try to obtain the highest accuracy and low false positive/negative rates.
+%compare complexity
+
+
 
 
 % summary
 \chapter{Summary}
 \newpage
 
-% References
-\begin{thebibliography}{7}
-  \bibitem{msdn-kinect-info}
-    Microsoft Corporation.
-    \textit{Kinect Fusion} [Online]. 
-    Place of publication: Microsoft Developer Network.
-    Available from: \url{https://msdn.microsoft.com/en-us/library/dn188670.aspx}
-    [Accessed 22 October 2015].
 
-  \bibitem{blog-kinect-annc}
-    Kinect for Windows Team, 2013.
-    \textit{Kinect Fusion demonstrated at Microsoft Research TechFest, coming soon to SDK} [Online].
-    Place of publication: Kinect for Windows Blog
-    Available from: \url{http://blogs.msdn.com/b/kinectforwindows/archive/2013/03/06/kinect-fusion-demonstrated-at-microsoft-research-techfest-coming-soon-to-sdk.aspx}
-    [Accessed 22 October 2015].
-
-  \bibitem{blog-semantic-paint}
-    Cameron, S., 2015.
-    \textit{Microsoft Research debuts another project, Semantic Paint} [Online].
-    Place of publication: WinBeta Blog
-    Available from: \url{http://www.winbeta.org/news/microsoft-research-debuts-another-project-semantic-paint}
-    [Accessed 23 October 2015].
-
-  \bibitem{art-DyanmicFusion}
-    Newcombe, R. A. et al., 2015.
-    DynamicFusion: Reconstruction and Tracking of Non-rigid Scenes in Real-Time. 
-    \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, 7-12 June 2015 Boston, Massachusetts.
-    Seatle: University of Washington, pp.343-352.
-    %Available from: \url{http://homes.cs.washington.edu/~newcombe/papers/DynamicFusion.pdf}
-    %[Accessed 23 October 2015].
-
-  \bibitem{art-dense-surface}
-    Newcombe, R A et al., 2011.
-    KinectFusion: Real-time dense surface mapping and tracking.
-    \textit{Mixed and augmented reality (ISMAR), 2011 10th IEEE international symposium}, 26-29 October 2011 Basel, Switzerland.
-    Seatle: University of Washington, pp.127-136
-    %Available from: \url{http://homes.cs.washington.edu/~newcombe/papers/newcombe_etal_ismar2011.pdf}
-    %[Accessed 23 October 2015].
-
-  \bibitem{the-HouseScan}
-    Hambüchen, N., 2014.
-    \textit{HouseScan: Building-scale interior 3D reconstruction with KinectFusion}. 
-    Thesis (MSc).
-    Imperial College, London.
-    %Available from: \url{http://www.doc.ic.ac.uk/teaching/distinguished-projects/2014/n.hambuechen.pdf}
-    %[Accessed 23 October 2015].
-
-  \bibitem{}
-    Silberman, N. et al..
-    \textit{NYU Depth Dataset V2} [Online].
-    Available from: \url{http://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html}
-    [Accessed 23 October 2015].
-
-\end{thebibliography}
-\newpage
+% bibliography
+\pagenumbering{gobble}
+\bibliographystyle{unsrt}
+\bibliography{mybib}
 
 
 \end{document}
