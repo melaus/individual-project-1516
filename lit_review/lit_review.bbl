@@ -1,13 +1,20 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{kinect-doc}
+Microsoft Coporation.
+\newblock {Kinect Fusion MSDN Documentation}.
 
 \bibitem{nyu-dataset}
 Pushmeet~Kohli Nathan~Silberman, Derek~Hoiem and Rob Fergus.
 \newblock {Indoor Segmentation and Support Inference from RGBD Images}.
 \newblock In {\em ECCV}, 2012.
 
-\bibitem{kinect-doc}
-Microsoft Coporation.
-\newblock {Kinect Fusion MSDN Documentation}.
+\bibitem{semantic-paint}
+J.~Valentin, V.~Vineet, M.-M. Cheng, D.~Kim, J.~Shotton, P.~Kohli, M.~Niessner,
+  A.~Criminisi, S.~Izadi, and P.~Torr.
+\newblock Semanticpaint: Interactive 3d labeling and learning at your
+  fingertips.
+\newblock {\em ACM Trans. on Graphics (TOG)}, August 2015.
 
 \bibitem{chi-book}
 Ling Shao, Jungong Han, Pushmeet Kohli, and Zhengyou Zhang.
@@ -19,6 +26,43 @@ Hamed Sarbolandi, Damien Lefloch, and Andreas Kolb.
 \newblock Kinect range sensing: Structured-light versus time-of-flight kinect.
 \newblock {\em CoRR}, abs/1505.05459, 2015.
 
+\bibitem{szeliski-book}
+Richard Szeliski.
+\newblock {\em Computer vision: algorithms and applications}.
+\newblock Springer Science \& Business Media, 2010.
+
+\bibitem{kinect-research}
+Microsoft Coporation.
+\newblock {Kinect Fusion Project Page}.
+
+\bibitem{ms-3d-paper}
+Shahram Izadi, David Kim, Otmar Hilliges, David Molyneaux, Richard Newcombe,
+  Pushmeet Kohli, Jamie Shotton, Steve Hodges, Dustin Freeman, Andrew Davison,
+  et~al.
+\newblock Kinectfusion: real-time 3d reconstruction and interaction using a
+  moving depth camera.
+\newblock In {\em Proceedings of the 24th annual ACM symposium on User
+  interface software and technology}, pages 559--568. ACM, 2011.
+
+\bibitem{ms-surface-paper}
+Richard~A. Newcombe, Shahram Izadi, Otmar Hilliges, David Molyneaux, David Kim,
+  Andrew~J. Davison, Pushmeet Kohli, Jamie Shotton, Steve Hodges, and Andrew
+  Fitzgibbon.
+\newblock Kinectfusion: Real-time dense surface mapping and tracking.
+\newblock In {\em IEEE ISMAR}. IEEE, October 2011.
+
+\bibitem{hall-notes}
+Peter Hall.
+\newblock {Fundamentals of Pattern Analysis Notes}.
+\newblock 2015.
+
+\bibitem{class-analysis}
+G~Sahoo et~al.
+\newblock {Analysis of parametric \& non parametric classifiers for
+  classification technique using WEKA}.
+\newblock {\em International Journal of Information Technology and Computer
+  Science (IJITCS)}, 4(7):43--49, July 2012.
+
 \bibitem{scikit-learn-paper}
 Fabian Pedregosa, Ga\"{e}l Varoquaux, Alexandre Gramfort, Vincent Michel,
   Bertrand Thirion, Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron
@@ -26,5 +70,53 @@ Fabian Pedregosa, Ga\"{e}l Varoquaux, Alexandre Gramfort, Vincent Michel,
   Matthieu Brucher, Matthieu Perrot, and \'{E}douard Duchesnay.
 \newblock {Scikit-learn: Machine Learning in Python}.
 \newblock {\em J. Mach. Learn. Res.}, 12:2825--2830, November 2011.
+
+\bibitem{precision-recall}
+Jesse Davis and Mark Goadrich.
+\newblock {The Relationship Between Precision-Recall and ROC Curves}.
+\newblock In {\em Proceedings of the 23rd International Conference on Machine
+  Learning}, ICML '06, pages 233--240, New York, NY, USA, 2006. ACM.
+
+\bibitem{precision-recall-wiki}
+David~Martin Powers.
+\newblock {Evaluation: from precision, recall and F-measure to ROC,
+  informedness, markedness and correlation}.
+\newblock 2011.
+
+\bibitem{cross-val-scikit}
+{scikit-learn}.
+\newblock {Cross-validation: evaluating estimator performance (Documentation)}.
+
+\bibitem{cross-val-kohavi}
+Ron Kohavi et~al.
+\newblock A study of cross-validation and bootstrap for accuracy estimation and
+  model selection.
+\newblock In {\em Ijcai}, volume~14, pages 1137--1145, 1995.
+
+\bibitem{t-test-paper}
+Thomas~G Dietterich.
+\newblock Approximate statistical tests for comparing supervised classification
+  learning algorithms.
+\newblock {\em Neural computation}, 10(7):1895--1923, 1998.
+
+\bibitem{scikit-docs-supervised}
+{scikit-learn}.
+\newblock {scikit-learn: Supervised learning (Documentation)}.
+
+\bibitem{compare-supervised}
+Rich Caruana and Alexandru Niculescu-Mizil.
+\newblock {An Empirical Comparison of Supervised Learning Algorithms}.
+\newblock In {\em Proceedings of the 23rd International Conference on Machine
+  Learning}, ICML '06, pages 161--168, New York, NY, USA, 2006. ACM.
+
+\bibitem{scikit-docs-supervised-compare}
+{scikit-learn}.
+\newblock {Classifier comparison}.
+
+\bibitem{forestry}
+Mostafa Pordel, Thomas Hellstr{\"o}m, and Ahmad Ostovar.
+\newblock Integrating kinect depth data with a stochastic object classification
+  framework for forestry robots.
+\newblock In {\em ICINCO (2)}, pages 314--320, 2012.
 
 \end{thebibliography}

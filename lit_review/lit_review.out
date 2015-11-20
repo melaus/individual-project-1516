@@ -3,21 +3,27 @@
 \BOOKMARK [1][-]{section.2.1}{Kinect Camera Technologies}{chapter.2}% 3
 \BOOKMARK [2][-]{subsection.2.1.1}{Structured Light}{section.2.1}% 4
 \BOOKMARK [2][-]{subsection.2.1.2}{Time-of-Flight}{section.2.1}% 5
-\BOOKMARK [2][-]{subsection.2.1.3}{Comparing the Two Systems}{section.2.1}% 6
-\BOOKMARK [1][-]{section.2.2}{Data Representation}{chapter.2}% 7
-\BOOKMARK [2][-]{subsection.2.2.1}{Point Cloud}{section.2.2}% 8
-\BOOKMARK [1][-]{section.2.3}{Reconstruction}{chapter.2}% 9
-\BOOKMARK [2][-]{subsection.2.3.1}{Pipeline}{section.2.3}% 10
-\BOOKMARK [2][-]{subsection.2.3.2}{Volumetric \(3D\) Reconstruction}{section.2.3}% 11
-\BOOKMARK [2][-]{subsection.2.3.3}{? \(2D\) Reconstruction}{section.2.3}% 12
-\BOOKMARK [1][-]{section.2.4}{Segmentation}{chapter.2}% 13
-\BOOKMARK [2][-]{subsection.2.4.1}{Segmentation in NYU Dataset V2}{section.2.4}% 14
-\BOOKMARK [0][-]{chapter.3}{NYU Dataset V2}{}% 15
-\BOOKMARK [0][-]{chapter.4}{Classification}{}% 16
-\BOOKMARK [1][-]{section.4.1}{Classification Projects}{chapter.4}% 17
-\BOOKMARK [2][-]{subsection.4.1.1}{scikit-learn}{section.4.1}% 18
-\BOOKMARK [1][-]{section.4.2}{Training}{chapter.4}% 19
-\BOOKMARK [2][-]{subsection.4.2.1}{NYU Depth Dataset V2 nyu-dataset}{section.4.2}% 20
-\BOOKMARK [1][-]{section.4.3}{Classification Algorithms}{chapter.4}% 21
-\BOOKMARK [2][-]{subsection.4.3.1}{Comparing Algorithms}{section.4.3}% 22
-\BOOKMARK [0][-]{chapter.5}{Summary}{}% 23
+\BOOKMARK [1][-]{section.2.2}{Data Representation}{chapter.2}% 6
+\BOOKMARK [2][-]{subsection.2.2.1}{Point Cloud}{section.2.2}% 7
+\BOOKMARK [1][-]{section.2.3}{Reconstruction}{chapter.2}% 8
+\BOOKMARK [2][-]{subsection.2.3.1}{Pipeline}{section.2.3}% 9
+\BOOKMARK [2][-]{subsection.2.3.2}{Volumetric Reconstruction}{section.2.3}% 10
+\BOOKMARK [2][-]{subsection.2.3.3}{Surface Reconstruction}{section.2.3}% 11
+\BOOKMARK [1][-]{section.2.4}{Segmentation}{chapter.2}% 12
+\BOOKMARK [0][-]{chapter.3}{Classification}{}% 13
+\BOOKMARK [1][-]{section.3.1}{Classification Types}{chapter.3}% 14
+\BOOKMARK [2][-]{subsection.3.1.1}{Supervised Classification}{section.3.1}% 15
+\BOOKMARK [2][-]{subsection.3.1.2}{Unsupervised Classification}{section.3.1}% 16
+\BOOKMARK [2][-]{subsection.3.1.3}{NYU Depth Dataset V2}{section.3.1}% 17
+\BOOKMARK [1][-]{section.3.2}{Machine-learning in Python}{chapter.3}% 18
+\BOOKMARK [2][-]{subsection.3.2.1}{scikit-learn}{section.3.2}% 19
+\BOOKMARK [3][-]{subsubsection.3.2.1.1}{R, MatLab}{subsection.3.2.1}% 20
+\BOOKMARK [1][-]{section.3.3}{Performance}{chapter.3}% 21
+\BOOKMARK [2][-]{subsection.3.3.1}{Precision and Recall}{section.3.3}% 22
+\BOOKMARK [2][-]{subsection.3.3.2}{Cross-validation}{section.3.3}% 23
+\BOOKMARK [2][-]{subsection.3.3.3}{Statistical Testings}{section.3.3}% 24
+\BOOKMARK [1][-]{section.3.4}{Classification Algorithms}{chapter.3}% 25
+\BOOKMARK [2][-]{subsection.3.4.1}{Notable Supervised Algorithms}{section.3.4}% 26
+\BOOKMARK [2][-]{subsection.3.4.2}{Notable Unsupervised Algorithms}{section.3.4}% 27
+\BOOKMARK [1][-]{section.3.5}{Using Classifiers for Depth Data}{chapter.3}% 28
+\BOOKMARK [0][-]{chapter.4}{The Project}{}% 29

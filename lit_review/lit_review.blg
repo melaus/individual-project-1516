@@ -3,46 +3,60 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: lit_review.aux
 The style file: unsrt.bst
 Database file #1: mybib.bib
+I was expecting a `,' or a `}'---line 133 of file mybib.bib
+ :   
+ :   url={http://www.cs.bath.ac.uk/~pmh/Teaching/Pattern_Analysis_files/notes.pdf}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "3d-paper"
+Warning--I didn't find a database entry for "scikit-doccs-supervised"
 Warning--empty note in kinect-doc
-You've used 5 entries,
+Warning--empty note in kinect-research
+Warning--empty note in hall-notes
+Warning--empty journal in precision-recall-wiki
+Warning--empty note in cross-val-scikit
+Warning--can't use both volume and number fields in cross-val-kohavi
+Warning--empty note in scikit-docs-supervised
+Warning--empty note in scikit-docs-supervised-compare
+You've used 21 entries,
             1791 wiz_defined-function locations,
-            472 strings with 4471 characters,
-and the built_in function-call counts, 1081 in all, are:
-= -- 71
-> -- 87
-< -- 0
-+ -- 31
-- -- 26
-* -- 79
-:= -- 199
-add.period$ -- 14
-call.type$ -- 5
-change.case$ -- 4
+            550 strings with 7108 characters,
+and the built_in function-call counts, 4846 in all, are:
+= -- 408
+> -- 261
+< -- 6
++ -- 97
+- -- 76
+* -- 306
+:= -- 781
+add.period$ -- 62
+call.type$ -- 21
+change.case$ -- 19
 chr.to.int$ -- 0
-cite$ -- 6
-duplicate$ -- 43
-empty$ -- 92
-format.name$ -- 26
-if$ -- 222
+cite$ -- 29
+duplicate$ -- 226
+empty$ -- 441
+format.name$ -- 76
+if$ -- 1080
 int.to.chr$ -- 0
-int.to.str$ -- 5
-missing$ -- 5
-newline$ -- 27
-num.names$ -- 5
-pop$ -- 18
+int.to.str$ -- 21
+missing$ -- 17
+newline$ -- 103
+num.names$ -- 21
+pop$ -- 72
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 14
+skip$ -- 118
 stack$ -- 0
-substring$ -- 31
-swap$ -- 5
-text.length$ -- 0
+substring$ -- 245
+swap$ -- 68
+text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 1
-while$ -- 7
-width$ -- 6
-write$ -- 51
-(There was 1 warning)
+warning$ -- 8
+while$ -- 41
+width$ -- 23
+write$ -- 213
+(There was 1 error message)

@@ -18,6 +18,12 @@
 	url		 = {https://msdn.microsoft.com/en-us/library/dn188670.aspx}
 }
 
+@unpublished{kinect-research,
+	author = {Microsoft Coporation},
+	title = "{Kinect Fusion Project Page}",
+	url = {http://research.microsoft.com/en-us/projects/surfacerecon/}
+}
+
 @book{chi-book,
   title={Computer Vision and Machine Learning with RGB-D Sensors},
   author={Shao, Ling and Han, Jungong and Kohli, Pushmeet and Zhang, Zhengyou},
@@ -41,6 +47,38 @@
   organization={ACM}
 }
 
+@Inproceedings {ms-surface-paper,
+abstract     = {<p>We present a system for accurate real-time mapping of complex and arbitrary
+                indoor scenes in variable lighting conditions, using only a moving low-cost depth
+                camera and commodity graphics hardware. We fuse all of the depth data streamed
+                from a Kinect sensor into a single global implicit surface model of the observed
+                scene in real-time. The current sensor pose is simultaneously obtained by
+                tracking the live depth frame relative to the global model using a coarse-to-fine
+                iterative closest point (ICP) algorithm, which uses all of the observed depth
+                data available. We demonstrate the advantages of tracking against the growing
+                full surface model compared with frame-to-frame tracking, obtaining tracking and
+                mapping results in constant time within room sized scenes with limited drift
+
+                and high accuracy. We also show both qualitative and quantitative results
+                relating to various aspects of our tracking and mapping system. Modelling of
+                natural scenes, in real-time with only commodity sensor and GPU hardware,
+                promises an exciting step forward
+
+                in augmented reality (AR), in particular, it allows dense surfaces to be
+                reconstructed in real-time, with a level of detail and robustness beyond any
+                solution yet presented using passive computer vision.</p>},
+author       = {Richard A. Newcombe and Shahram Izadi and Otmar Hilliges and David Molyneaux and
+                David Kim and Andrew J. Davison and Pushmeet Kohli and Jamie Shotton and Steve
+                Hodges and Andrew Fitzgibbon},
+booktitle    = {IEEE ISMAR},
+month        = {October},
+publisher    = {IEEE},
+title        = {KinectFusion: Real-Time Dense Surface Mapping and Tracking},
+url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=155378},
+year         = {2011},
+}
+
+
 @article{scikit-learn-paper,
  author = {Pedregosa, Fabian and Varoquaux, Ga\"{e}l and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, \'{E}douard},
  title = "{Scikit-learn: Machine Learning in Python}",
@@ -62,4 +100,142 @@
   title     = "{Indoor Segmentation and Support Inference from RGBD Images}",
   booktitle = {ECCV},
   year      = {2012}
+}
+
+@inproceedings{precision-recall,
+ author = {Davis, Jesse and Goadrich, Mark},
+ title = "{The Relationship Between Precision-Recall and ROC Curves}",
+ booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
+ series = {ICML '06},
+ year = {2006},
+ isbn = {1-59593-383-2},
+ location = {Pittsburgh, Pennsylvania, USA},
+ pages = {233--240},
+ numpages = {8},
+ url = {http://doi.acm.org/10.1145/1143844.1143874},
+ doi = {10.1145/1143844.1143874},
+ acmid = {1143874},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@article{precision-recall-wiki,
+  title="{Evaluation: from precision, recall and F-measure to ROC, informedness, markedness and correlation}",
+  author={Powers, David Martin},
+  year={2011},
+  publisher={Bioinfo Publications}
+}
+
+@unpublished{hall-notes,
+  title="{Fundamentals of Pattern Analysis Notes}",
+  author={Hall, Peter},
+  year={2015}
+  url={http://www.cs.bath.ac.uk/~pmh/Teaching/Pattern_Analysis_files/notes.pdf}
+}
+
+@article{class-analysis,
+  title="{Analysis of parametric \& non parametric classifiers for classification technique using WEKA}",
+  author={Sahoo, G and others},
+  journal={International Journal of Information Technology and Computer Science (IJITCS)},
+  volume={4},
+  number={7},
+  pages={43-49},
+  year={2012},
+	month=jul
+}
+
+@unpublished{cross-val-scikit,
+  title = "{Cross-validation: evaluating estimator performance (Documentation)}",
+  url = {http://scikit-learn.org/stable/modules/cross_validation.html},
+  author="{scikit-learn}"
+}
+
+@unpublished{scikit-docs-supervised,
+	title = "{scikit-learn: Supervised learning (Documentation)}",
+	url = {http://scikit-learn.org/stable/supervised_learning.html},
+	author= "{scikit-learn}"
+}
+
+@unpublished{scikit-docs-supervised-compare,
+	title="{Classifier comparison}",
+	url={http://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html},
+	author="{scikit-learn}"
+}
+
+@inproceedings{compare-supervised,
+ author = {Caruana, Rich and Niculescu-Mizil, Alexandru},
+ title = "{An Empirical Comparison of Supervised Learning Algorithms}",
+ booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
+ series = {ICML '06},
+ year = {2006},
+ isbn = {1-59593-383-2},
+ location = {Pittsburgh, Pennsylvania, USA},
+ pages = {161--168},
+ numpages = {8},
+ url = {http://doi.acm.org/10.1145/1143844.1143865},
+ doi = {10.1145/1143844.1143865},
+ acmid = {1143865},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+}
+
+@MISC{taylor-notes,
+    author = {D. Michie and D. J. Spiegelhalter and C.C. Taylor},
+    title = "{Machine Learning, Neural and Statistical Classification}",
+    year = {1994}
+}
+
+@inproceedings{cross-val-kohavi,
+  title={A study of cross-validation and bootstrap for accuracy estimation and model selection},
+  author={Kohavi, Ron and others},
+  booktitle={Ijcai},
+  volume={14},
+  number={2},
+  pages={1137--1145},
+  year={1995}
+}
+
+@article{t-test-paper,
+  title={Approximate statistical tests for comparing supervised classification learning algorithms},
+  author={Dietterich, Thomas G},
+  journal={Neural computation},
+  volume={10},
+  number={7},
+  pages={1895--1923},
+  year={1998},
+  publisher={MIT Press}
+}
+
+@inproceedings{forestry,
+  title={Integrating Kinect Depth Data with a Stochastic Object Classification Framework for Forestry Robots.},
+  author={Pordel, Mostafa and Hellstr{\"o}m, Thomas and Ostovar, Ahmad},
+  booktitle={ICINCO (2)},
+  pages={314--320},
+  year={2012}
+}
+
+@Article {semantic-paint,
+abstract     = {<p>We present a new interactive and online approach to 3D scene understanding.
+                Our system, SemanticPaint, allows users to simultaneously scan their environment,
+                whilst interactively segmenting the scene simply by reaching out and touching any
+                desired object or surface. Our system continuously learns from these
+                segmentations, and labels new unseen parts of the environment. Unlike offline
+                systems, where capture, labeling and batch learning often takes hours or even
+                days to perform, our approach is fully online. This provides users with
+                continuous live feedback of the recognition during capture, allowing them to
+                immediately correct errors in the segmentation and/or learning – a feature that
+                has so far been unavailable to batch and offline methods. This leads to models
+                that are tailored or personalized specifically to the user’s environments and
+                object classes of interest, opening up the potential for new applications in
+                augmented reality, interior design, and human/robot navigation. It also provides
+                the ability to capture substantial labeled 3D datasets for training large-scale
+                visual recognition systems.</p>},
+author       = {J. Valentin and V. Vineet and M.-M. Cheng and D. Kim and J. Shotton and P. Kohli
+                and M. Niessner and A. Criminisi and S. Izadi and P. Torr},
+journal      = {ACM Trans. on Graphics (TOG)},
+month        = {August},
+publisher    = {ACM – Association for Computing Machinery},
+title        = {SemanticPaint: Interactive 3D Labeling and Learning at your Fingertips},
+url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=244725},
+year         = {2015},
 }

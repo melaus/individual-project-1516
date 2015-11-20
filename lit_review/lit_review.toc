@@ -3,21 +3,27 @@
 \contentsline {section}{\numberline {2.1}Kinect Camera Technologies}{2}{section.2.1}
 \contentsline {subsection}{\numberline {2.1.1}Structured Light}{2}{subsection.2.1.1}
 \contentsline {subsection}{\numberline {2.1.2}Time-of-Flight}{2}{subsection.2.1.2}
-\contentsline {subsection}{\numberline {2.1.3}Comparing the Two Systems}{2}{subsection.2.1.3}
-\contentsline {section}{\numberline {2.2}Data Representation}{2}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Point Cloud}{2}{subsection.2.2.1}
+\contentsline {section}{\numberline {2.2}Data Representation}{3}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Point Cloud}{3}{subsection.2.2.1}
 \contentsline {section}{\numberline {2.3}Reconstruction}{3}{section.2.3}
 \contentsline {subsection}{\numberline {2.3.1}Pipeline}{3}{subsection.2.3.1}
-\contentsline {subsection}{\numberline {2.3.2}Volumetric (3D) Reconstruction}{4}{subsection.2.3.2}
-\contentsline {subsection}{\numberline {2.3.3}? (2D) Reconstruction}{4}{subsection.2.3.3}
+\contentsline {subsection}{\numberline {2.3.2}Volumetric Reconstruction}{4}{subsection.2.3.2}
+\contentsline {subsection}{\numberline {2.3.3}Surface Reconstruction}{4}{subsection.2.3.3}
 \contentsline {section}{\numberline {2.4}Segmentation}{4}{section.2.4}
-\contentsline {subsection}{\numberline {2.4.1}Segmentation in NYU Dataset V2}{4}{subsection.2.4.1}
-\contentsline {chapter}{\numberline {3}NYU Dataset V2}{5}{chapter.3}
-\contentsline {chapter}{\numberline {4}Classification}{6}{chapter.4}
-\contentsline {section}{\numberline {4.1}Classification Projects}{6}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}\texttt {scikit-learn}}{6}{subsection.4.1.1}
-\contentsline {section}{\numberline {4.2}Training}{6}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}NYU Depth Dataset V2 \cite {nyu-dataset}}{6}{subsection.4.2.1}
-\contentsline {section}{\numberline {4.3}Classification Algorithms}{7}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}Comparing Algorithms}{7}{subsection.4.3.1}
-\contentsline {chapter}{\numberline {5}Summary}{8}{chapter.5}
+\contentsline {chapter}{\numberline {3}Classification}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}Classification Types}{5}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Supervised Classification}{5}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Unsupervised Classification}{5}{subsection.3.1.2}
+\contentsline {subsection}{\numberline {3.1.3}NYU Depth Dataset V2}{6}{subsection.3.1.3}
+\contentsline {section}{\numberline {3.2}Machine-learning in Python}{6}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}\texttt {scikit-learn}}{6}{subsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.1.1}R, MatLab}{7}{subsubsection.3.2.1.1}
+\contentsline {section}{\numberline {3.3}Performance}{7}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Precision and Recall}{7}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Cross-validation}{8}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.3.3}Statistical Testings}{8}{subsection.3.3.3}
+\contentsline {section}{\numberline {3.4}Classification Algorithms}{9}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Notable Supervised Algorithms}{9}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.4.2}Notable Unsupervised Algorithms}{10}{subsection.3.4.2}
+\contentsline {section}{\numberline {3.5}Using Classifiers for Depth Data}{10}{section.3.5}
+\contentsline {chapter}{\numberline {4}The Project}{11}{chapter.4}
