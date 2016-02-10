@@ -23,8 +23,9 @@ def get_strings(matlab, dataset):
             row_data.append(''.join(map(unichr, matlab[column[row_number]][:])))   
         data.append(row_data)
 
-    return np.transpose(data)
+    #return np.transpose(data)
     #return np.ravel(data)
+    return data[0]
 
 
 
@@ -47,7 +48,7 @@ def run():
     run everything required to gather data and output it to files
     """
     # where to get data from
-    matlab = h5py.File('nyu_depth_v2_labeled.mat', 'r') 
+    matlab = h5py.File('py-data/nyu_depth_v2_labeled.mat', 'r') 
     #number_datasets = [ 'accelData', 'depths', 
                         #'images', 'instances', 
                         #'labels' ] 
@@ -68,11 +69,12 @@ def run():
             #write_to_file(string+'_map.p', names_map)
 
     # get number datasets
-    for number in number_datasets:
-        dataset = get_numbers(matlab, number)
-        print number, np.shape(dataset) # quickly check if things are okay
-        print dataset[0]
-        write_to_file(number+'.p', dataset) 
+    #for number in number_datasets:
+        #dataset = get_numbers(matlab, number)
+        #print number, np.shape(dataset) # quickly check if things are okay
+        #print dataset[0]
+        #write_to_file(number+'.p', dataset) 
+    print get_strings(matlab, 'names')
 
 if __name__ == '__main__':
     run()
