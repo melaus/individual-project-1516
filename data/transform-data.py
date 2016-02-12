@@ -1,10 +1,11 @@
-#!/Users/melaus/virtualenv/env_python2/bin/python
 
 import cPickle as pickle
 import numpy as np
 import sys, getopt
 import math
 #import matplotlib.pyplot as plt
+
+path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
 
 """
 get the data required
@@ -19,8 +20,8 @@ def initialise():
 
 
 """
-generate coordinates of squared areas with respect 
-to the size of an image and the required dimension
+find the depths of the required areas with respect to 
+the size of an image and the required dimension
 
 input:
     x   : width
@@ -32,35 +33,50 @@ return:
     y_max : accessible pixels on the y-axis
     areas : the points
 """
-def gen_areas(x, y, dim):
+def gen_area_depths(x, y, dim):
     # check what is the maximum area that the dimension can cover
     excess_x = x % dim
     excess_y = y % dim
     
-    # the range of coordinates concerned
     x_min = int(math.ceil(excess_x/2-1)) if excess_x > 0 else 0 
     x_max = x - int(math.floor(excess_x/2)) if excess_x > 0 else x 
 
     y_min = int(math.ceil(excess_y/2-1)) if excess_y > 0 else 0 
     y_max = y - int(math.floor(excess_y/2)) if excess_y > 0 else y
 
+    x_lower = x_min
+    x_upper = x_min + dim
+
+    y_lower = y_min
+    y_upper = y_min + dim
+
     print 'x_min:', x_min, ' x_max:', x_max, ' y_min:', y_min, ' y_max:', y_max
+    print 'x_lower:', x_lower, 'x_upper:', x_upper, 'y_lower:', y_lower, 'y_upper:', y_upper
+    print dim
+
+    tmp = []
+    output = []
+
+    for y_groups in range(0, y_max/dim):
+	for x_groups in range(0, x_max/dim):
+            #tmp = [(x, y) for y in range(y_lower, y_upper) for x in range(x_lower, x_upper)]
+            tmp = [img_depth[x][y] for y in range(y_lower, y_upper) for x in range(x_lower, x_upper)]
+	    
+	    # increase the y bounds to process the next group
+	    x_lower += dim
+	    x_upper += dim
+	
+            output.append(tmp)
+
+	# reset x bounds
+	x_lower = x_min
+	x_upper = x_min + dim
+	
+	# increase y bounds to process the next group
+	y_lower += dim
+	y_upper += dim
     
-    #[ for whole in range(x_min, x_max, dim)
-
-    # create a list with all the points 
-    x_co = [i for i in range(x_min, x_max)*x_max]
-    y_co = [j for j in range(y_min, y_max)*x_max]
-    points = zip(sorted(x_co), (y_co))
-    print 'lenth of points:', len(points)
-
-    # group it by the given dimension
-    grouped = [points[n:n+dim*dim] for n in range(0, len(points), dim*dim)]
-    print 'length of grouped:', len(grouped)
-    print grouped[0]
-
-
-    return grouped
+    return output 
 
 """
 get areas of interest
@@ -111,11 +127,14 @@ def get_normalised_depth(areas, means):
 """
 store features and target dicitonary to a file for reuse
 """
-def store_output_dict(features, targets):
-    output = {'features': features, 'targets': targets}
-    pickle.dump(output, open('py-data/features_targets.p', 'wb'))
-    print 'done'
+#def store_output_dict(features, targets):
+    #output = {'features': features, 'targets': targets}
+    #pickle.dump(output, open('py-data/features_targets.p', 'wb'))
+    #print 'done'
 
+def store_output(data, filename):
+    pickle.dump(data, open(path+filename, 'wb'))
+    print 'done'
 
 """
 testing point
@@ -169,5 +188,9 @@ if __name__ == '__main__':
     #test_normalised = get_normalised_depth(test_dps, test_means)
     #print len(test_dps)
     
-    gen_areas(4,4,2)
-
+    #store_output(gen_area_depths(640,480,15), 'area_depths_6.p')
+    depths            = gen_area_depths(640,480,15)
+    depths_mean       = mean_depth(depths)
+    depths_normalised = get_normalised_depth(depths, depths_mean)
+    store_output(depths_normalised, 'area_depths_6.p')
+    #print len(output[0])
