@@ -1,3 +1,4 @@
 *.swp
 py-data
 *.p
+.idea
