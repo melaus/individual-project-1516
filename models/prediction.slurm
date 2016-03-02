@@ -4,9 +4,9 @@
 #SBATCH --account=free
  
 # set name of job
-#SBATCH --job-name=hello_world_test
-#SBATCH --output=hello_world_test.out
-#SBATCH --error=hello_world_test.err
+#SBATCH --job-name=prediction
+#SBATCH --output=prediction.out
+#SBATCH --error=prediction.err
  
 # set the number of nodes
 #SBATCH --nodes=1
