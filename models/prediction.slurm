@@ -4,9 +4,9 @@
 #SBATCH --account=free
  
 # set name of job
-#SBATCH --job-name=prediction
-#SBATCH --output=prediction.out
-#SBATCH --error=prediction.err
+#SBATCH --job-name=prediction_np
+#SBATCH --output=prediction_np.out
+#SBATCH --error=prediction_np.err
  
 # set the number of nodes
 #SBATCH --nodes=1

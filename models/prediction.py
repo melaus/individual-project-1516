@@ -3,7 +3,7 @@
 import numpy as np
 import cPickle as pickle
 from random import randrange
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 
 
 """
@@ -122,13 +122,13 @@ def main():
     print 'start importing all files'
     svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
     patches = load_data('img_6_per_pixel.p', 'rb', path)
-    patches = patches.reshape(291716, 225).tolist()
+    patches = patches.reshape(291716, 225)
     colours = load_data('colours.p', 'rb', path)
     # area_depths = load_data('area_depths_6.p', 'rb', path)
     print 'end importing all files'
 
     # save_data(entry_predict_image(svc_rbf, patches, colours, 15, path), 'prediction_img_6.p', path)
-    save_data(svc_rbf.predict(patches), 'prediction_img_6.p', path)
+    save_data(svc_rbf.predict(patches), 'prediction_img_6_np.p', path)
     print 'done'
 
 
