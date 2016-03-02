@@ -2,54 +2,41 @@
 
 import numpy as np
 import cPickle as pickle
-#from matplotlib import pyplot as plt
+from random import randrange
+from matplotlib import pyplot as plt
 
 
 """
-generate a matrix that can be drawn as an image
+generate unique colours for each object
 """
-def gen_colours(pts, dim):
-    colours = {0:0, 5:255}
-    return [[colours[pt]]*(dim*dim) for pt in pts]
+def gen_colours(size=894):
+    colours = {0:[0,0,0]}
+
+    for i in range(1,size+1):
+        colours.update({i:[randrange(0,255), randrange(0,255), randrange(0,255)]})
+
+    return colours
 
 
 """
-generate output image matrices
+generate output image using predictions of each pixel
 """
-def gen_image(img_x, img_y, dim, colours):
-    # define the image size
-    output = np.array([np.array([None for i in range(img_y)]) for j in range(img_x)])
+def gen_image(predictions, colours_dict, dim):
 
-    # initialising bounds
-    x_lower, x_upper = 0, dim
-    y_lower, y_upper = 0, dim
+    # size of x y
+    x, y = 640-(dim-1), 480-(dim-1)
 
-    # counters to get the correct colour value
-    col_ctr = 0 
-    item_ctr = 0 
-    
-    for y_group in range(img_y/dim):
-        for x_group in range(img_x/dim):
+    predictions = predictions.reshape(y,x)
+    output = np.array([ [None for i in range(y)] for j in range(x) ]).reshape(y,x)
+    print output
+    print ''
+    print ''
 
-            # get depths for these points
-            for y in range(y_lower, y_upper):
-                for x in range(x_lower, x_upper):
-                    output[x][y] = (colours[col_ctr])[item_ctr]
-                    item_ctr+=1
-            col_ctr+=1
-            item_ctr=0 # reset counter for next group
-
-            # increase the y bounds to process the next group
-            x_lower += dim
-            x_upper += dim
-
-        # reset x bounds
-        x_lower = 0 
-        x_upper = dim
-
-        # increase y bounds to process the next group
-        y_lower += dim
-        y_upper += dim
+    for row in range(x):
+        for col in range(y):
+            # fill in the colours
+            # output[row, col] = colours_dict[predictions[row, col]]
+            output[row, col] = predictions[row, col]
 
     return output
 
@@ -57,7 +44,7 @@ def gen_image(img_x, img_y, dim, colours):
 """
 save image
 """
-def save_figure(img, filename, dpi_val):
+def save_figure(img, filename, dpi_val, path=''):
     fig = plt.figure(frameon=False, dpi=dpi_val)
     ax  = plt.Axes(fig, [0.,0.,1.,1.])
 
@@ -65,13 +52,82 @@ def save_figure(img, filename, dpi_val):
     fig.add_axes(ax)
 
     ax.imshow(img, aspect='auto')
-    fig.savefig(filename)
+    fig.savefig(path+filename)
 
     print 'image saved'
 
 
-def prediction(model, dim, path=''):
-    predicted = model.predict(data_np)
+"""
+save data to file
+
+input:
+    - (any) data: data to be saved
+    - (string) filename: the name of the file to be saved
+    - (string) path: store it outside of 'root'
+"""
+def save_data(data, filename, path=''):
+    pickle.dump(data, open(path+filename, 'wb'))
+
+    print 'data saved'
+
+
+"""
+load data from file
+"""
+def load_data(filename, mode, path=''):
+    return pickle.load(open(path+filename, mode))
+
+
+
+"""
+perform prediction given a model
+
+input:
+    - (np.array) data: the pixels to be predicted
+
+output:
+    - (np.array) prediction
+"""
+def prediction(model, data):
+    return model.predict(data)
+
+
+"""
+ENTRY
+
+perform prediction, and generate and store image
+"""
+def entry_predict_image(model, patches, colours, dim, path):
+    print 'start prediction'
+    return prediction(model, patches)
+
+    # print 'start generated'
+    # generated = gen_image(predicted, colours, dim)
+    # print 'end generated'
+    # print 'start save figure'
+    # save_figure(generated, 'generated_pp_6', 150, path)
+    # print 'end save figure'
+    # print 'done prediction and generation'
+
+
+"""
+ENTRY
+
+main function
+"""
+def main():
+    path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
+
+    print 'start importing all files'
+    svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
+    patches = load_data('img_6_per_pixel.p', 'rb', path)
+    patches = patches.reshape(291716, 225)
+    colours = load_data('colours.p', 'rb', path)
+    # area_depths = load_data('area_depths_6.p', 'rb', path)
+    print 'end importing all files'
+
+    save_data(entry_predict_image(svc_rbf, patches, colours, 15, path), 'prediction_img_6.p', path)
+    print 'done'
 
 
 """
@@ -79,16 +135,16 @@ run
 """
 if __name__ == '__main__':
     path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-    
-    # load data
-    svc_rbf    = pickle.load(open(path+'svc_rbf_6.p', 'rb'))
-    svc_linear = pickle.load(open(path+'svc_linear_6.p', 'rb'))
-    data       = pickle.load(open(path+'area_depths_6.p', 'rb'))
-    
-    # numpyify data
-    data_np = np.array([np.array(i) for i in data])
 
-    #""" RBF """
+    main()
+
+    # load data
+    # svc_rbf    = pickle.load(open(path+'svc_rbf_6.p', 'rb'))
+    # svc_linear = pickle.load(open(path+'svc_linear_6.p', 'rb'))
+    # data       = pickle.load(open(path+'area_depths_6.p', 'rb'))
+
+
+    """ RBF """
     ## see what elements are being predicted
     #rbf_predicted_2 = svc_rbf.predict(data_np)
     #print 'rbf length:', len(rbf_predicted_2)
@@ -109,21 +165,33 @@ if __name__ == '__main__':
     #print 'done'
 
     """ linear """
-    # see what elements are being predicted
-    linear_predicted = svc_linear.predict(data_np)
-    print 'linear length:', len(linear_predicted)
-    print 'linaer set:   ', set(list(linear_predicted))
+    ## see what elements are being predicted
+    #linear_predicted = svc_linear.predict(data_np)
+    #print 'linear length:', len(linear_predicted)
+    #print 'linaer set:   ', set(list(linear_predicted))
     
-    pickle.dump(linear_predicted, open(path+'linear_predicted.p', 'wb'))
-    print 'written to file linear_predicted.p'
+    #pickle.dump(linear_predicted, open(path+'linear_predicted.p', 'wb'))
+    #print 'written to file linear_predicted.p'
     
-    # predicted colours
-    colours = gen_colours(linear_predicted, 15) 
-    print 'colours for those pixels'
+    ## predicted colours
+    #colours = gen_colours(linear_predicted, 15) 
+    #print 'colours for those pixels'
 
-    # predicted image matrix
-    img = list(list(k) for k in gen_image(630,480,15, colours))
-    #img = gen_image(630,480,15, colours)
-    pickle.dump(img, open(path+'linear_predicted_img.p', 'wb'))
-    print 'stored predicted image matrix'
-    print 'done'
+    ## predicted image matrix
+    #img = list(list(k) for k in gen_image(630,480,15, colours))
+    ##img = gen_image(630,480,15, colours)
+    #pickle.dump(img, open(path+'linear_predicted_img.p', 'wb'))
+    #print 'stored predicted image matrix'
+    #print 'done'
+
+    """ confusion prediction - rbf """
+    #linear_cf_model = pickle.load(open(path+'linear_cf_model.p','rb'))
+    #linear_cf_test_data = pickle.load(open(path+'linear_cf_test_data.p', 'rb'))
+
+    #pickle.dump(linear_cf_model.predict(linear_cf_test_data["features"]), open(path+'linear_cf_predicted.p', 'wb'))
+
+    """ confusion prediction - linear """
+    # rbf_cf_model = pickle.load(open(path+'rbf_cf_model.p','rb'))
+    # rbf_cf_test_data = pickle.load(open(path+'rbf_cf_test_data.p', 'rb'))
+    #
+    # pickle.dump(rbf_cf_model.predict(rbf_cf_test_data["features"]), open(path+'rbf_cf_predicted.p', 'wb'))

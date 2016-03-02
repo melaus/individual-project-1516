@@ -20,66 +20,6 @@ def initialise(img='',path=''):
     return image, depth, label
 
 
-#"""
-#generic way to find depths given boundaries and dimension
-#"""
-#def get_depths(x_min, x_max, y_min, y_max, dim):
-    
-    #x_lower, x_upper = x_min, x_min+dim
-    #y_lower, y_upper = y_min, y_min+dim
-
-    #tmp = []
-    #output = []
-
-    #for y_groups in range(0, int(m.floor(y_max/dim))):
-	#for x_groups in range(0, int(m.floor(x_max/dim))):
-            ## get depths for these points
-            #tmp = [img_depths[x][y] for y in range(y_lower, y_upper) for x in range(x_lower, x_upper)]
-	    
-	    ## increase the y bounds to process the next group
-	    #x_lower += dim
-	    #x_upper += dim
-	
-            #output.append(tmp)
-
-	## reset x bounds
-	#x_lower = x_min
-	#x_upper = x_min + dim
-	
-	## increase y bounds to process the next group
-	#y_lower += dim
-	#y_upper += dim
-        
-    #return output
-
-
-#"""
-#find the depths of the required areas with respect to 
-#the size of an image and the required dimension
-
-#uses get_depths
-
-#input:
-    #x   : width
-    #y   : height
-    #dim : dimension
-
-#return: list of depths 
-#"""
-#def gen_area_depths(x, y, dim):
-    ## check what is the maximum area that the dimension can cover
-    #excess_x = x % dim
-    #excess_y = y % dim
-    
-    ## set the min and max value
-    #x_min = int(m.ceil(excess_x/2-1)) if excess_x > 0 else 0 
-    #x_max = x - int(m.floor(excess_x/2)) if excess_x > 0 else x 
-
-    #y_min = int(m.ceil(excess_y/2-1)) if excess_y > 0 else 0 
-    #y_max = y - int(m.floor(excess_y/2)) if excess_y > 0 else y
-
-    #return get_depths(x_min, x_max, y_min, y_max, dim)
-
 """
 get a depth patch for each pixel
 """
@@ -98,31 +38,6 @@ def get_patch_depth(depths, dim):
             output.append(depths[row-lim:row+lim+1, col-lim:col+lim+1])
     
     return output
-
-
-
-# """
-# get depth patches for given label
-# """
-# def get_object_depth(label_data, depth_data, lbl, dim):
-#     # find out chair areas
-#     coordinates = zip(*np.where(label_data == lbl))
-#     areas       = []
-#
-#     # find the area of which we use to normalise the middle point
-#     for pt in coordinates:
-#         # get the range of the area concerned
-#         x_min = pt[0]-int(m.floor(dim/2)) if pt[0]-int(m.floor(dim/2)) >= 0 else 0
-#         x_max = pt[0]+int(m.ceil(dim/2))  if pt[0]+int(m.ceil(dim/2)) < 640 else 479
-#
-#         y_min = pt[1]-int(m.floor(dim/2)) if pt[1]-int(m.floor(dim/2)) >= 0 else 0
-#         y_max = pt[1]+int(m.ceil(dim/2))  if pt[1]+int(m.ceil(dim/2)) < 480 else 479
-#
-#         if (x_max-x_min == dim-(dim%2) & y_max-y_min == dim-(dim%2)):
-#             # append depths to output list
-#             areas.append([depth_data[x][y] for y in range(y_min, y_max+1) for x in range(x_min, x_max+1)])
-#
-#     return areas
 
 
 """get coordinates of a given object type
@@ -150,9 +65,8 @@ def get_object_coordinates(label_data, lbl, dim):
 """
 get depths of given coordinates
 """
-def get_object_depth(depth_data, label_data, lbl, dim):
+def get_object_depth(depth_data, co, dim):
     # get the coordinates
-    co = get_object_coordinates(label_data, lbl, dim)
     lim = int(m.floor(dim/2))
 
     output = []
@@ -240,9 +154,10 @@ ENTRY
 
 generate the patches of some given coordinates
 """
-def entry_given_co(img, depths, labels, lbl, dim):
+def entry_given_co(depths, labels, lbl, dim):
     co = get_object_coordinates(labels, lbl, dim)
-    print "more"
+    object_depth = get_object_depth(depths, co, dim)
+    return object_depth
 
 
 """
@@ -254,8 +169,13 @@ def main():
     path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
     img_images, img_depths, img_labels = initialise('6')
 
+    per_pixel = entry_per_pixel(img_depths, 15)
+
+    print 'shape', per_pixel.shape
+    print per_pixel[0]
+
     # depth patches for each pixel
-    save_data(entry_per_pixel(img_depths, 15), 'img_6_per_pixel.p', path)
+    save_data(per_pixel, 'img_6_per_pixel.p', path)
 
 
 """
