@@ -126,7 +126,8 @@ def main():
     # area_depths = load_data('area_depths_6.p', 'rb', path)
     print 'end importing all files'
 
-    save_data(entry_predict_image(svc_rbf, patches, colours, 15, path), 'prediction_img_6.p', path)
+    # save_data(entry_predict_image(svc_rbf, patches, colours, 15, path), 'prediction_img_6.p', path)
+    save_data(svc_rbf.predict(patches), 'prediction_img_6.p', path)
     print 'done'
 
 
