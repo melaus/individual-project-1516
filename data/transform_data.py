@@ -3,6 +3,7 @@ import cPickle as pickle
 import numpy as np
 import sys, getopt
 import math as m
+import argparse
 #import matplotlib.pyplot as plt
 
 """
@@ -11,13 +12,12 @@ get the data required
 input:
     - img - image number
 """
-def initialise(img='',path=''):
+def initialise(path='',img=''):
     # load image data
-    image = pickle.load(open(path+'images'+img+'.p', 'r'))
     depth = pickle.load(open(path+'depths'+img+'.p', 'r'))
     label = pickle.load(open(path+'labels'+img+'.p', 'r')) # 640 * 480
 
-    return image, depth, label
+    return depth, label
 
 
 """
@@ -57,8 +57,7 @@ def get_object_coordinates(label_data, lbl, dim):
     coordinates = zip(*np.where(label_data == lbl))
 
     # get all the pairs that can form a patch without padding
-    coordinates = [pair for pair in coordinates if ((lim <= pair[0] <= x-1-lim) and (lim <= pair[1] >= lim <= y-1-lim))]
-
+    coordinates = [pair for pair in coordinates if ((lim <= pair[0] <= x-1-lim) and (lim <= pair[1] <= y-1-lim))]
     return coordinates
 
 
@@ -72,7 +71,7 @@ def get_object_depth(depth_data, co, dim):
     output = []
 
     for pair in co:
-        output.append(depth_data[pair[0]-lim:pair[0]+lim+1, pair[1]-lim:pair[1]+lim+1])
+        output.append(depth_data[pair[0]-lim:pair[0]+lim+1, pair[1]-lim:pair[1]+lim+1].tolist())
 
     return output
 
@@ -98,31 +97,6 @@ create feature-target dicitonary
 def create_ft_dict(features, targets):
     return {'features': features, 'targets': targets}
 
-
-"""
-obtain the patches of normalised depth of a given list of labels 
-
-input:
-    - lbl_dict (dict): a dictionary containing the labels concerned
-"""
-def find_feature_patch_depth(lbl_dict):
-    pass
-
-"""
-get depth patch for each pixel in image
-
---depths
-pad_depth
-get_patch_depth
-"""
-
-"""
-for each object
-
-get_object_depth
-mean_depth
-get_norm_depth
-"""
 
 
 """
@@ -150,6 +124,17 @@ def entry_per_pixel(depths, dim):
 
 
 """
+AVAILABLE FUNCTION
+
+obtain and store all patches of the required image
+"""
+def aggr_per_pixel(img_start, img_end, depths, dim):
+    # for each image
+    for img in range(img_start, img_end):
+        pass
+
+
+"""
 ENTRY
 
 generate the patches of some given coordinates
@@ -161,21 +146,102 @@ def entry_given_co(depths, labels, lbl, dim):
 
 
 """
+AVAILABLE FUNCTION
+
+obtain and store the required object patches for the required image
+"""
+def aggr_given_co(depths, labels, img_start, img_end, dim, path):
+
+    output_patches = []
+    output_targets = []
+
+    # do this for each given image
+    for img in range(img_start, img_end+1):
+        img_depths = depths[img]
+        img_labels = labels[img]
+        x, y = img_labels.shape
+        set_labels = list(set(img_labels.reshape(x*y,))) # the set of labels in the image
+
+        # do this for all the labels
+        for lbl in set_labels:
+            patches = entry_given_co(img_depths, img_labels, lbl, dim)
+
+            # append only if not empty
+            if patches:
+                output_patches.extend(patches)
+                output_targets.extend([lbl for l in range(len(patches))])
+
+        # store feature-target dictionary and reset outputs
+        save_data(create_ft_dict(output_patches, output_targets),'ft_co_'+str(img)+'.p', path)
+        output_patches = []
+        output_targets = []
+
+    # return np.array(output_patches), np.array(output_targets)
+
+
+
+
+"""
+command line argument parser
+"""
+def parser():
+    parser = argparse.ArgumentParser(description='transform some given data into a desired format')
+    parser.add_argument('-fn', '-function', action='store', dest='fn', help='operation to perform')
+    parser.add_argument('-img_s', '-img_start', action='store', type=int, dest='img_s', help='image range start')
+    parser.add_argument('-img_e', '-img_end', action='store', type=int, dest='img_e', help='image range end')
+    parser.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    args = parser.parse_args()
+    return args
+
+
+"""
+check if there are any none arguments
+"""
+def check_args(args):
+    for key, val in vars(args).iteritems():
+        if val is None:
+            return False
+    return True
+
+
+"""
 ENTRY
 
 main function
 """
 def main():
-    path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-    img_images, img_depths, img_labels = initialise('6')
+    # path = '/Users/melaus/repo/uni/individual-project/data/'
+    path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
-    per_pixel = entry_per_pixel(img_depths, 15)
+    # per_pixel = entry_per_pixel(img_depths, 15)
+    #
+    # print 'shape', per_pixel.shape
+    # print per_pixel[0]
+    #
+    # # depth patches for each pixel
+    # save_data(per_pixel, 'img_6_per_pixel.p', path)
 
-    print 'shape', per_pixel.shape
-    print per_pixel[0]
+    # initialisation
+    depths, labels = initialise(path)
+    # depths = pickle.load(open('test_depths.p', 'rb'))
+    # labels = pickle.load(open('test_labels.p', 'rb'))
 
-    # depth patches for each pixel
-    save_data(per_pixel, 'img_6_per_pixel.p', path)
+    args = parser()
+
+    if not check_args(args):
+        print >> sys.stderr, 'invalid parameters inputted -> use -h to find out the required parameters'
+        sys.exit(1)
+
+    # find out which function to perform
+    if args.fn == 'per_pixel':
+        # aggr_per_pixel(args.img_s, args.img_e, depths, args.dim)
+        print 'per_pixel'
+    elif args.fn == 'co':
+        aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
+        # print 'co'
+    else:
+        print >> sys.stderr, 'possible inputs: per_pixel, co'
+        sys.exit(1)
 
 
 """
