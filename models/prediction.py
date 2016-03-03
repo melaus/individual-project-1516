@@ -117,7 +117,7 @@ main function
 """
 def main():
     # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-    path = '~/scratch/data/ip/'
+    path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
     print 'start importing all files'
     svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
@@ -136,8 +136,6 @@ def main():
 run
 """
 if __name__ == '__main__':
-    path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-
     main()
 
     # load data
