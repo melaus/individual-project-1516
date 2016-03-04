@@ -128,11 +128,12 @@ AVAILABLE FUNCTION
 
 obtain and store all patches of the required image
 """
-def aggr_per_pixel(img_start, img_end, depths, dim):
+def aggr_per_pixel(depths, img_start, img_end, dim, path):
 
     # for each image
     for img in range(img_start, img_end):
-        entry_per_pixel(depths, dim)
+        # print entry_per_pixel(depths[img], dim)
+        save_data(entry_per_pixel(depths[img], dim), 'px_'+dim+'_'+img+'.p', path)
 
 
 """
@@ -235,7 +236,7 @@ def main():
 
     # find out which function to perform
     if args.fn == 'per_pixel':
-        # aggr_per_pixel(args.img_s, args.img_e, depths, args.dim)
+        aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
         print 'per_pixel'
     elif args.fn == 'co':
         aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
