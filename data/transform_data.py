@@ -80,7 +80,7 @@ def get_object_depth(depth_data, co, dim):
 return the mean value for each patch
 """
 def mean_val(patches):
-    return [np.mean(patch) for patch in patches]
+    return [float(np.mean(patch)) for patch in patches]
 
 
 """
@@ -88,7 +88,7 @@ normalise depth by deducting the mean value
 from each depth value in the area concerned
 """
 def get_norm_depth(areas, means):
-    return [[j - b for j in a] for a, b in zip(areas,means)]
+    return [[[j - mean for j in ls] for ls in area] for area, mean in zip(areas,means)]
 
 
 """
@@ -120,7 +120,7 @@ generate depth patches for every pixel of the image
 """
 def entry_per_pixel(depths, dim):
     patches = get_patch_depth(depths, dim)
-    return np.array(get_norm_depth(patches, mean_val(patches)))
+    return get_norm_depth(patches, mean_val(patches))
 
 
 """
@@ -129,9 +129,10 @@ AVAILABLE FUNCTION
 obtain and store all patches of the required image
 """
 def aggr_per_pixel(img_start, img_end, depths, dim):
+
     # for each image
     for img in range(img_start, img_end):
-        pass
+        entry_per_pixel(depths, dim)
 
 
 """
@@ -142,7 +143,9 @@ generate the patches of some given coordinates
 def entry_given_co(depths, labels, lbl, dim):
     co = get_object_coordinates(labels, lbl, dim)
     object_depth = get_object_depth(depths, co, dim)
-    return object_depth
+    norm = get_norm_depth(object_depth, mean_val(object_depth))
+
+    return norm
 
 
 """
@@ -173,12 +176,10 @@ def aggr_given_co(depths, labels, img_start, img_end, dim, path):
 
         # store feature-target dictionary and reset outputs
         save_data(create_ft_dict(output_patches, output_targets),'ft_co_'+str(img)+'.p', path)
+        # print output_patches
+        # print output_targets
         output_patches = []
         output_targets = []
-
-    # return np.array(output_patches), np.array(output_targets)
-
-
 
 
 """
