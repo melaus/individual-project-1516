@@ -2,8 +2,9 @@
 
 import numpy as np
 import cPickle as pickle
+import sys, argparse
 from random import randrange
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 
 """
@@ -21,10 +22,10 @@ def gen_colours(size=894):
 """
 generate output image using predictions of each pixel
 """
-def gen_image(predictions, colours_dict, dim):
+def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
 
     # size of x y
-    x, y = 640-(dim-1), 480-(dim-1)
+    x, y = x_im-(dim-1), y_im-(dim-1)
 
     predictions = predictions.reshape(y,x)
     output = np.array([ [None for i in range(y)] for j in range(x) ]).reshape(y,x)
@@ -111,6 +112,32 @@ def entry_predict_image(model, patches, colours, dim, path):
 
 
 """
+command line argument parser
+"""
+def parser():
+    parser = argparse.ArgumentParser(description='transform some given data into a desired format')
+    parser.add_argument('-fn', '-function', action='store', dest='fn', help='operation to perform')
+    parser.add_argument('-img_s', '-img_start', action='store', type=int, dest='img_s', help='image range start')
+    parser.add_argument('-img_e', '-img_end', action='store', type=int, dest='img_e', help='image range end')
+    parser.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    parser.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
+    parser.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
+    args = parser.parse_args()
+    return args
+
+
+"""
+check if there are any none arguments
+"""
+def check_args(args):
+    for key, val in vars(args).iteritems():
+        # don't check for optional keys
+        if val is None and key not in ('x', 'y'):
+            return False
+    return True
+
+
+"""
 ENTRY
 
 main function
@@ -121,15 +148,29 @@ def main():
 
     print 'start importing all files'
     svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
-    patches = load_data('img_6_per_pixel.p', 'rb', path)
-    patches = patches.reshape(291716, 225)
-    colours = load_data('colours.p', 'rb', path)
-    # area_depths = load_data('area_depths_6.p', 'rb', path)
+    patches = np.array(load_data('px_15_6_.p', 'rb', path)).reshape(291716,225)
+
+    # colours = load_data('colours.p', 'rb', path)
     print 'end importing all files'
 
     # save_data(entry_predict_image(svc_rbf, patches, colours, 15, path), 'prediction_img_6.p', path)
-    save_data(svc_rbf.predict(patches), 'prediction_img_6_np.p', path)
+    save_data(svc_rbf.predict(patches), 'pre_6.p', path)
     print 'done'
+
+    # args = parser()
+    #
+    # if not check_args(args):
+    #     print >> sys.stderr, 'invalid parameters inputted -> use -h to find out the required parameters'
+    #     sys.exit(1)
+    #
+    # # find out which function to perform
+    # if args.fn == 'predict':
+    #     print 'predict'
+    # elif args.fn == 'img':
+    #     print 'img'
+    # else:
+    #     print >> sys.stderr, 'possible inputs: predict, img'
+    #     sys.exit(1)
 
 
 """
