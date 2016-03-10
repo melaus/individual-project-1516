@@ -131,9 +131,9 @@ obtain and store all patches of the required image
 def aggr_per_pixel(depths, img_start, img_end, dim, path):
 
     # for each image
-    for img in range(img_start, img_end):
+    for img in range(img_start, img_end+1):
         # print entry_per_pixel(depths[img], dim)
-        save_data(entry_per_pixel(depths[img], dim), 'px_'+dim+'_'+img+'.p', path)
+        save_data(entry_per_pixel(depths[img], dim), 'px_'+str(dim)+'_'+str(img)+'.p', path)
 
 
 """
