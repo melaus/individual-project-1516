@@ -1,7 +1,7 @@
 
 import cPickle as pickle
 import numpy as np
-import sys, getopt
+import sys
 import math as m
 import argparse
 #import matplotlib.pyplot as plt
@@ -215,14 +215,6 @@ def main():
     # path = '/Users/melaus/repo/uni/individual-project/data/'
     path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
-    # per_pixel = entry_per_pixel(img_depths, 15)
-    #
-    # print 'shape', per_pixel.shape
-    # print per_pixel[0]
-    #
-    # # depth patches for each pixel
-    # save_data(per_pixel, 'img_6_per_pixel.p', path)
-
     # initialisation
     depths, labels = initialise(path)
     # depths = pickle.load(open('test_depths.p', 'rb'))
@@ -251,69 +243,3 @@ testing point
 """
 if __name__ == '__main__':
     main()
-
-    ## background 
-    #bk_dps        = get_object_depth(img_labels, 0, 15)
-    #bk_mean       = mean_depth(bk_dps)
-    #bk_normalised = get_norm_depth(bk_dps, bk_mean)
-    #print 'background sorted'
-    #print ' - mean length:', len(bk_mean)
-    #print ' - dps length: ', len(bk_dps)
-    #print ' - dps set len:', set([len(i) for i in bk_dps])
-    #print ''
-
-    ## ceiling
-    #ceiling_dps        = get_object_depth(img_labels, 4, 15)
-    #ceiling_mean       = mean_depth(ceiling_dps)
-    #ceiling_normalised = get_norm_depth(ceiling_dps, ceiling_mean)
-    #print 'ceiling sorted'
-    #print ' - mean length:', len(ceiling_mean)
-    #print ' - dps length: ', len(ceiling_dps)
-    #print ' - dps set len:', set([len(i) for i in ceiling_dps])
-    #print ''
-    
-    ## chair
-    #chair_dps          = get_object_depth(img_labels, 5, 15)
-    #chair_mean         = mean_depth(chair_dps)
-    #chair_normalised   = get_norm_depth(chair_dps, chair_mean)
-    #print 'chair sorted'
-    #print ' - mean length:', len(ceiling_mean)
-    #print ' - dps length: ', len(ceiling_dps)
-    #print ' - dps set len:', set([len(i) for i in ceiling_dps])
-    #print ''
- 
-    ## construct targets
-    #targets = []
-    #targets.extend([0]*len(bk_mean))
-    #targets.extend([4]*len(ceiling_mean))
-    #targets.extend([5]*len(chair_mean))
-    #print 'targets, length', len(targets)
-
-    ## construct features
-    #features = []
-    #features.extend(bk_normalised)
-    #features.extend(ceiling_normalised)
-    #features.extend(chair_normalised)
-    #print 'features, length', len(features)
-    #print ''
-
-    ## store features and targets to file
-    #store_output(create_ft_dict(features, targets), 'features_targets.p', path)
-    #print 'stored dict'
-    #print ''
-
-    # find depths of an image
-    #area_dps            = gen_area_depths(640,480,15)
-    #area_dps_mean       = mean_depth(area_dps)
-    #area_dps_normalised = get_norm_depth(area_dps, area_dps_mean)
-    #print 'area_depths'
-    #print ' - length:', len(area_dps)
-    #print ' - set length:', set([len(i) for i in area_dps_normalised])
-    #print ''
-    
-    ## store this output 
-    #store_output(area_dps_normalised, 'area_depths_6.p', path)
-    #print 'stored area_depths'
-    #print 'done'
-
-    #print gen_area_depths(6,6,3)
