@@ -25,7 +25,7 @@ generate output image using predictions of each pixel
 def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
 
     # size of x y
-    x, y = x_im-(dim-1), y_im-(dim-1)
+    x, y = x_im-(dim), y_im-(dim)
 
     predictions = predictions.reshape(y,x)
     output = np.array([ [None for i in range(y)] for j in range(x) ]).reshape(y,x)
