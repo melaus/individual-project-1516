@@ -36,8 +36,8 @@ def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
     for row in range(x):
         for col in range(y):
             # fill in the colours
-            # output[row, col] = colours_dict[predictions[row, col]]
-            output[row, col] = predictions[row, col]
+            output[row, col] = colours_dict[predictions[row, col]]
+            # output[row, col] = predictions[row, col]
 
     return output
 
@@ -93,6 +93,8 @@ def prediction(model, data):
     return model.predict(data)
 
 
+
+# TODO: DELETE THIS
 """
 ENTRY
 
@@ -100,13 +102,14 @@ perform prediction, and generate and store image
 """
 def entry_prediction(model, patches, img_s, img_e, colours, dim, path):
 
-    for img in range(img_s, img_e+1):
-        print 'image', img, '- start prediction for image'
-
-        save_data(prediction(model, patches[img]), 'predictions_'+str(img)+'.p', path+'predictions/')
-
-        print 'image', img, '- end prediction for image'
-        print 'image', img, '- prediction saved'
+    pass
+    # for img in range(img_s, img_e+1):
+    #     print 'image', img, '- start prediction for image'
+    #
+    #     save_data(prediction(model, patches[img]), 'predictions_'+str(img)+'.p', path+'predictions/')
+    #
+    #     print 'image', img, '- end prediction for image'
+    #     print 'image', img, '- prediction saved'
 
     # print 'start generated'
     # generated = gen_image(predicted, colours, dim)
@@ -122,10 +125,12 @@ command line argument parser
 """
 def parser():
     parser = argparse.ArgumentParser(description='transform some given data into a desired format')
+
     parser.add_argument('-fn', '-function', action='store', dest='fn', help='operation to perform')
-    parser.add_argument('-img_s', '-img_start', action='store', type=int, dest='img_s', help='image range start')
-    parser.add_argument('-img_e', '-img_end', action='store', type=int, dest='img_e', help='image range end')
+    parser.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
     parser.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+
+    # optional parameters
     parser.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
     parser.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
     args = parser.parse_args()
@@ -152,35 +157,50 @@ def main():
     # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
     path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
-    print 'start importing all files'
-    svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
-    patches = np.array(load_data('px_15_6.p', 'rb', path)).reshape(291716,225)
-
-    # colours = load_data('colours.p', 'rb', path)
-    print 'end importing all files'
-
-    # save_data(svc_rbf.predict(patches), 'pre_6.p')
-    save_data(prediction(svc_rbf, patches), 'pre_6_all.p')
-    print 'done'
-
-
-    # args = parser()
+    # print 'start importing all files'
+    # svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
+    # patches = np.array(load_data('px_15_6.p', 'rb', path)).reshape(291716,225)
     #
-    # if not check_args(args):
-    #     print >> sys.stderr, 'invalid parameters inputted -> use -h to find out the required parameters'
-    #     sys.exit(1)
+    # # colours = load_data('colours.p', 'rb', path)
+    # print 'end importing all files'
     #
-    # # find out which function to perform
-    # if args.fn == 'predict':
-    #     entry_prediction()
-    #     print 'predict'
-    # elif args.fn == 'img':
-    #     print 'img'
-    # else:
-    #     print >> sys.stderr, 'possible inputs: predict, img, predict_img'
-    #     print >> sys.stderr, 'predict - predict and save'
-    #     print >> sys.stderr, 'img - generate image based on prediction'
-    #     sys.exit(1)
+    # # save_data(svc_rbf.predict(patches), 'pre_6.p')
+    # save_data(prediction(svc_rbf, patches), 'pre_6_all.p')
+    # print 'done'
+
+
+    args = parser()
+
+    # check arguments to see if all the necessary arguments are given
+    if not check_args(args):
+        print >> sys.stderr, 'invalid parameter(s) inputted -> use -h to find out the required parameters'
+        sys.exit(1)
+
+    # find out which function to perform
+    if args.fn == 'pre':
+        model = load_data(args.model+'.p', 'rb', path)
+        patches = load_data('px_'+str(args.dim)+'_'+args.img+'.p', 'rb', path)
+
+        save_data(prediction(model, patches), 'pre_'+str(args.img)+'_all.p', path+'prediction/')
+        print 'saved prediction'
+
+    elif args.fn == 'gen':
+        colours = load_data('colours.p', 'rb', path)
+        pre = load_data('pre_'+str(args.dim)+'_'+str(args.img)+'.p', 'rb', path)
+
+        generated = gen_image(pre, colours, args.dim, args.x, args.y) \
+            if args.x is not None and args.y is not None \
+            else gen_image(pre, colours, args.dim)
+
+        save_data(generated, 'gen_'+str(args.img)+'.p', path+'generated/')
+        print 'saved generated image'
+
+    else:
+        # error message
+        print >> sys.stderr, 'possible inputs: pre, gen, pre_gen\n', \
+                             '    pre     - predict and save prediction      , given image patches\n', \
+                             '    gen     - generate and save image          , given prediction'
+        sys.exit(1)
 
 
 """
