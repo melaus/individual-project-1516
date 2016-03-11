@@ -27,10 +27,13 @@ def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
     # size of x y
     x, y = x_im-(dim-1), y_im-(dim-1)
 
-    print 'shape:', predictions.shape
+    print 'shape (pre):', predictions.shape
     print '(x,y):', (x,y)
     predictions = predictions.reshape(y,x)
-    output = np.array([ [None for i in range(y-1)] for j in range(x-1) ]).reshape(y,x)
+    output = np.array([ [None for i in range(y)] for j in range(x) ]).reshape(y,x)
+
+    print 'shape (output):', output.shape
+    print 'shape (pre):   ', predictions.shape
 
     for row in range(x):
         for col in range(y):
