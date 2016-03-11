@@ -30,7 +30,7 @@ def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
     print 'shape:', predictions.shape
     print '(x,y):', (x,y)
     predictions = predictions.reshape(y,x)
-    output = np.array([ [None for i in range(y)] for j in range(x) ]).reshape(y,x)
+    output = np.array([ [None for i in range(y-1)] for j in range(x-1) ]).reshape(y,x)
 
     for row in range(x):
         for col in range(y):
