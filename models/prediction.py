@@ -98,9 +98,15 @@ ENTRY
 
 perform prediction, and generate and store image
 """
-def entry_predict_image(model, patches, colours, dim, path):
-    print 'start prediction'
-    return prediction(model, patches)
+def entry_prediction(model, patches, img_s, img_e, colours, dim, path):
+
+    for img in range(img_s, img_e+1):
+        print 'image', img, '- start prediction for image'
+
+        save_data(prediction(model, patches[img]), 'predictions_'+str(img)+'.p', path+'predictions/')
+
+        print 'image', img, '- end prediction for image'
+        print 'image', img, '- prediction saved'
 
     # print 'start generated'
     # generated = gen_image(predicted, colours, dim)
@@ -148,14 +154,15 @@ def main():
 
     print 'start importing all files'
     svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
-    patches = np.array(load_data('px_15_6_.p', 'rb', path)).reshape(291716,225)
+    patches = np.array(load_data('px_15_6.p', 'rb', path)).reshape(291716,225)
 
     # colours = load_data('colours.p', 'rb', path)
     print 'end importing all files'
 
-    # save_data(entry_predict_image(svc_rbf, patches, colours, 15, path), 'prediction_img_6.p', path)
-    save_data(svc_rbf.predict(patches), 'pre_6.p', path)
+    # save_data(svc_rbf.predict(patches), 'pre_6.p')
+    save_data(prediction(svc_rbf, patches), 'pre_6_all.p')
     print 'done'
+
 
     # args = parser()
     #
@@ -165,11 +172,14 @@ def main():
     #
     # # find out which function to perform
     # if args.fn == 'predict':
+    #     entry_prediction()
     #     print 'predict'
     # elif args.fn == 'img':
     #     print 'img'
     # else:
-    #     print >> sys.stderr, 'possible inputs: predict, img'
+    #     print >> sys.stderr, 'possible inputs: predict, img, predict_img'
+    #     print >> sys.stderr, 'predict - predict and save'
+    #     print >> sys.stderr, 'img - generate image based on prediction'
     #     sys.exit(1)
 
 
