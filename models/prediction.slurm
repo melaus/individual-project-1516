@@ -22,4 +22,4 @@
 #SBATCH --mail-user=awll20@bath.ac.uk
 
 # run the application
-python prediction.py
+python prediction.py -fn gen -dim 15 -img 6
