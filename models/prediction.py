@@ -148,7 +148,7 @@ def main():
 
     print 'start importing all files'
     svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
-    patches = np.array(load_data('px_15_6_.p', 'rb', path)).reshape(291716,225)
+    patches = np.array(load_data('px_15_6.p', 'rb', path)).reshape(291716,225)
 
     # colours = load_data('colours.p', 'rb', path)
     print 'end importing all files'
