@@ -27,19 +27,17 @@ def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
     # size of x y
     x, y = x_im-(dim-1), y_im-(dim-1)
 
-    print 'shape (pre):', predictions.shape
-    print '(x,y):', (x,y)
     predictions = predictions.reshape(x,y)
-    output = np.array([ [None for i in range(y)] for j in range(x) ]).reshape(x,y)
-
-    print 'shape (output):', output.shape
-    print 'shape (pre):   ', predictions.shape
+    # output = np.array(np.array([ np.array([None for i in range(y)]).astype('float_') for j in range(x) ]).astype('float_')).reshape(x,y)
+    output = np.array([ [[None for colour in range(3)] for i in range(y)] for j in range(x) ]).astype('float_')
 
     for row in range(x):
         for col in range(y):
             # fill in the colours
-            output[row, col] = colours_dict[predictions[row, col]]
+            output[row, col] = np.array(colours_dict[predictions[row, col]]).astype('float_')
             # output[row, col] = predictions[row, col]
+
+    print 'output shape:', output.shape
 
     return output
 
@@ -48,14 +46,17 @@ def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
 save image
 """
 def save_figure(img, filename, dpi_val, path=''):
-    fig = plt.figure(frameon=False, dpi=dpi_val)
-    ax  = plt.Axes(fig, [0.,0.,1.,1.])
+    # fig = plt.figure(frameon=False)
+    # ax  = plt.Axes(fig, [0.,0.,1.,1.])
 
-    ax.set_axis_off()
-    fig.add_axes(ax)
+    # ax.set_axis_off()
+    # fig.add_axes(ax)
 
-    ax.imshow(img, aspect='auto')
-    fig.savefig(path+filename)
+    # ax.imshow(img)
+    # fig.savefig(path+filename)
+    plt.imshow(img, aspect='equal')
+    plt.axis('off')
+    plt.savefig(path+filename, bbox_inches='tight') #, frameon=False, bbox_inches='tight')
 
     print 'image saved'
 
@@ -159,18 +160,6 @@ def main():
     # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
     path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
-    # print 'start importing all files'
-    # svc_rbf = load_data('svc_rbf_6.p', 'rb', path)
-    # patches = np.array(load_data('px_15_6.p', 'rb', path)).reshape(291716,225)
-    #
-    # # colours = load_data('colours.p', 'rb', path)
-    # print 'end importing all files'
-    #
-    # # save_data(svc_rbf.predict(patches), 'pre_6.p')
-    # save_data(prediction(svc_rbf, patches), 'pre_6_all.p')
-    # print 'done'
-
-
     args = parser()
 
     # check arguments to see if all the necessary arguments are given
@@ -179,6 +168,7 @@ def main():
         sys.exit(1)
 
     # find out which function to perform
+    # possible functions: pre, gen
     if args.fn == 'pre':
         model = load_data(args.model+'.p', 'rb', path)
         patches = load_data('px_'+str(args.dim)+'_'+args.img+'.p', 'rb', path)
@@ -187,7 +177,7 @@ def main():
         print 'saved prediction'
 
     elif args.fn == 'gen':
-        colours = load_data('colours.p', 'rb', path)
+        colours = load_data('colours_f.p', 'rb', path)
         pre = load_data('pre_'+str(args.dim)+'_'+str(args.img)+'.p', 'rb', path)
 
         generated = gen_image(pre, colours, args.dim, args.x, args.y) \
