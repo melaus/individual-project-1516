@@ -195,6 +195,7 @@ def main():
             else gen_image(pre, colours, args.dim)
 
         save_data(generated, 'gen_'+str(args.img)+'.p', path+'generated/')
+        save_figure(generated, 'gen_'+str(args.img)+'.png', 150, path)
         print 'saved generated image'
 
     else:
