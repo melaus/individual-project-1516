@@ -4,17 +4,15 @@
 #SBATCH --account=free
  
 # set name of job
-#SBATCH --job-name=ipp_test1
-#SBATCH --output=ipp_test1.out
-#SBATCH --error=ipp_test1.err
+#SBATCH --job-name=px_1301_1448
+#SBATCH --output=px_1301_1448.out
+#SBATCH --error=px_1301_1448.err
  
 # set the number of nodes
-#SBATCH --nodes=2
-#SBATCH --cpus-per-task=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --nodes=1
  
 # set max wallclock time
-#SBATCH --time=00:05:00
+#SBATCH --time=04:00:00
  
 # mail alert at start, end and abortion of execution
 #SBATCH --mail-type=END
@@ -23,10 +21,7 @@
 #SBATCH --mail-user=awll20@bath.ac.uk
 
 # load conda
-#module load anaconda/2.3.0
 source activate py2
 
 # run the application
-ipcluster start -n 2 --engines=MPI &
-python test.py
-ipcluster stop
+python transform_data.py -fn per_pixel -dim 15 -img_s 1410 -img_e 1448 
