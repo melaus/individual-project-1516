@@ -294,11 +294,11 @@ def main():
         sys.exit(1)
 
     # find out which function to perform
-    if args.fn == 'per_pixel':
+    if args.which == 'per_pixel':
         aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
-    elif args.fn == 'co':
+    elif args.which == 'co':
         aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
-    elif args.fn == 'top_n':
+    elif args.which == 'top_n':
         labels_dict = load_data(path+'labels_map.p', 'rb', path)
         print top_n(args.l, labels_dict, args.n, path)
     else:
