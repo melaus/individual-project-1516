@@ -254,7 +254,7 @@ def parser():
 
     # top_n
     p_topn = subparsers.add_parser('top_n', help='get n random samples for a given label')
-    p_topn.add_argument('-l', '-label', action='store', dest='target', type=int, help='the label to be explored')
+    p_topn.add_argument('-l', '-label', action='store', dest='label', type=int, help='the label to be explored')
     p_topn.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
     p_topn.set_defaults(which='top_n')
 
@@ -300,7 +300,7 @@ def main():
         aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
     elif args.which == 'top_n':
         labels_dict = load_data('labels_map.p', 'rb', path)
-        print top_n(args.l, labels_dict, args.n, path)
+        print top_n(args.label, labels_dict, args.n, path)
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)
