@@ -24,4 +24,4 @@
 source activate py2
 
 # run the application
-python transform_data.py -fn co -dim 15 -img_s 1391 -img_e 1400
+python transform_data.py patches -fn co -dim 15 -img_s 1391 -img_e 1400
