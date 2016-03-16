@@ -299,7 +299,7 @@ def main():
     elif args.which == 'co':
         aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
     elif args.which == 'top_n':
-        labels_dict = load_data(path+'labels_map.p', 'rb', path)
+        labels_dict = load_data('labels_map.p', 'rb', path)
         print top_n(args.l, labels_dict, args.n, path)
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
