@@ -91,12 +91,66 @@ def get_norm_depth(areas, means):
     return [[[j - mean for j in ls] for ls in area] for area, mean in zip(areas,means)]
 
 
+
+"""
+ONE-OFF
+
+generate a label-image dictionary
+"""
+# def gen_labels_dict():
+#     output = []
+#     d = []
+#     for i in range(894):
+#         d[i] = [ img for img in range(1449) if np.where(output[img] == i)[0] ]
+#
+# def top_n_labels_dict():
+#     d = dict()
+#     d_mod = dict()
+#     for i in range(894):
+#         to_store = d[i] if len(d[i]) > 1 else 123456
+#         if to_store != 123456:
+#             d_mod[i] = to_store
+
+
+"""
+get shuffled top_n records
+
+input:
+    - data_s start
+    - data_e end
+    - (optional) path
+
+return:
+    - records top n records
+"""
+def top_n(target, labels_dict, n, path=''):
+    records = np.array([])
+    imgs = labels_dict[target]
+
+    # load images
+    for img in imgs:
+        loaded = load_data(path+'ft_co_'+img+'p.', 'rb', path)
+        np.append(records, [loaded], axis=0)
+
+    print 'records shape:', records.shape
+
+    return np.random.shuffle(records)[0:n]
+
+
+
 """
 create feature-target dicitonary
 """
 def create_ft_dict(features, targets):
     return {'features': features, 'targets': targets}
 
+
+
+"""
+load data from file
+"""
+def load_data(filename, mode, path=''):
+    return pickle.load(open(path+filename, mode))
 
 
 """
@@ -188,10 +242,25 @@ command line argument parser
 """
 def parser():
     parser = argparse.ArgumentParser(description='transform some given data into a desired format')
-    parser.add_argument('-fn', '-function', action='store', dest='fn', help='operation to perform')
-    parser.add_argument('-img_s', '-img_start', action='store', type=int, dest='img_s', help='image range start')
-    parser.add_argument('-img_e', '-img_end', action='store', type=int, dest='img_e', help='image range end')
-    parser.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    subparsers = parser.add_subparsers(help='available commands')
+
+    # co AND per_pixel
+    p_patches = subparsers.add_parser('patches', help='obtain patches with known labels')
+    p_patches.add_argument('-fn', '-function', action='store', dest='fn', help='operation to perform')
+    p_patches.add_argument('-img_s', '-img_start', action='store', type=int, dest='img_s', help='image range start')
+    p_patches.add_argument('-img_e', '-img_end', action='store', type=int, dest='img_e', help='image range end')
+    p_patches.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    p_patches.set_defaults(which='patches')
+
+
+    # top_n
+    p_topn = subparsers.add_parser('top_n', help='get n random samples for a given label')
+    p_topn.add_argument('-l', '-label', action='store', dest='target', type=int, help='the label to be explored')
+    p_topn.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
+    p_topn.set_defaults(which='top_n')
+
+
+
     args = parser.parse_args()
     return args
 
@@ -229,12 +298,13 @@ def main():
     # find out which function to perform
     if args.fn == 'per_pixel':
         aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
-        print 'per_pixel'
     elif args.fn == 'co':
         aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
-        # print 'co'
+    elif args.fn == 'top_n':
+        labels_dict = load_data(path+'labels_map.p', 'rb', path)
+        print top_n(101, labels_dict, 3, path)
     else:
-        print >> sys.stderr, 'possible inputs: per_pixel, co'
+        print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)
 
 
