@@ -252,14 +252,11 @@ def parser():
     p_patches.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
     p_patches.set_defaults(which='patches')
 
-
     # top_n
     p_topn = subparsers.add_parser('top_n', help='get n random samples for a given label')
     p_topn.add_argument('-l', '-label', action='store', dest='target', type=int, help='the label to be explored')
     p_topn.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
     p_topn.set_defaults(which='top_n')
-
-
 
     args = parser.parse_args()
     return args
@@ -290,6 +287,7 @@ def main():
     # labels = pickle.load(open('test_labels.p', 'rb'))
 
     args = parser()
+    print args
 
     if not check_args(args):
         print >> sys.stderr, 'invalid parameters inputted -> use -h to find out the required parameters'
@@ -302,7 +300,7 @@ def main():
         aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
     elif args.fn == 'top_n':
         labels_dict = load_data(path+'labels_map.p', 'rb', path)
-        print top_n(101, labels_dict, 3, path)
+        print top_n(args.l, labels_dict, args.n, path)
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)
