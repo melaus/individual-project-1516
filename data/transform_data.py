@@ -234,7 +234,7 @@ def aggr_given_co(depths, labels, img_start, img_end, dim, path):
         # print output_patches
         # print output_targets
         output_patches = []
-        output_targets = []
+
 
 
 """
@@ -281,26 +281,32 @@ def main():
     # path = '/Users/melaus/repo/uni/individual-project/data/'
     path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
-    # initialisation
-    depths, labels = initialise(path)
     # depths = pickle.load(open('test_depths.p', 'rb'))
     # labels = pickle.load(open('test_labels.p', 'rb'))
 
     args = parser()
-    print args
+    print 'args:', args
 
     if not check_args(args):
         print >> sys.stderr, 'invalid parameters inputted -> use -h to find out the required parameters'
         sys.exit(1)
 
     # find out which function to perform
-    if args.which == 'per_pixel':
-        aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
-    elif args.which == 'co':
-        aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
+    if args.which == 'patches':
+        # load required data
+        depths, labels = initialise(path)
+
+        if args.fn == 'per_pixel':
+            aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
+            # print 'per_pixel'
+        elif args.which == 'co':
+            aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
+            # print 'co'
+
     elif args.which == 'top_n':
         labels_dict = load_data('labels_map.p', 'rb', path)
         print top_n(args.label, labels_dict, args.n, path)
+        # print 'top_n'
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)
