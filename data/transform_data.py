@@ -293,20 +293,25 @@ def main():
 
     # find out which function to perform
     if args.which == 'patches':
+        print 'in patches'
         # load required data
         depths, labels = initialise(path)
 
         if args.fn == 'per_pixel':
+            print 'running per_pixel'
             aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
-            # print 'per_pixel'
+            print 'done per_pixel'
         elif args.which == 'co':
+            print 'running co'
             aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
-            # print 'co'
+            print 'done co'
 
     elif args.which == 'top_n':
+        print 'in top_n'
+        print 'running top_n'
         labels_dict = load_data('labels_map.p', 'rb', path)
         print top_n(args.label, labels_dict, args.n, path)
-        # print 'top_n'
+        print 'done top_n'
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)
