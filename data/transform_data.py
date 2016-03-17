@@ -123,9 +123,10 @@ input:
 return:
     - records top n records
 """
-def top_n(target, labels_dict, n, path=''):
+def top_n(label, labels_dict, n, path=''):
     records = np.array([])
-    imgs = labels_dict[target]
+    imgs = labels_dict[label]
+    print 'imgs:', imgs
 
     # load images
     for img in imgs:
