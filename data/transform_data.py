@@ -129,7 +129,7 @@ def top_n(target, labels_dict, n, path=''):
 
     # load images
     for img in imgs:
-        loaded = load_data('ft_co_'+str(img)+'p.', 'rb', path)
+        loaded = load_data('ft_co_'+str(img)+'.p', 'rb', path)
         np.append(records, [loaded], axis=0)
 
     print 'records shape:', records.shape
