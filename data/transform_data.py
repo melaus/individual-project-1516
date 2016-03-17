@@ -301,7 +301,7 @@ def main():
             print 'running per_pixel'
             aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
             print 'done per_pixel'
-        elif args.which == 'co':
+        elif args.fn== 'co':
             print 'running co'
             aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
             print 'done co'
