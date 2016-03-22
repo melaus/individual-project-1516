@@ -4,15 +4,15 @@
 #SBATCH --account=free
  
 # set name of job
-#SBATCH --job-name=co_1391_1400
-#SBATCH --output=co_1391_1400.out
-#SBATCH --error=co_1391_1400.err
+#SBATCH --job-name=co_1351_1447
+#SBATCH --output=co_1351_1447.out
+#SBATCH --error=co_1351_1447.err
  
 # set the number of nodes
 #SBATCH --nodes=1
  
 # set max wallclock time
-#SBATCH --time=00:40:00
+#SBATCH --time=02:50:00
  
 # mail alert at start, end and abortion of execution
 #SBATCH --mail-type=END
@@ -24,4 +24,4 @@
 source activate py2
 
 # run the application
-python transform_data.py patches -fn co -dim 15 -img_s 1391 -img_e 1400
+python transform_data.py patches -fn co -dim 15 -img_s 1351 -img_e 1447

@@ -148,7 +148,6 @@ def top_n(label, labels_dict, num_images, num_samples, path=''):
         else:
             np.append(data_aggr, features, axis=0)
 
-
         # add to aggregation, used for final dict
 
     output = {'features': data_aggr, 'images':imgs, 'positions':pos_dict}
@@ -206,7 +205,7 @@ def aggr_per_pixel(depths, img_start, img_end, dim, path):
     # for each image
     for img in range(img_start, img_end+1):
         # print entry_per_pixel(depths[img], dim)
-        save_data(entry_per_pixel(depths[img], dim), 'px_'+str(dim)+'_'+str(img)+'.p', path)
+        save_data(np.array(entry_per_pixel(depths[img], dim)), 'px_'+str(dim)+'_'+str(img)+'.p', path)
 
 
 """
@@ -249,7 +248,7 @@ def aggr_given_co(depths, labels, img_start, img_end, dim, path):
                 output_targets.extend([lbl for l in range(len(patches))])
 
         # store feature-target dictionary and reset outputs
-        save_data(create_ft_dict(output_patches, output_targets),'ft_co_'+str(img)+'.p', path)
+        save_data(create_ft_dict(np.array(output_patches), np.array(output_targets)),'ft_co_'+str(img)+'.p', path)
         # print output_patches
         # print output_targets
         output_patches = []

@@ -4,9 +4,9 @@
 #SBATCH --account=free
  
 # set name of job
-#SBATCH --job-name=px_1301_1448
-#SBATCH --output=px_1301_1448.out
-#SBATCH --error=px_1301_1448.err
+#SBATCH --job-name=px_151_200
+#SBATCH --output=px_151_200.out
+#SBATCH --error=px_151_200.err
  
 # set the number of nodes
 #SBATCH --nodes=1
@@ -24,4 +24,4 @@
 source activate py2
 
 # run the application
-python transform_data.py -fn per_pixel -dim 15 -img_s 1410 -img_e 1448 
+python transform_data.py patches -fn per_pixel -dim 15 -img_s 151 -img_e 200
