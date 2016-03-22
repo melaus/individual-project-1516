@@ -124,14 +124,17 @@ return:
     - records top n records
 """
 def top_n(label, labels_dict, n, path=''):
-    records = np.array([])
     imgs = labels_dict[label]
     print 'imgs:', imgs
 
+    records = load_data('ft_co'+str(imgs[0])+'.p', 'rb', path)['features']
+
     # load images
-    for img in imgs:
+    for img in imgs[1:]:
+        print '    for img:', img
         loaded = load_data('ft_co_'+str(img)+'.p', 'rb', path)
-        np.append(records, [loaded], axis=0)
+        np.append(records, [loaded['targets']], axis=0)
+        print '    records shape:', records.shape
 
     print 'records shape:', records.shape
 
@@ -188,7 +191,7 @@ def aggr_per_pixel(depths, img_start, img_end, dim, path):
     # for each image
     for img in range(img_start, img_end+1):
         # print entry_per_pixel(depths[img], dim)
-        save_data(entry_per_pixel(depths[img], dim), 'px_'+str(dim)+'_'+str(img)+'.p', path)
+        save_data(np.array(entry_per_pixel(depths[img], dim)), 'px_'+str(dim)+'_'+str(img)+'.p', path)
 
 
 """
@@ -231,7 +234,7 @@ def aggr_given_co(depths, labels, img_start, img_end, dim, path):
                 output_targets.extend([lbl for l in range(len(patches))])
 
         # store feature-target dictionary and reset outputs
-        save_data(create_ft_dict(output_patches, output_targets),'ft_co_'+str(img)+'.p', path)
+        save_data(create_ft_dict(np.array(output_patches), np.array(output_targets)),'ft_co_'+str(img)+'.p', path)
         # print output_patches
         # print output_targets
         output_patches = []
