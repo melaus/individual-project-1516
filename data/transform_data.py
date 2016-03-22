@@ -123,19 +123,37 @@ input:
 return:
     - records top n records
 """
-def top_n(label, labels_dict, n, path=''):
-    records = np.array([])
-    imgs = labels_dict[label]
-    print 'imgs:', imgs
+def top_n(label, labels_dict, num_images, num_samples, path=''):
+    smp_per_img = num_samples / num_images
+    pos_dict = dict
 
-    # load images
+    # get 5 images to extract features from
+    imgs = np.random.choice(labels_dict[label], num_images, replace=False)
+
+
+    # extract features and pick an equal amount of random samples from each image
+    # to form [no_samples] samples for each label
     for img in imgs:
-        loaded = load_data('ft_co_'+str(img)+'.p', 'rb', path)
-        np.append(records, [loaded], axis=0)
+        # get image and randomised position
+        data = load_data('co/ft_co_'+str(img),+'.p', 'rb', path)
+        pos = np.random.choice( np.where(data['targets'] == label)[0], smp_per_img, replace=False )
 
-    print 'records shape:', records.shape
+        # relate each location extracted to the image it is from
+        pos_dict[img] = pos
 
-    return np.random.shuffle(records)[0:n]
+        # obtain data and appended to the aggregation
+        features = data['features'][pos[0]:pos[-1]]
+        if img == img[0]:
+            data_aggr = features
+        else:
+            np.append(data_aggr, features, axis=0)
+
+
+        # add to aggregation, used for final dict
+
+    output = {'features': data_aggr, 'images':imgs, 'positions':pos_dict}
+
+    return output
 
 
 
@@ -310,8 +328,8 @@ def main():
     elif args.which == 'top_n':
         print 'in top_n'
         print 'running top_n'
-        labels_dict = load_data('labels_map.p', 'rb', path)
-        print top_n(args.label, labels_dict, args.n, path)
+        labels2imgs = load_data('labels2imgs.p', 'rb', path)
+        top_n(args.label, labels2imgs, 1, 1, path)
         print 'done top_n'
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
