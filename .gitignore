@@ -6,3 +6,4 @@ py-data
 *.err
 *.out
 slurm_co/
+py_data
