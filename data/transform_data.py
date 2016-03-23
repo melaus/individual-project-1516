@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import math as m
 import argparse
+import time
 #import matplotlib.pyplot as plt
 
 """
@@ -125,35 +126,32 @@ return:
 """
 def top_n(label, labels_dict, num_images, num_samples, path=''):
     smp_per_img = num_samples / num_images
-    pos_dict = dict
+    pos_dict = dict()
 
-    # get 5 images to extract features from
+    # get [num_images] images to extract features from
     imgs = np.random.choice(labels_dict[label], num_images, replace=False)
+    imgs = [0]
 
 
     # extract features and pick an equal amount of random samples from each image
-    # to form [no_samples] samples for each label
+    # to form [num_samples] samples for each label
     for img in imgs:
         # get image and randomised position
-        data = load_data('co/ft_co_'+str(img),+'.p', 'rb', path)
+        data = load_data('co/ft_co_'+str(img)+'.p', 'rb', path)
         pos = np.random.choice( np.where(data['targets'] == label)[0], smp_per_img, replace=False )
 
         # relate each location extracted to the image it is from
         pos_dict[img] = pos
 
         # obtain data and appended to the aggregation
-        features = data['features'][pos[0]:pos[-1]]
-        if img == img[0]:
+        features = [data['features'][po] for po in pos]
+        if img == imgs[0]:
             data_aggr = features
         else:
             np.append(data_aggr, features, axis=0)
 
-        # add to aggregation, used for final dict
-
-    output = {'features': data_aggr, 'images':imgs, 'positions':pos_dict}
-
-    return output
-
+    save_data({'features': data_aggr, 'images':imgs, 'positions':pos_dict}, 'top/top_'+str(num_images)+'_'+str(label)+'.p', path)
+    print 'top_n saved'
 
 
 """
@@ -161,7 +159,6 @@ create feature-target dicitonary
 """
 def create_ft_dict(features, targets):
     return {'features': features, 'targets': targets}
-
 
 
 """
@@ -218,7 +215,7 @@ def entry_given_co(depths, labels, lbl, dim):
     object_depth = get_object_depth(depths, co, dim)
     norm = get_norm_depth(object_depth, mean_val(object_depth))
 
-    return norm
+    return norm 
 
 
 """
@@ -237,6 +234,7 @@ def aggr_given_co(depths, labels, img_start, img_end, dim, path):
         img_labels = labels[img]
         x, y = img_labels.shape
         set_labels = list(set(img_labels.reshape(x*y,))) # the set of labels in the image
+        print set_labels
 
         # do this for all the labels
         for lbl in set_labels:
@@ -249,9 +247,8 @@ def aggr_given_co(depths, labels, img_start, img_end, dim, path):
 
         # store feature-target dictionary and reset outputs
         save_data(create_ft_dict(np.array(output_patches), np.array(output_targets)),'ft_co_'+str(img)+'.p', path)
-        # print output_patches
-        # print output_targets
         output_patches = []
+        output_targets = []
 
 
 
@@ -273,6 +270,7 @@ def parser():
     # top_n
     p_topn = subparsers.add_parser('top_n', help='get n random samples for a given label')
     p_topn.add_argument('-l', '-label', action='store', dest='label', type=int, help='the label to be explored')
+    p_topn.add_argument('-imgs', '-images', action='store', dest='images', type=int, help='the number of images to draw the sample from')
     p_topn.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
     p_topn.set_defaults(which='top_n')
 
@@ -314,6 +312,8 @@ def main():
         print 'in patches'
         # load required data
         depths, labels = initialise(path)
+        # depths = np.array([[[1,2,3,10,11,12],[4,5,6,13,14,15],[7,8,9,16,17,18]]])
+        # labels = np.array([[[13,13,14,19,24,26],[15,15,19,42,44,46],[4,3,2,9,10,11]]])
 
         if args.fn == 'per_pixel':
             print 'running per_pixel'
@@ -325,11 +325,11 @@ def main():
             print 'done co'
 
     elif args.which == 'top_n':
-        print 'in top_n'
         print 'running top_n'
         labels2imgs = load_data('labels2imgs.p', 'rb', path)
-        top_n(args.label, labels2imgs, 1, 1, path)
+        top_n(args.label, labels2imgs, 1, args.n, path)
         print 'done top_n'
+
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)

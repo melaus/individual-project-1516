@@ -5,3 +5,4 @@ py-data
 *.png
 *.err
 *.out
+slurm_co/
