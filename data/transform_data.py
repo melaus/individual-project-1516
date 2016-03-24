@@ -112,6 +112,12 @@ generate a label-image dictionary
 #         if to_store != 123456:
 #             d_mod[i] = to_store
 
+# for i in range(0, 1449):
+#     imgs2labels[i] = np.array(list(set(labels[i].reshape(640*480))))
+
+# for label in range(0,9):
+#     labels2imgs[label] =  np.array([ img for img in range(0,3) if len(np.where(imgs2labels[img] == label)[0]) > 0 ])
+
 
 """
 get shuffled top_n records
@@ -125,6 +131,9 @@ return:
     - records top n records
 """
 def top_n(label, labels_dict, num_images, num_samples, path=''):
+    # change [num_images] if there are not enough images for that label
+    num_images = num_images if len(labels_dict[label]) == num_images else len(labels_dict[label])
+
     smp_per_img = num_samples / num_images
     pos_dict = dict()
 
@@ -327,7 +336,7 @@ def main():
     elif args.which == 'top_n':
         print 'running top_n'
         labels2imgs = load_data('labels2imgs.p', 'rb', path)
-        top_n(args.label, labels2imgs, 1, args.n, path)
+        top_n(args.label, labels2imgs, 2, args.n, path)
         print 'done top_n'
 
     else:
