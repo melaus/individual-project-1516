@@ -130,37 +130,73 @@ input:
 return:
     - records top n records
 """
-def top_n(label, labels_dict, num_images, num_samples, path=''):
-    # change [num_images] if there are not enough images for that label
-    num_images = num_images if len(labels_dict[label]) == num_images else len(labels_dict[label])
+def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
+    for label in range(label_s, label_e+1):
+        print '----- DEALING WITH LABEL', label, '-----'
+        # change [num_images] if there are not enough images for that label
+        extract_imgs = num_images if len(labels_dict[label]) >= num_images else len(labels_dict[label])
+        print 'extract_images: ', extract_imgs 
 
-    smp_per_img = num_samples / num_images
-    pos_dict = dict()
+        smp_per_img = num_samples / extract_imgs
+        print 'sample per image:', smp_per_img 
+        pos_dict = dict()
 
-    # get [num_images] images to extract features from
-    imgs = np.random.choice(labels_dict[label], num_images, replace=False)
-    imgs = [0]
+        # get [extract_imgs] images to extract features from
+        imgs = np.random.choice(labels_dict[label], extract_imgs, replace=False)
+        print 'images to use:', imgs
+        print '\n'
 
+        collected = np.array([])
 
-    # extract features and pick an equal amount of random samples from each image
-    # to form [num_samples] samples for each label
-    for img in imgs:
-        # get image and randomised position
-        data = load_data('co/ft_co_'+str(img)+'.p', 'rb', path)
-        pos = np.random.choice( np.where(data['targets'] == label)[0], smp_per_img, replace=False )
+        # extract features and pick an equal amount of random samples from each image
+        # to form [num_samples] samples for each label
+        for img in imgs:
+            print 'in', img
+            # get image and randomised position
+            data = load_data('co/ft_co_'+str(img)+'.p', 'rb', path)
+            print 'loaded data'
+            print 'size of targets with this label:', np.where(data['targets'] == label)[0].shape
+            
+            
+            potentials = np.where(data['targets'] == label)[0]
+            extract_smps = smp_per_img if smp_per_img <= len(potentials) else len(potentials)
+            collected = np.append(collected, extract_smps)
 
-        # relate each location extracted to the image it is from
-        pos_dict[img] = pos
+            pos = np.random.choice( potentials, extract_smps, replace=False )
+            print 'size of random pos chosen:', len(pos)
 
-        # obtain data and appended to the aggregation
-        features = [data['features'][po] for po in pos]
-        if img == imgs[0]:
-            data_aggr = features
-        else:
-            np.append(data_aggr, features, axis=0)
+            # relate each location extracted to the image it is from
+            pos_dict[img] = pos
 
-    save_data({'features': data_aggr, 'images':imgs, 'positions':pos_dict}, 'top/top_'+str(num_images)+'_'+str(label)+'.p', path)
-    print 'top_n saved'
+            # obtain data and appended to the aggregation
+            features = np.array([data['features'][po] for po in pos])
+            if img == imgs[0]:
+                print 'first image'
+                data_aggr = features 
+            else:
+                print 'others'
+                data_aggr = np.append(data_aggr, features, axis=0)
+            print 'data_aggr shape at this point:', data_aggr.shape
+            print ''
+
+        col_min = min(collected)
+        col_max = max(collected)
+        col_sum = sum(collected)
+
+        output_dict = {'features': data_aggr, 'images' : imgs, 'positions' : pos_dict}
+        save_data(output_dict, 'top/top_'+str(label)+'_'+str(extract_imgs)+'_'+str(col_sum)+'.p', path)
+        print 'top_n for label', label, 'saved'
+        print ''
+        print '----shape of data----'
+        print 'size(features)      :', data_aggr.shape
+        print 'len(positions_dict) :',len(pos_dict)
+        print 'size(images)        :', imgs.shape 
+        print 'min(collected):', col_min
+        print 'max(collected):', col_max 
+        print 'sum(collected):', col_sum
+        print '----shape of data----'
+        print ''
+    # return {'features': data_aggr, 'images':imgs, 'positions':pos_dict}
 
 
 """
@@ -278,7 +314,8 @@ def parser():
 
     # top_n
     p_topn = subparsers.add_parser('top_n', help='get n random samples for a given label')
-    p_topn.add_argument('-l', '-label', action='store', dest='label', type=int, help='the label to be explored')
+    p_topn.add_argument('-ls', '-label_s', action='store', dest='label_s', type=int, help='the staring label to be explored')
+    p_topn.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
     p_topn.add_argument('-imgs', '-images', action='store', dest='images', type=int, help='the number of images to draw the sample from')
     p_topn.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
     p_topn.set_defaults(which='top_n')
@@ -336,7 +373,9 @@ def main():
     elif args.which == 'top_n':
         print 'running top_n'
         labels2imgs = load_data('labels2imgs.p', 'rb', path)
-        top_n(args.label, labels2imgs, 2, args.n, path)
+        print '\n'
+        top_n(args.label_s, args.label_e, labels2imgs, args.images, args.n, path)
+        print '\n'
         print 'done top_n'
 
     else:
