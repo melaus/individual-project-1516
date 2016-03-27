@@ -189,7 +189,7 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         col_sum = sum(collected)
 
         output_dict = {'features': data_aggr, 'images' : imgs, 'positions' : pos_dict}
-        save_data(output_dict, 'top/top_'+str(label)+'_'+str(int(extract_imgs))+'_'+str(col_sum)+'.p', path)
+        save_data(output_dict, 'top/top_'+str(label)+'_'+str(int(extract_imgs))+'_'+str(int(col_sum))+'.p', path)
         print 'top_n for label', label, 'saved'
         print ''
         print '----shape of data----'
