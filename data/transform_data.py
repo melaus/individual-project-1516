@@ -5,6 +5,7 @@ import sys
 import math as m
 import argparse
 import time
+from math import ceil
 #import matplotlib.pyplot as plt
 
 """
@@ -134,8 +135,12 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
     for label in range(label_s, label_e+1):
         print '----- DEALING WITH LABEL', label, '-----'
         # change [num_images] if there are not enough images for that label
-        extract_imgs = num_images if len(labels_dict[label]) >= num_images else len(labels_dict[label])
+        extract_imgs = num_images if ceil(len(labels_dict[label])/2) >= num_images else ceil(len(labels_dict[label])/2)
         print 'extract_images: ', extract_imgs 
+
+        # go no further if 0 images are available for training 
+        if extract_imgs == 0:
+            continue
 
         smp_per_img = num_samples / extract_imgs
         print 'sample per image:', smp_per_img 
@@ -184,7 +189,7 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         col_sum = sum(collected)
 
         output_dict = {'features': data_aggr, 'images' : imgs, 'positions' : pos_dict}
-        save_data(output_dict, 'top/top_'+str(label)+'_'+str(extract_imgs)+'_'+str(col_sum)+'.p', path)
+        save_data(output_dict, 'top/top_'+str(label)+'_'+str(int(extract_imgs))+'_'+str(col_sum)+'.p', path)
         print 'top_n for label', label, 'saved'
         print ''
         print '----shape of data----'
@@ -195,7 +200,7 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         print 'max(collected):', col_max 
         print 'sum(collected):', col_sum
         print '----shape of data----'
-        print ''
+        print '\n\n\n#=============================================================\n'
     # return {'features': data_aggr, 'images':imgs, 'positions':pos_dict}
 
 

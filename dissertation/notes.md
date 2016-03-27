@@ -21,4 +21,5 @@
 
 # Cross Validation
 - cv = cv
-    - read up and see what options we can choose, or whether to just choose a random number
+    - integer
+    - 
