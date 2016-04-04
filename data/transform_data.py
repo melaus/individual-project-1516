@@ -241,7 +241,7 @@ def n_random_records(max_records, label_s, label_e, path=''):
             features = np.append(features, random_fts.reshape(num,x*y), axis=0)
 
         # targets for the obtained positions
-        targets.extend([lbl for i in range(len(num_records))])
+        targets = np.append(targets, [lbl for i in range(len(num_records))])
 
     out_pos = dict(dict_creator(out_pos))
 
