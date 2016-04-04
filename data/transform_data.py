@@ -4,8 +4,10 @@ import numpy as np
 import sys
 import math as m
 import argparse
-import time
+import glob
 from math import ceil
+from itertools import groupby
+from operator import itemgetter
 #import matplotlib.pyplot as plt
 
 """
@@ -99,19 +101,6 @@ ONE-OFF
 
 generate a label-image dictionary
 """
-# def gen_labels_dict():
-#     output = []
-#     d = []
-#     for i in range(894):
-#         d[i] = [ img for img in range(1449) if np.where(output[img] == i)[0] ]
-#
-# def top_n_labels_dict():
-#     d = dict()
-#     d_mod = dict()
-#     for i in range(894):
-#         to_store = d[i] if len(d[i]) > 1 else 123456
-#         if to_store != 123456:
-#             d_mod[i] = to_store
 
 # for i in range(0, 1449):
 #     imgs2labels[i] = np.array(list(set(labels[i].reshape(640*480))))
@@ -121,7 +110,7 @@ generate a label-image dictionary
 
 
 """
-get shuffled top_n records
+generate shuffled top_n records from co_* files
 
 input:
     - data_s start
@@ -138,7 +127,7 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         extract_imgs = num_images if ceil(len(labels_dict[label])/2) >= num_images else ceil(len(labels_dict[label])/2)
         print 'extract_images: ', extract_imgs 
 
-        # go no further if 0 images are available for training 
+        # go no further if 0 images are available for extraction
         if extract_imgs == 0:
             continue
 
@@ -202,6 +191,69 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         print '----shape of data----'
         print '\n\n\n#=============================================================\n'
     # return {'features': data_aggr, 'images':imgs, 'positions':pos_dict}
+
+
+"""
+get [n] random records as a combined dict
+"""
+def n_random_records(max_records, label_s, label_e, path=''):
+    features = np.array([])
+    targets = np.array([])
+    out_pos = []
+
+    for lbl in range(label_s, label_e+1):
+
+        # only run loop if there exist such file
+        filename = glob.glob(path+'top_'+str(lbl)+'_*')
+        if len(glob.glob(path+'top_'+str(lbl)+'_*')) > 0:
+            filename = filename[0]
+        else:
+            continue
+
+        print 'load data from', filename
+        data = load_data(filename, 'rb', path)
+
+        # number of records to get for this label
+        num_records = max_records if len(data['features']) >= max_records else len(data['features'])
+        print 'records in dict:', len(data['features']), 'wanted:', max_records, 'gets:', num_records
+
+        pos = []
+        # create pairs of positions
+        # should use 'images' as the order, as dictionary uses its own random order
+        for img in data['images']:
+            pos.extend(zip( [img for i in range( len(data['positions'][img]) )], data['positions'][img]) )
+
+        # find random choice of positions
+        random_list = np.random.choice( np.array( [i in range(len(pos))] ), num_records, replace=False )
+        out_pos.extend([pt for pt in [pos[i] for i in random_list]])
+
+        # add randomised features to output list
+        random_fts = np.array( [data['features'][loc] for loc in [pos[i][1] for i in random_list]] )
+        num, x, y = random_fts.shape
+        if len(features) == 0:
+            features = random_fts.reshape(num, x*y)
+        else:
+            features = np.append(features, random_fts.reshape(num,x*y), axis=0)
+
+        # targets for the obtained positions
+        targets.extend([lbl for i in range(len(num_records))])
+
+    out_pos = dict(dict_creator(out_pos))
+
+    save_data({'features': features, 'targets':targets, 'positions': out_pos}, 'test_output.p', path)
+    print 'features.shape:', features.shape
+    print 'targets.shape: ', targets.shape
+    print 'DONE'
+
+
+
+"""
+create dict given a list of tuples
+"""
+def dict_creator(tups):
+    it = groupby(tups, itemgetter(0))
+    for key, vals in it:
+        yield key, np.array([val[1] for val in vals])
 
 
 """
@@ -325,6 +377,13 @@ def parser():
     p_topn.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
     p_topn.set_defaults(which='top_n')
 
+    # n_random
+    p_rand = subparsers.add_parser('rand', help='get n random samples from training set')
+    p_rand.add_argument('-ls', '-label_s', action='store', dest='label_s', type=int, help='the staring label to be explored')
+    p_rand.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
+    p_rand.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
+    p_rand.set_defaults(which='rand')
+
     args = parser.parse_args()
     return args
 
@@ -383,6 +442,8 @@ def main():
         print '\n'
         print 'done top_n'
 
+    elif args.which == 'rand':
+        n_random_records(args.n, args.label_s, args.label_e, path+'top/')
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
         sys.exit(1)
