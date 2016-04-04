@@ -230,6 +230,7 @@ def n_random_records(max_records, label_s, label_e, path=''):
         print 'random_list size:', len(random_list)
         random_list = np.random.choice( random_list, num_records, replace=False )
         out_pos.extend([pt for pt in [pos[i] for i in random_list]])
+        print 'random_list:', random_list
 
         # add randomised features to output list
         random_fts = np.array( [data['features'][loc] for loc in [pos[i][1] for i in random_list]] )
