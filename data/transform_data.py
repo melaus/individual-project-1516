@@ -211,7 +211,7 @@ def n_random_records(max_records, label_s, label_e, path=''):
             continue
 
         print 'load data from', filename
-        data = load_data(filename, 'rb', path)
+        data = load_data(filename, 'rb')
 
         # number of records to get for this label
         num_records = max_records if len(data['features']) >= max_records else len(data['features'])
