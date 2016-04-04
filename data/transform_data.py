@@ -198,7 +198,7 @@ get [n] random records as a combined dict
 """
 def n_random_records(max_records, label_s, label_e, path=''):
     features = np.array([])
-    targets = np.array([])
+    targets = np.array([], int)
     out_pos = []
 
     for lbl in range(label_s, label_e+1):
@@ -228,7 +228,7 @@ def n_random_records(max_records, label_s, label_e, path=''):
         # find random choice of positions
         random_list = np.array( [i for i in range(len(pos))] )
         print 'random_list size:', len(random_list)
-        random_list = np.random.choice( random_list, num_records, replace=False )
+        random_list = sorted(np.random.choice( random_list, num_records, replace=False ))
         out_pos.extend([pt for pt in [pos[i] for i in random_list]])
         print 'random_list:', random_list
 
@@ -241,11 +241,13 @@ def n_random_records(max_records, label_s, label_e, path=''):
             features = np.append(features, random_fts.reshape(num,x*y), axis=0)
 
         # targets for the obtained positions
-        targets = np.append(targets, [lbl for i in range(len(num_records))])
+        targets = np.append(targets, [lbl for i in range(num_records)])
+    
+    print 'len(out_pos):', len(out_pos)
+    print '\n'
+    out = dict(dict_creator(out_pos))
 
-    out_pos = dict(dict_creator(out_pos))
-
-    save_data({'features': features, 'targets':targets, 'positions': out_pos}, 'test_output.p', path)
+    save_data({'features': features, 'targets':targets, 'positions': out}, 'test_output.p', path)
     print 'features.shape:', features.shape
     print 'targets.shape: ', targets.shape
     print 'DONE'
@@ -256,9 +258,12 @@ def n_random_records(max_records, label_s, label_e, path=''):
 create dict given a list of tuples
 """
 def dict_creator(tups):
+    tups = sorted(tups, key=itemgetter(0))
     it = groupby(tups, itemgetter(0))
     for key, vals in it:
-        yield key, np.array([val[1] for val in vals])
+        out = np.array([val[1] for val in vals])
+        print 'key:', key
+        yield key, out 
 
 
 """
