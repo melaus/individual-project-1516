@@ -226,7 +226,9 @@ def n_random_records(max_records, label_s, label_e, path=''):
         print 'size of pos:', len(pos)
 
         # find random choice of positions
-        random_list = np.random.choice( np.array( [i in range(len(pos))] ), num_records, replace=False )
+        random_list = np.array( [i for i in range(len(pos))] )
+        print 'random_list size:', len(random_list)
+        random_list = np.random.choice( random_list, num_records, replace=False )
         out_pos.extend([pt for pt in [pos[i] for i in random_list]])
 
         # add randomised features to output list
