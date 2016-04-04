@@ -223,6 +223,8 @@ def n_random_records(max_records, label_s, label_e, path=''):
         for img in data['images']:
             pos.extend(zip( [img for i in range( len(data['positions'][img]) )], data['positions'][img]) )
 
+        print 'size of pos:', len(pos)
+
         # find random choice of positions
         random_list = np.random.choice( np.array( [i in range(len(pos))] ), num_records, replace=False )
         out_pos.extend([pt for pt in [pos[i] for i in random_list]])
