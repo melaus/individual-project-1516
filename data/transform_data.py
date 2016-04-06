@@ -345,12 +345,13 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
 
     # obtain patches for all images that has labels
     for lbl in range(label_s, label_e+1):
+        print '--- in lbl', 'lbl','---'
         for img in labels2imgs_i[lbl]:
             # get the positions of the required features
             print '[lim:x-lim]:', (lim, x-lim), 'lim:y-lim', (lim, y-lim)
             img_labels = labels[img, lim:x-lim, lim:y-lim].reshape((x-lim*2)*(y-lim*2))
             pos = sorted(np.where(img_labels == lbl)[0])
-            print '\n',pos, '\n'
+            print 'img', img, 'has', len(pos), 'positions with the label'
 
             # open the required patch file
             px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', path+'px/')
@@ -362,6 +363,7 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
                 out = np.append(out, px[pos,:,:], axis=0)
 
         print 'shape:', out.shape
+        print '\n'
 
         save_data(out, 'per_lbl_'+str(lbl)+'.p', path+'lbl/')
         out = np.array([])
