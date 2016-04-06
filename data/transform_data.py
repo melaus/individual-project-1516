@@ -100,6 +100,7 @@ def get_norm_depth(areas, means):
 ONE-OFF
 
 generate a label-image dictionary
+generate ignore list
 """
 
 # for i in range(0, 1449):
@@ -107,6 +108,22 @@ generate a label-image dictionary
 
 # for label in range(0,9):
 #     labels2imgs[label] =  np.array([ img for img in range(0,3) if len(np.where(imgs2labels[img] == label)[0]) > 0 ])
+
+
+# def ignore_images():
+#     out = np.array([])
+#     out = np.append(out, [169,57, 311,1345,349,341,342,350,351,362,363])
+#     out = np.append(out, range(83,118+1))
+#     out = np.append(out, range(335,337+1))
+#     out = np.append(out, range(238,248+1))
+#     out = np.append(out, [136,1295,270])
+#     out = np.append(out, [407,408,409,440,441,442,466,467,645,646,278])
+
+# out = dict()
+# for lbl in labels2imgs:
+    # out[lbl] = np.array([x for x in labels2imgs[lbl] if x not in to_ignore])
+
+# p.dump(out, open('labels2imgs_ignore.p', 'wb'))
 
 
 """
@@ -318,49 +335,85 @@ def aggr_per_pixel(depths, img_start, img_end, dim, path):
 
 
 """
-ENTRY
-
-generate the patches of some given coordinates
+obtain patches for each label
 """
-def entry_given_co(depths, labels, lbl, dim):
-    co = get_object_coordinates(labels, lbl, dim)
-    object_depth = get_object_depth(depths, co, dim)
-    norm = get_norm_depth(object_depth, mean_val(object_depth))
+def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
+    lim = int(m.floor(dim/2))
+    x, y = 640, 480
 
-    return norm 
+    out = np.array([])
+
+    # obtain patches for all images that has labels
+    for lbl in range(label_s, label_e+1):
+        for img in labels2imgs_i[lbl]:
+            # get the positions of the required features
+            print '[lim:x-lim]:', (lim, x-lim), 'lim:y-lim', (lim, y-lim)
+            img_labels = labels[img, lim:x-lim, lim:y-lim].reshape((x-lim*2)*(y-lim*2))
+            pos = sorted(np.where(img_labels == lbl)[0])
+            print '\n',pos, '\n'
+
+            # open the required patch file
+            px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', path+'px/')
+
+            # add to output array
+            if len(out) == 0 :
+                out = px[pos,:,:]
+            else:
+                out = np.append(out, px[pos,:,:], axis=0)
+
+        print 'shape:', out.shape
+
+        save_data(out, 'per_lbl_'+str(lbl)+'.p', path+'lbl/')
+        out = np.array([])
 
 
-"""
-AVAILABLE FUNCTION
 
-obtain and store the required object patches for the required image
-"""
-def aggr_given_co(depths, labels, img_start, img_end, dim, path):
 
-    output_patches = []
-    output_targets = []
 
-    # do this for each given image
-    for img in range(img_start, img_end+1):
-        img_depths = depths[img]
-        img_labels = labels[img]
-        x, y = img_labels.shape
-        set_labels = list(set(img_labels.reshape(x*y,))) # the set of labels in the image
-        print set_labels
-
-        # do this for all the labels
-        for lbl in set_labels:
-            patches = entry_given_co(img_depths, img_labels, lbl, dim)
-
-            # append only if not empty
-            if patches:
-                output_patches.extend(patches)
-                output_targets.extend([lbl for l in range(len(patches))])
-
-        # store feature-target dictionary and reset outputs
-        save_data(create_ft_dict(np.array(output_patches), np.array(output_targets)),'ft_co_'+str(img)+'.p', path)
-        output_patches = []
-        output_targets = []
+# """
+# ENTRY
+#
+# generate the patches of some given coordinates
+# """
+# def entry_given_co(depths, labels, lbl, dim):
+#     co = get_object_coordinates(labels, lbl, dim)
+#     object_depth = get_object_depth(depths, co, dim)
+#     norm = get_norm_depth(object_depth, mean_val(object_depth))
+#
+#     return norm
+#
+#
+# """
+# AVAILABLE FUNCTION
+#
+# obtain and store the required object patches for the required image
+# """
+# def aggr_given_co(depths, labels, img_start, img_end, dim, path):
+#
+#     output_patches = []
+#     output_targets = []
+#
+#     # do this for each given image
+#     for img in range(img_start, img_end+1):
+#         img_depths = depths[img]
+#         img_labels = labels[img]
+#         x, y = img_labels.shape
+#         set_labels = list(set(img_labels.reshape(x*y,))) # the set of labels in the image
+#         print set_labels
+#
+#         # do this for all the labels
+#         for lbl in set_labels:
+#             patches = entry_given_co(img_depths, img_labels, lbl, dim)
+#
+#             # append only if not empty
+#             if patches:
+#                 output_patches.extend(patches)
+#                 output_targets.extend([lbl for l in range(len(patches))])
+#
+#         # store feature-target dictionary and reset outputs
+#         save_data(create_ft_dict(np.array(output_patches), np.array(output_targets)),'ft_co_'+str(img)+'.p', path)
+#         output_patches = []
+#         output_targets = []
 
 
 
@@ -393,6 +446,12 @@ def parser():
     p_rand.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
     p_rand.add_argument('-n', action='store', dest='n', type=int, help='the number of random samples required')
     p_rand.set_defaults(which='rand')
+
+    p_lbl = subparsers.add_parser('lbl', help='get patches from all images for a given label')
+    p_lbl.add_argument('-ls', '-label_s', action='store', dest='label_s', type=int, help='the staring label to be explored')
+    p_lbl.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
+    p_lbl.add_argument('-d', '-dim', action='store', dest='dim', type=int, help='dimension of patches')
+    p_lbl.set_defaults(which='lbl')
 
     args = parser.parse_args()
     return args
@@ -431,18 +490,22 @@ def main():
     if args.which == 'patches':
         print 'in patches'
         # load required data
-        depths, labels = initialise(path)
         # depths = np.array([[[1,2,3,10,11,12],[4,5,6,13,14,15],[7,8,9,16,17,18]]])
         # labels = np.array([[[13,13,14,19,24,26],[15,15,19,42,44,46],[4,3,2,9,10,11]]])
 
         if args.fn == 'per_pixel':
+            depths, labels = initialise(path)
             print 'running per_pixel'
             aggr_per_pixel(depths, args.img_s, args.img_e, args.dim, path)
             print 'done per_pixel'
-        elif args.fn== 'co':
-            print 'running co'
-            aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
-            print 'done co'
+        # elif args.fn== 'co':
+        #     print 'running co'
+        #     aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
+        #     print 'done co'
+        elif args.fn == 'lbl':
+            labels = load_data('labels.p','rb', path)
+            labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', path)
+            patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
 
     elif args.which == 'top_n':
         print 'running top_n'
@@ -454,8 +517,14 @@ def main():
 
     elif args.which == 'rand':
         n_random_records(args.n, args.label_s, args.label_e, path+'top/')
+
+    elif args.fn == 'lbl':
+        labels = load_data('labels.p','rb', path)
+        labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', path)
+        patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
+
     else:
-        print >> sys.stderr, 'possible inputs: per_pixel, co, top_n'
+        print >> sys.stderr, 'possible inputs: per_pixel, co, top_n, rand, lbl'
         sys.exit(1)
 
 

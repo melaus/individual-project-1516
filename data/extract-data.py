@@ -48,7 +48,7 @@ def run():
     run everything required to gather data and output it to files
     """
     # where to get data from
-    matlab = h5py.File('py-data/nyu_depth_v2_labeled.mat', 'r') 
+    matlab = h5py.File('py-data/nyu_depth_v2_labeled.mat', 'r')
     #number_datasets = [ 'accelData', 'depths', 
                         #'images', 'instances', 
                         #'labels' ] 
