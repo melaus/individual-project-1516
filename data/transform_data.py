@@ -345,7 +345,7 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
 
     # obtain patches for all images that has labels
     for lbl in range(label_s, label_e+1):
-        print '--- in lbl', 'lbl','---'
+        print '--- in lbl', lbl, '---'
         for img in labels2imgs_i[lbl]:
             # get the positions of the required features
             print '[lim:x-lim]:', (lim, x-lim), 'lim:y-lim', (lim, y-lim)
