@@ -518,7 +518,7 @@ def main():
     elif args.which == 'rand':
         n_random_records(args.n, args.label_s, args.label_e, path+'top/')
 
-    elif args.fn == 'lbl':
+    elif args.which == 'lbl':
         labels = load_data('labels.p','rb', path)
         labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', path)
         patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
