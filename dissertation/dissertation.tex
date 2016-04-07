@@ -1,0 +1,208 @@
+\documentclass[11pt,openright,a4paper]{report}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{geometry}
+\usepackage{tabularx}
+\usepackage{color}
+\usepackage[table]{xcolor}
+\usepackage{caption, subcaption}
+\usepackage{amssymb, amsmath}
+\usepackage{listings}
+\lstset{language=MatLab}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{subfiles}
+
+\graphicspath{ {images/} }
+
+% set margin
+\geometry{
+  a4paper,
+  top=20mm,
+  bottom=20mm
+}
+
+% self-defined colours
+\definecolor{newgrey}{HTML}{e5e5e5}
+
+% title
+\title{
+  Final Year Project \textit{Work In Progress…}
+  \\~\\
+  \textbf{Using Machine-learning Techniques to Achieve Quality Mutilclass Classification Results(Working Title)}
+}
+\author{Alan Lau (awll20)}
+%\date{MComp Computer Science\\University of Bath\\October 2015}
+
+% set section depth
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{5}
+
+% tab spacing
+\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+
+% set chapter format
+\titleformat{\chapter}[hang]{\LARGE\bfseries}{\thechapter\hspace{20pt}}{0pt}{\LARGE\bfseries}
+\titlespacing{\chapter}{0pt}{0pt}{5pt}
+
+% set section format
+\titleformat{\section}[hang]{\Large\bfseries}{\thesection\hspace{20pt}}{0pt}{\Large\bfseries}
+\titlespacing{\section}{0pt}{30pt}{-3pt}
+
+% set subsection format
+\titleformat{\subsection}[hang]{\large\bfseries}{\thesubsection\hspace{20pt}}{0pt}{\large\bfseries}
+\titlespacing{\subsection}{0pt}{10pt}{-3pt}
+
+% set subsubsection format
+\titleformat{\subsubsection}[hang]{\bfseries}{\thesubsubsection\hspace{20pt}}{0pt}{\bfseries}
+\titlespacing{\subsubsection}{0pt}{10pt}{-5pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+% title page
+\maketitle
+\newpage
+
+% set pagragraph style
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+
+\newpage
+
+
+% abstract
+\subfile{sub/abstract.tex}
+\newpage
+
+
+% acknowledgements
+\subfile{sub/ack.tex}
+\newpage
+
+
+% ToC
+\tableofcontents
+\newpage
+% reset page number
+\pagenumbering{arabic}
+\setcounter{page}{1}
+% set pagragraph style
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+\newpage
+
+
+% introduction
+\subfile{sub/introduction.tex}
+\newpage
+
+% image - dot product illustration
+%\begin{figure}[h]
+  %\centering
+  %\includegraphics[width=0.6\textwidth]{dot_product}
+  %\caption{\textit{An example of how dot product is performed during the convolution process. The dot product between a 3x3 image patch centred around a pixel, \texttt{x}, and the kernel, produces a new value, \texttt{x'}. This is stored at the same position as \texttt{x} in the output image.}}
+  %\label{fig:dot_product}
+%\end{figure}
+
+
+% methodology
+\subfile{sub/methodology.tex}
+\newpage
+
+
+% techical approach
+\subfile{sub/tech_approach.tex}
+\newpage
+
+
+% results
+\subfile{sub/results.tex}
+\newpage
+
+
+% conclusion
+\subfile{sub/conclusion.tex}
+\newpage
+
+
+\newpage
+\subsubsection{Table}
+
+\begin{longtable}{ | m{2.3cm} | m{3.8cm} | c | }
+  \hline
+  Name & Kernel & Image \\ \hline
+  
+  Edge 
+  
+  Enhancement
+  &
+  \[ \begin{bmatrix} 0 & 0 & 0 \\ -1 & 1 & 0 \\ 0 & 0 & 0 \end{bmatrix} \]
+  & 
+  \begin{minipage}{.6\textwidth}
+    %\includegraphics[width=\linewidth]{en.png}
+  \end{minipage}
+  \\ \hline
+  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
+  \\ \hline
+
+  Edge 
+  
+  Detection
+  &
+  \[ \begin{bmatrix} 0 & 1 & 0 \\ 1 & -4 & 1 \\ 0 & 1 & 0 \end{bmatrix} \]
+  &
+  \begin{minipage}{.6\textwidth}
+    %\includegraphics[width=\linewidth]{ed.png}
+  \end{minipage}
+  \\ \hline
+  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
+  \\ \hline
+
+  Sharpen 
+  &
+  \[ \begin{bmatrix} 0  &  0  &  0  &  0  &  0 \\ 
+                     0  &  0  & -1  &  0  &  0 \\
+                     0  & -1  &  5  & -1  &  0 \\ 
+                     0  &  0  & -1  &  0  &  0 \\
+                     0  &  0  &  0  &  0  &  0
+   \end{bmatrix} \]
+  & 
+  \begin{minipage}{.6\textwidth}
+    %\includegraphics[width=\linewidth]{sharp.png}
+  \end{minipage}
+  \\ \hline
+  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
+  \\ \hline
+
+  
+  Box Blur 
+  &
+  \[ \frac{1}{9}\begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} \]
+  & 
+  \begin{minipage}{.6\textwidth}
+    %\includegraphics[width=\linewidth]{blur.png}
+  \end{minipage}
+  \\ \hline
+  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
+  \\ \hline
+
+  \caption{Convoluation results}
+  \label{tbl:conv}
+\end{longtable}
+
+
+\newpage
+
+% bibliography
+\pagenumbering{gobble}
+\bibliographystyle{unsrt}
+\bibliography{mybib}
+
+
+\end{document}

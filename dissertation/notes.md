@@ -22,4 +22,34 @@
 # Cross Validation
 - cv = cv
     - integer
-    - 
+
+# Structure
+- Title
+- Abstract
+- Acknowledgements
+- Contents Pages
+- Introduction
+- Literature Review
+- Methodology 
+  - Define 'quality'
+  - Choosing a Classification Model
+      - SVM
+      - (Random Forest)
+  - Feature Engineering
+- Technical Approach
+  - Tools
+    - Python
+      - scikit-learn
+          - many features for training models, performing cross validations and 
+      - numpy
+    - Why not MatLab or R
+      - familiarity with Python
+      - powerful, open-source libraries
+    - Balena
+- Results
+  - Performance
+  - Comparison
+  - Practicality
+- Conclusion
+- Bibliography
+- Appendices (tech/ results)

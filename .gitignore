@@ -9,3 +9,10 @@ co/
 slurm_co/
 py_data
 *.slurm
+
+*.aux
+*.log
+*.toc
+*.pdf
+
+data/nyu_depth_v2_labeled.mat
