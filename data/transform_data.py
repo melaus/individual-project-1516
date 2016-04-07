@@ -1,5 +1,5 @@
 
-import cPickle as pickle
+import pickle as pickle
 import numpy as np
 import sys
 import math as m
@@ -18,6 +18,7 @@ input:
 """
 def initialise(path='',img=''):
     # load image data
+    # TODO: NOT GOING TO WORK ANYMORE
     depth = pickle.load(open(path+'depths'+img+'.p', 'r'))
     label = pickle.load(open(path+'labels'+img+'.p', 'r')) # 640 * 480
 
@@ -164,7 +165,7 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         for img in imgs:
             print 'in', img
             # get image and randomised position
-            data = load_data('co/ft_co_'+str(img)+'.p', 'rb', path)
+            data = load_data('co/ft_co_'+str(img)+'.p', 'rb', 'p', path)
             print 'loaded data'
             print 'size of targets with this label:', np.where(data['targets'] == label)[0].shape
             
@@ -195,7 +196,7 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
         col_sum = sum(collected)
 
         output_dict = {'features': data_aggr, 'images' : imgs, 'positions' : pos_dict}
-        save_data(output_dict, 'top/top_'+str(label)+'_'+str(int(extract_imgs))+'_'+str(int(col_sum))+'.p', path)
+        save_data(output_dict, 'top/top_'+str(label)+'_'+str(int(extract_imgs))+'_'+str(int(col_sum))+'.p', 'p', path)
         print 'top_n for label', label, 'saved'
         print ''
         print '----shape of data----'
@@ -228,7 +229,7 @@ def n_random_records(max_records, label_s, label_e, path=''):
             continue
 
         print 'load data from', filename
-        data = load_data(filename, 'rb')
+        data = load_data(filename, 'rb', 'p')
 
         # number of records to get for this label
         num_records = max_records if len(data['features']) >= max_records else len(data['features'])
@@ -264,7 +265,7 @@ def n_random_records(max_records, label_s, label_e, path=''):
     print '\n'
     out = dict(dict_creator(out_pos))
 
-    save_data({'features': features, 'targets':targets, 'positions': out}, 'test_output.p', path)
+    save_data({'features': features, 'targets':targets, 'positions': out}, 'test_output.p', 'p', path)
     print 'features.shape:', features.shape
     print 'targets.shape: ', targets.shape
     print 'DONE'
@@ -293,8 +294,11 @@ def create_ft_dict(features, targets):
 """
 load data from file
 """
-def load_data(filename, mode, path=''):
-    return pickle.load(open(path+filename, mode))
+def load_data(filename, mode, method, path=''):
+    if method == 'p':
+        return pickle.load(open(path+filename, mode))
+    elif method == 'np':
+        return np.load(path+filename)['arr_0']
 
 
 """
@@ -305,10 +309,13 @@ input:
     - (string) filename: the name of the file to be saved
     - (string) path: store it outside of 'root'
 """
-def save_data(data, filename, path=''):
-    pickle.dump(data, open(path+filename, 'wb'))
+def save_data(data, filename, method, path=''):
+    if method == 'p':
+        pickle.dump(data, open(path+filename, 'wb'))
+    elif method == 'np':
+        np.savez(path+filename, filename)
 
-    print 'data saved'
+    print 'data saved using', method
 
 
 """
@@ -331,7 +338,7 @@ def aggr_per_pixel(depths, img_start, img_end, dim, path):
     # for each image
     for img in range(img_start, img_end+1):
         # print entry_per_pixel(depths[img], dim)
-        save_data(np.array(entry_per_pixel(depths[img], dim)), 'px_'+str(dim)+'_'+str(img)+'.p', path)
+        save_data(np.array(entry_per_pixel(depths[img], dim)), 'px_'+str(dim)+'_'+str(img)+'.p', 'p', path)
 
 
 """
@@ -354,7 +361,7 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
             print 'img', img, 'has', len(pos), 'positions with the label\n'
 
             # open the required patch file
-            px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', path+'px/')
+            px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', 'p', path+'px/')
 
             # add to output array
             if len(out) == 0 :
@@ -365,7 +372,8 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
         print 'shape:', out.shape
         print ''
 
-        save_data(out, 'per_lbl_'+str(lbl)+'.p', path+'lbl/')
+        # save using numpy
+        save_data(out, 'per_lbl_'+str(lbl), 'np', path+'lbl/')
         out = np.array([])
 
 
@@ -505,13 +513,13 @@ def main():
         #     aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
         #     print 'done co'
         elif args.fn == 'lbl':
-            labels = load_data('labels.p','rb', path)
-            labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', path)
+            labels = load_data('labels.p','rb','p', path)
+            labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', 'p', path)
             patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
 
     elif args.which == 'top_n':
         print 'running top_n'
-        labels2imgs = load_data('labels2imgs.p', 'rb', path)
+        labels2imgs = load_data('labels2imgs.p', 'rb', 'p', path)
         print '\n'
         top_n(args.label_s, args.label_e, labels2imgs, args.images, args.n, path)
         print '\n'
@@ -521,8 +529,8 @@ def main():
         n_random_records(args.n, args.label_s, args.label_e, path+'top/')
 
     elif args.which == 'lbl':
-        labels = load_data('labels.p','rb', path)
-        labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', path)
+        labels = load_data('labels.p','rb', 'p', path)
+        labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', 'p', path)
         patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
 
     else:
