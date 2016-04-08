@@ -382,9 +382,10 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
 """
 use k-means to create a smaller dataset
 """
-def kmeans(init, n_clusters, n_init, data, label_s, label_e, path):
+def kmeans(init, n_clusters, n_init, label_s, label_e, path):
 
     for lbl in range(label_s, label_e+1):
+        data = load_data('per_lbl_'+str(lbl)+'.npy', '', np, path+'lbl/lbl')
         cls = KMeans(init=init, n_clusters=n_clusters, n_init=n_init)
 
         t0 = time.time()
@@ -480,6 +481,13 @@ def parser():
     p_lbl.add_argument('-d', '-dim', action='store', dest='dim', type=int, help='dimension of patches')
     p_lbl.set_defaults(which='lbl')
 
+    p_km = subparsers.add_parser('km', help='k-means clustering')
+    p_km.add_argument('-n_init', action='store', dest='init', help='number of seeds')
+    p_km.add_argument('-n_cluster', action='store', dest='n_cluster', help='number of cluster/ points to generate')
+    p_km.add_argument('-ls', '-label_s', action='store', dest='label_s', type=int, help='the staring label to be explored')
+    p_km.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
+    p_km.set_defaults(which='km')
+
     args = parser.parse_args()
     return args
 
@@ -549,6 +557,9 @@ def main():
         labels = load_data('labels.npy','', 'np', path)
         labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', 'p', path)
         patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
+
+    elif args.which == 'km':
+        kmeans('k-means++', args.n_clusters, args.n_init, args.label_s, args.label_e, path)
 
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n, rand, lbl'
