@@ -300,7 +300,7 @@ def load_data(filename, mode, method, path=''):
     if method == 'p':
         return pickle.load(open(path+filename, mode))
     elif method == 'np':
-        return np.load(path+filename)['arr_0']
+        return np.load(path+filename)
 
 
 """
@@ -315,7 +315,7 @@ def save_data(data, filename, method, path=''):
     if method == 'p':
         pickle.dump(data, open(path+filename, 'wb'))
     elif method == 'np':
-        np.savez(path+filename, filename)
+        np.save(path+filename, filename)
 
     print 'data saved using', method
 
