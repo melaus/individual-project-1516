@@ -315,7 +315,7 @@ def save_data(data, filename, method, path=''):
     if method == 'p':
         pickle.dump(data, open(path+filename, 'wb'))
     elif method == 'np':
-        np.save(path+filename, filename)
+        np.save(path+filename, data)
 
     print 'data saved using', method
 
@@ -546,7 +546,7 @@ def main():
         n_random_records(args.n, args.label_s, args.label_e, path+'top/')
 
     elif args.which == 'lbl':
-        labels = load_data('labels.p','rb', 'p', path)
+        labels = load_data('labels.npy','', 'np', path)
         labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', 'p', path)
         patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
 
