@@ -8,6 +8,8 @@ import glob
 from math import ceil
 from itertools import groupby
 from operator import itemgetter
+from sklearn.cluster import KMeans
+import time
 #import matplotlib.pyplot as plt
 
 """
@@ -361,7 +363,8 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
             print 'img', img, 'has', len(pos), 'positions with the label\n'
 
             # open the required patch file
-            px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', 'p', path+'px/')
+            # px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', 'p', path+'px/')
+            px = load_data('px_'+str(dim)+'_'+str(img)+'.npy', 'rb', 'np', path+'px/')
 
             # add to output array
             if len(out) == 0 :
@@ -376,6 +379,20 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
         save_data(out, 'per_lbl_'+str(lbl), 'np', path+'lbl/')
         out = np.array([])
 
+"""
+use k-means to create a smaller dataset
+"""
+def kmeans(init, n_clusters, n_init, data, label_s, label_e, path):
+
+    for lbl in range(label_s, label_e+1):
+        cls = KMeans(init=init, n_clusters=n_clusters, n_init=n_init)
+
+        t0 = time.time()
+        cls.fit(data)
+        t1 = time.time()
+        print 'time taken to get', len(cls.cluster_centers_), 'features in', t1-t0, 'seconds'
+
+        save_data(cls.cluster_centers_, 'pts_'+str(lbl), 'np', path+'pts/')
 
 
 
