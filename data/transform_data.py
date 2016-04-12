@@ -523,6 +523,8 @@ def parser():
     p_pts.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
     p_pts.set_defaults(which='pts')
 
+    p_com = subparsers.add_parser('com', help='combine multiple files as one feature-target dictionary')
+    p_com.set_defaults(which='com')
     args = parser.parse_args()
     return args
 
@@ -559,9 +561,6 @@ def main():
     # find out which function to perform
     if args.which == 'patches':
         print 'in patches'
-        # load required data
-        # depths = np.array([[[1,2,3,10,11,12],[4,5,6,13,14,15],[7,8,9,16,17,18]]])
-        # labels = np.array([[[13,13,14,19,24,26],[15,15,19,42,44,46],[4,3,2,9,10,11]]])
 
         if args.fn == 'per_pixel':
             depths, labels = initialise(path)
@@ -591,6 +590,9 @@ def main():
 
     elif args.which == 'pts':
         kmeans('k-means++', args.n_clusters, args.n_init, args.label_s, args.label_e, path)
+
+    elif args.which == 'com':
+        combine_data(path+'lbl/')
 
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n, rand, lbl'
