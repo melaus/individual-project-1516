@@ -2,25 +2,25 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{titlesec}
-\usepackage{geometry}
+\usepackage[margin=35mm,footskip=0.5in]{geometry}
 \usepackage{tabularx}
 \usepackage{color}
 \usepackage[table]{xcolor}
 \usepackage{caption, subcaption}
 \usepackage{amssymb, amsmath}
 \usepackage{listings}
-\lstset{language=MatLab}
+\lstset{language=Python}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{subfiles}
 
-\graphicspath{ {images/} }
+\graphicspath{ {images/} {lit_review/images/} }
 
 % set margin
 \geometry{
   a4paper,
-  top=20mm,
-  bottom=20mm
+  top=25mm,
+  bottom=35mm
 }
 
 % self-defined colours
@@ -69,12 +69,10 @@
 \maketitle
 \newpage
 
+\begingroup
 % set pagragraph style
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{\baselineskip}
-
-\newpage
-
 
 % abstract
 \subfile{sub/abstract.tex}
@@ -84,7 +82,7 @@
 % acknowledgements
 \subfile{sub/ack.tex}
 \newpage
-
+\endgroup
 
 % ToC
 \tableofcontents
@@ -92,6 +90,7 @@
 % reset page number
 \pagenumbering{arabic}
 \setcounter{page}{1}
+
 % set pagragraph style
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{\baselineskip}
@@ -110,6 +109,8 @@
   %\label{fig:dot_product}
 %\end{figure}
 
+\subfile{lit_review/lit_review.tex}
+\newpage
 
 % methodology
 \subfile{sub/methodology.tex}

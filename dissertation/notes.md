@@ -23,33 +23,61 @@
 - cv = cv
     - integer
 
+
+
+
+
+
+
+
 # Structure
 - Title
+    - Using Machine-learning Techniques to Achieve Quality Mutilclass Object Classification in Images Using Depth Data
 - Abstract
-- Acknowledgements
-- Contents Pages
+    - how to generalise a multi-class classification problem
+    - demonstrate the process of applying machine learning on a relatively large problem
+#- Acknowledgements
+#- Contents Pages
 - Introduction
+    - aim/ rationale
+    - related work
+
 - Literature Review
+    - what more to add?
 - Methodology 
+    - 'higher level'
   - Define 'quality'
   - Choosing a Classification Model
       - SVM
       - (Random Forest)
   - Feature Engineering
+      - 15*15 patches
+      - have to create a managable dataset (291716 patches per image)
+          - random
+          - k-means clustering
 - Technical Approach
+    - 'more academic'
+  - Support Vector Machine
   - Tools
     - Python
       - scikit-learn
           - many features for training models, performing cross validations and 
       - numpy
+          - very helpful in manipulating lists
     - Why not MatLab or R
       - familiarity with Python
       - powerful, open-source libraries
     - Balena
+      - large dataset
+      - memory and storage requirements
 - Results
   - Performance
   - Comparison
   - Practicality
+      - speed vs quality trade-off
 - Conclusion
+    - more features
+    - smarter data selection - discard similar data
+- Future Work
 - Bibliography
-- Appendices (tech/ results)
+- Appendix (tech/ results)

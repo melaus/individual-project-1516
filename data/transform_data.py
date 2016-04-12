@@ -411,7 +411,7 @@ def combine_data(path=''):
 
         print 'load data of', lbl
         if lbl in all_kmeans:
-            file = 'per_lbl_'+str(lbl)+_'slim.npy'
+            file = 'per_lbl_'+str(lbl)+'_'+'slim.npy'
             data = np.load(path+'lbl/'+file)
             print 'k_meaned filename:', file, 'of shape', data.shape
         else:
@@ -420,7 +420,7 @@ def combine_data(path=''):
             data = data.reshape(len(data), 225)
             print 'normal filename:  ', file, 'of shape', data.shape
        
-            if len(features) == 0 and len(targets) = 0:
+            if len(features) == 0 and len(targets) == 0:
                 features = data
                 labels   = np.array([lbl for x in range(len(data))])
             else:
@@ -429,7 +429,7 @@ def combine_data(path=''):
 
             print 'added to dicts\n\n'
 
-     save_data(create_ft_dict(features, targets), 'combined', 'np', path+'lbl/')
+    save_data(create_ft_dict(features, targets), 'combined', 'np', path+'lbl/')
 
 
 

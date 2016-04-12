@@ -2,15 +2,77 @@
 \begin{document}
 
 \chapter{Methodology}
+\label{chap:methodology}
 
 \section{Goal}
 - quality - best case: 100\% TP, none
 
 \section{Choosing a Classification Algorithm}
-Nearest neighbour is good for binary classification
+Nearest neighbour
+
+\section{SVM}
+SVM
+- widely used
+- (explain how it works?)
 
 \section{Feature Engineering}
-A custom dataset has to be created to perform 
+Before we can run any supervised classfication algorithm, we have to create a labelled dataset for it to learn from. Labels represent different classes of objects. Some examples of labels are 'chair', 'desk' and 'lamp'. For each label, we form data points, known as feature vectors, where each point contains information about an object belonging to that label. Much consideration is required to create a quality dataset that can create a generalised classifier that can predict unseen data properly.
 
-One idea is to collect a random number of points from a random selection of images possessing the label. The idea is to try to be as impartial as possible. However, the disadvantage is that these random images may not cover all the cases
+The NYU Depth Dataset provides as a great starting point for creating the training dataset required for this project. It contains useful data for many scans at many different scenes, which requires a variety of available scenes and time. Also, these images are already labelled per pixel, which makes it easier to form our dataset. 
+
+\subsection{Depth Patches as Features}
+Depth information of each image scan is used to form the feature vectors. In the NYU Depth Dataset, each pixel is given a depth value, which represents the distance between the camera and the pixel in the scene. A simple approach would be to use the depth value of each pixel as features. However, this would not form an effective classifier, as the distance of one point could not separate a label from another. For example, a red dot could mean many different classes of objects in the real world. We would need to consider the surroundings to that dot in order to differentiate between classes of objects.
+
+The solution is to obtain a patch around a pixel. This would provide some context as to what that pixel might represent by taking its neighbours into account. However, the size of the patch should not be too small or too large. In both cases, it would be hard for the classifier to distinguish between labels due to too little information or the presence of too much noise. After all, machine learning algorithms attempt to create correct boundaries between data points so that they can be labelled as a class. Considering the size of the input images (640-by-480 pixels) and the sizes of objects in most scenes, a 15-by-15 pixels patch (7 neighbouring pixels at each direction) is chosen.
+
+% TODO: illustrate depth
+
+Each of the patches is then normalised by deducting the mean of the patch from each pixel. The aim is to remove the actual distance between the camera and the object, so that each patch is more or less independent of factors such as the angle of which the image is taken from and the actual distiance between the object and the camera. 
+
+% TODO: illustrate process of picking 15*15
+
+
+\subsection{Reducing Number of Datapoints}
+Each image is composed of 640-by-480 pixels, meaning that more than 290 000 patches are generated from each image. If all 1449 images are used, 460 million patches are generated. A Support Vector Classifier would take months to train with this unrealistically large dataset. Given the time and technical limitations, a manageable dataset is required. 
+
+% TODO: image showing patches forming
+
+\rule{200pt}{1pt}
+\subsubsection{Random}
+A method for reducing the number of datapoints is to to collect a random number of datapoints from a random selection of images possessing the label. In this way, we aim to collect a vast set of data from a wide range of images. The drawback is that it is uncertain what 'random' entails. Some valuable and important features may be missed out, making the classifier less powerful.
+
+\subsubsection{K-means Clustering}
+A better way is to spot the similarities in the data and extract those points of interests. By finding groups within the data, known as clusters, it is possible to generalise each of these groups by its centroid. The obtained points provide a more reliable dataset, as it does not throw away potentially important information about this label of objects.
+
+% TODO: Clustering imagary
+
+\rule{200pt}{1pt}
+
+Due to the number of patches present in some of the labels and computational limitations, both methods are used to obtain the datasets. K-means clustering is directly applied to labels with at most 120 000 datapoints for them to compute within the six-hour time limit on Balena as a free user. A random 100 000 datapoints are selected for labels with datapoints more than the limit. A few exceptions require a random number of images to be chosen before performing the random pick and clustering, due to the amount of images containing those labels and the number of patches that are generated. 
+
+\subsection{Creating the Datasets}
+To train and measure the performance of the classifier, two datasets are created.The first dataset is the 'training dataset'. This dataset should be as large as possible to enable the classifier to learn the characteristics of the labels effectively. After all, we aim to obtain high recognition rate with the classifier. This dataset is further split into two parts - training and testing. The testing part enables the classifier to evaluate its performance.
+
+A 'validation dataset' is created to measure a more realistic performace of the classifier. This dataset is not seen by the classifier during training, and none of its datapoints present in the training dataset. It is important to avoid measuring performance of a machine-learning model with datapoints seen by the classifier. Otherwise, unrealistic prediction rates would be reported due to feature leakage. To avoid feature leakage during any stage of the process, all of these datasets should be mutually exclusive.
+
+The datasets are created by combining all the datapoints generated through k-means clustering. The sets are split into 'training and testing' and 'validation'.
+
+Some scenes are not used for any of the datasets above, so that they may be used as another way to assess the performance of the classifier in the end. This is discussed later in \autoref{chap:results}.
+
+\subsection{Detailed View of Dataset}
+% TODO: information about how we get to 1000 samples and how are we going to split
+
+% TODO: graph to illustrate the split
+
+\section{Training a Classifier}
+A classifier is then trained using the obtained data. Although the datasets have been carefully crafted, there is no guarantee that the dataset would provide any useful results. Perhaps more features is required to provide enough information for the classifier to effectively split the labelled data correctly, or that our assumption that depth is a useful metric is ill-founded.
+
+\subsection{Support Vector Machine}
+% TODO: REFERENCE TO SOMEWHERE
+As discussed in \ref{somewhere}, the SVM algorithm requires a few optional but influential parameters depending on the chosen kernel. If the selected kernel is RBF, the parameters \texttt{C} and \texttt{gamma} have to be specified.
+
+
+
+
+
 \end{document}
