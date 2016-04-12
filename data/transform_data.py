@@ -214,67 +214,6 @@ def top_n(label_s, label_e, labels_dict, num_images, num_samples, path=''):
 
 
 """
-get [n] random records as a combined dict
-"""
-def n_random_records(max_records, label_s, label_e, path=''):
-    features = np.array([])
-    targets = np.array([], int)
-    out_pos = []
-
-    for lbl in range(label_s, label_e+1):
-
-        # only run loop if there exist such file
-        filename = glob.glob(path+'top_'+str(lbl)+'_*')
-        if len(glob.glob(path+'top_'+str(lbl)+'_*')) > 0:
-            filename = filename[0]
-        else:
-            continue
-
-        print 'load data from', filename
-        data = load_data(filename, 'rb', 'p')
-
-        # number of records to get for this label
-        num_records = max_records if len(data['features']) >= max_records else len(data['features'])
-        print 'records in dict:', len(data['features']), 'wanted:', max_records, 'gets:', num_records
-
-        pos = []
-        # create pairs of positions
-        # should use 'images' as the order, as dictionary uses its own random order
-        for img in data['images']:
-            pos.extend(zip( [img for i in range( len(data['positions'][img]) )], data['positions'][img]) )
-
-        print 'size of pos:', len(pos)
-
-        # find random choice of positions
-        random_list = np.array( [i for i in range(len(pos))] )
-        print 'random_list size:', len(random_list)
-        random_list = sorted(np.random.choice( random_list, num_records, replace=False ))
-        out_pos.extend([pt for pt in [pos[i] for i in random_list]])
-        print 'random_list:', random_list
-
-        # add randomised features to output list
-        random_fts = np.array( [data['features'][loc] for loc in random_list] )
-        num, x, y = random_fts.shape
-        if len(features) == 0:
-            features = random_fts.reshape(num, x*y)
-        else:
-            features = np.append(features, random_fts.reshape(num,x*y), axis=0)
-
-        # targets for the obtained positions
-        targets = np.append(targets, [lbl for i in range(num_records)])
-    
-    print 'len(out_pos):', len(out_pos)
-    print '\n'
-    out = dict(dict_creator(out_pos))
-
-    save_data({'features': features, 'targets':targets, 'positions': out}, 'test_output.p', 'p', path)
-    print 'features.shape:', features.shape
-    print 'targets.shape: ', targets.shape
-    print 'DONE'
-
-
-
-"""
 create dict given a list of tuples
 """
 def dict_creator(tups):
@@ -300,6 +239,7 @@ def load_data(filename, mode, method, path=''):
     if method == 'p':
         return pickle.load(open(path+filename, mode))
     elif method == 'np':
+        print 'load file path:',path+filename,'\n'
         return np.load(path+filename)
 
 
@@ -354,16 +294,28 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
 
     # obtain patches for all images that has labels
     for lbl in range(label_s, label_e+1):
-        print '--- in lbl', lbl, '---'
-        for img in labels2imgs_i[lbl]:
+        print '\n\n--- in lbl', lbl, '---\n'
+
+        if lbl in [0,3,21]:
+            imgs = sorted(np.random.choice(labels2imgs_i[lbl], 400, replace=False))
+            save_data(imgs, 'per_lbl_'+str(lbl)+'_imgs', 'np', path+'lbl/')
+            print 'using new length:     ', len(imgs) 
+        else:
+            imgs = labels2imgs_i[lbl] 
+            print 'using original length:', len(imgs)
+
+        img_ctr = 1;
+
+        for img in imgs:
+            print 'img_ctr:', img_ctr
+            img_ctr += 1
             # get the positions of the required features
             print '[lim:x-lim]:', (lim, x-lim), 'lim:y-lim', (lim, y-lim)
             img_labels = labels[img, lim:x-lim, lim:y-lim].reshape((x-lim*2)*(y-lim*2))
             pos = sorted(np.where(img_labels == lbl)[0])
-            print 'img', img, 'has', len(pos), 'positions with the label\n'
+            print 'img', img, 'has', len(pos), 'positions with the label'
 
             # open the required patch file
-            # px = load_data('px_'+str(dim)+'_'+str(img)+'.p', 'rb', 'p', path+'px/')
             px = load_data('px_'+str(dim)+'_'+str(img)+'.npy', 'rb', 'np', path+'px/')
 
             # add to output array
@@ -379,22 +331,105 @@ def patches_per_label(label_s, label_e, labels, labels2imgs_i, dim, path):
         save_data(out, 'per_lbl_'+str(lbl), 'np', path+'lbl/')
         out = np.array([])
 
+
+"""
+get [n] random records from [per_lbl] for kmeans
+"""
+def n_random_records(records, label_s, label_e, path=''):
+    features = np.array([])
+
+    print '===== RAND',label_s, label_e,'====='
+
+    # labels to deal with
+    all = np.load(path+'remaining_large.npy')
+    labels =  [x for x in range(label_s, label_e+1) if x in all] 
+    print 'number of labels to deal with:', len(labels)
+
+    for lbl in labels:
+        print '\n--- lbl', lbl, '---'
+
+        filename = 'per_lbl_'+str(lbl)+'.npy'
+
+        print 'load data from', filename
+        data = load_data(filename, '', 'np', path)
+        print 'shape of data:', data.shape
+
+        # find random position 
+        random_list = np.array(range(len(data)))
+        random_list = sorted(np.random.choice( random_list, records, replace=False ))
+        print 'random_list size:', len(random_list)
+
+        # save random records
+        random_records = np.array( [data[loc] for loc in random_list] )
+        print 'random_records shape:', random_records.shape
+        save_data(random_records, 'per_lbl_'+str(lbl)+'_'+str(records), 'np', path)
+
+    print '===== END RAND =====\n\n'
+
+
 """
 use k-means to create a smaller dataset
 """
 def kmeans(init, n_clusters, n_init, label_s, label_e, path):
 
     for lbl in range(label_s, label_e+1):
-        data = load_data('per_lbl_'+str(lbl)+'.npy', '', np, path+'lbl/lbl')
-        cls = KMeans(init=init, n_clusters=n_clusters, n_init=n_init)
+        print '--- lbl', lbl, '---'
+        data = load_data('per_lbl_'+str(lbl)+'_100000.npy', '', 'np', path+'lbl/lbl/')
 
+        # to simplify process, we'll just specify start and end label and use this to ignore anything we don't want
+        if len(data) >= 0 and len(data) <= 1000:
+            continue
+
+        print 'ori shape of data:', data.shape
+
+        if len(data.shape) == 3:
+            i, x, y = data.shape
+            print 'i, x, y:', i, x, y
+            data = data.reshape(i,x*y)
+            print 'new shape of data:', data.shape
+        
+        cls = KMeans(init=init, n_clusters=n_clusters, n_init=n_init)
+        
         t0 = time.time()
         cls.fit(data)
         t1 = time.time()
         print 'time taken to get', len(cls.cluster_centers_), 'features in', t1-t0, 'seconds'
 
-        save_data(cls.cluster_centers_, 'pts_'+str(lbl), 'np', path+'pts/')
+        save_data(cls.cluster_centers_, 'per_lbl_'+str(lbl)+'_slim', 'np', path+'lbl/')
+        print ''
 
+def combine_data(path=''):
+    print '--- combine_data ---'
+    labels = range(0,895)
+    all_kmeans = np.load(path+'lbl/all_kmeans')
+    
+    features = np.array([])
+    targets  = np.array([])
+
+    # load each label and check output
+    for lbl in labels:
+
+        print 'load data of', lbl
+        if lbl in all_kmeans:
+            file = 'per_lbl_'+str(lbl)+_'slim.npy'
+            data = np.load(path+'lbl/'+file)
+            print 'k_meaned filename:', file, 'of shape', data.shape
+        else:
+            file = 'per_lbl_'+str(lbl)+'.npy'
+            data = np.load(path+'lbl/'+file)
+            data = data.reshape(len(data), 225)
+            print 'normal filename:  ', file, 'of shape', data.shape
+       
+            if len(features) == 0 and len(targets) = 0:
+                features = data
+                labels   = np.array([lbl for x in range(len(data))])
+            else:
+                features = np.append(features, data, axis=0)
+                labels   = np.append(labels, np.array([lbl for x in range(len(data))]))
+
+            print 'added to dicts\n\n'
+
+     save_data(create_ft_dict(features, targets), 'combined', 'np', path+'lbl/')
 
 
 
@@ -481,12 +516,12 @@ def parser():
     p_lbl.add_argument('-d', '-dim', action='store', dest='dim', type=int, help='dimension of patches')
     p_lbl.set_defaults(which='lbl')
 
-    p_km = subparsers.add_parser('km', help='k-means clustering')
-    p_km.add_argument('-n_init', action='store', dest='init', help='number of seeds')
-    p_km.add_argument('-n_cluster', action='store', dest='n_cluster', help='number of cluster/ points to generate')
-    p_km.add_argument('-ls', '-label_s', action='store', dest='label_s', type=int, help='the staring label to be explored')
-    p_km.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
-    p_km.set_defaults(which='km')
+    p_pts = subparsers.add_parser('pts', help='k-means clustering')
+    p_pts.add_argument('-n_init', action='store', dest='n_init', type=int, help='number of seeds')
+    p_pts.add_argument('-n_clusters', action='store', dest='n_clusters', type=int, help='number of cluster/ points to generate')
+    p_pts.add_argument('-ls', '-label_s', action='store', dest='label_s', type=int, help='the staring label to be explored')
+    p_pts.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
+    p_pts.set_defaults(which='pts')
 
     args = parser.parse_args()
     return args
@@ -537,10 +572,6 @@ def main():
         #     print 'running co'
         #     aggr_given_co(depths, labels, args.img_s, args.img_e, args.dim, path)
         #     print 'done co'
-        elif args.fn == 'lbl':
-            labels = load_data('labels.p','rb','p', path)
-            labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', 'p', path)
-            patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
 
     elif args.which == 'top_n':
         print 'running top_n'
@@ -551,14 +582,14 @@ def main():
         print 'done top_n'
 
     elif args.which == 'rand':
-        n_random_records(args.n, args.label_s, args.label_e, path+'top/')
+        n_random_records(args.n, args.label_s, args.label_e, path+'lbl/lbl/')
 
     elif args.which == 'lbl':
         labels = load_data('labels.npy','', 'np', path)
         labels2imgs_i = load_data('labels2imgs_ignore.p', 'rb', 'p', path)
         patches_per_label(args.label_s, args.label_e, labels, labels2imgs_i, args.dim, path)
 
-    elif args.which == 'km':
+    elif args.which == 'pts':
         kmeans('k-means++', args.n_clusters, args.n_init, args.label_s, args.label_e, path)
 
     else:
