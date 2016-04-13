@@ -14,5 +14,7 @@ py_data
 *.log
 *.toc
 *.pdf
+*.blg
+*.bbl
 
 data/nyu_depth_v2_labeled.mat
