@@ -401,10 +401,11 @@ def kmeans(init, n_clusters, n_init, label_s, label_e, path):
 def combine_data(path=''):
     print '--- combine_data ---'
     labels = range(0,895)
-    all_kmeans = np.load(path+'lbl/all_kmeans')
+    all_kmeans = np.load(path+'all_kmeans.npy')
     
     features = np.array([])
     targets  = np.array([])
+    lengths = dict()
 
     # load each label and check output
     for lbl in labels:
@@ -412,24 +413,29 @@ def combine_data(path=''):
         print 'load data of', lbl
         if lbl in all_kmeans:
             file = 'per_lbl_'+str(lbl)+'_'+'slim.npy'
-            data = np.load(path+'lbl/'+file)
+            data = np.load(path+file)
             print 'k_meaned filename:', file, 'of shape', data.shape
+            lengths[lbl] = data.shape[0]
         else:
             file = 'per_lbl_'+str(lbl)+'.npy'
-            data = np.load(path+'lbl/'+file)
+            data = np.load(path+file)
             data = data.reshape(len(data), 225)
             print 'normal filename:  ', file, 'of shape', data.shape
+            lengths[lbl] = data.shape[0]
        
-            if len(features) == 0 and len(targets) == 0:
-                features = data
-                labels   = np.array([lbl for x in range(len(data))])
-            else:
-                features = np.append(features, data, axis=0)
-                labels   = np.append(labels, np.array([lbl for x in range(len(data))]))
+        if len(features) == 0 and len(targets) == 0:
+            features = data
+            targets = np.array([lbl for x in range(len(data))])
+            print 'len(data):', len(data)
+        else:
+            features = np.append(features, data, axis=0)
+            targets = np.append(labels, np.array([lbl for x in range(len(data))]))
+            print 'len(data):', len(data)
 
-            print 'added to dicts\n\n'
+        print 'added to dicts\n\n'
 
-    save_data(create_ft_dict(features, targets), 'combined', 'np', path+'lbl/')
+    save_data(create_ft_dict(features, labels), 'combined', 'np', path)
+    save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
 
@@ -523,8 +529,9 @@ def parser():
     p_pts.add_argument('-le', '-label_e', action='store', dest='label_e', type=int, help='the ending label to be explored')
     p_pts.set_defaults(which='pts')
 
-    p_com = subparsers.add_parser('com', help='combine multiple files as one feature-target dictionary')
-    p_com.set_defaults(which='com')
+    p_com = subparsers.add_parser('combine', help='combine multiple files as one feature-target dictionary')
+    p_com.set_defaults(which='combine')
+
     args = parser.parse_args()
     return args
 
@@ -591,7 +598,7 @@ def main():
     elif args.which == 'pts':
         kmeans('k-means++', args.n_clusters, args.n_init, args.label_s, args.label_e, path)
 
-    elif args.which == 'com':
+    elif args.which == 'combine':
         combine_data(path+'lbl/')
 
     else:
