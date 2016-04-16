@@ -411,19 +411,26 @@ def combine_data(path=''):
     # load each label and check output
     for lbl in labels:
 
+        # load data
         print 'load data of', lbl
         if lbl in all_kmeans:
             file = 'per_lbl_'+str(lbl)+'_'+'slim.npy'
             data = np.load(path+file)
             print 'k_meaned filename:', file, 'of shape', data.shape
-            lengths[lbl] = data.shape[0]
         else:
             file = 'per_lbl_'+str(lbl)+'.npy'
             data = np.load(path+file)
             data = data.reshape(len(data), 225)
             print 'normal filename:  ', file, 'of shape', data.shape
+
+        # ignore 0-length labels
+        if len(data) == 0:
+            continue
+        else:
             lengths[lbl] = data.shape[0]
-       
+            '> 0, added to lengths'
+        
+        # append data to array 
         if len(features) == 0 and len(targets) == 0:
             features = data
             targets = np.array([lbl for x in range(len(data))])
@@ -433,14 +440,14 @@ def combine_data(path=''):
             targets = np.append(labels, np.array([lbl for x in range(len(data))]))
             print 'len(data):', len(data)
 
-        print 'added to dicts\n\n'
+        print 'added to dict\n\n'
 
     save_data(create_ft_dict(features, labels), 'combined', 'np', path)
     save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
 def datasets(path):
-    data = np.load(path+'combined.npy')
+    data = np.load(path+'combined.npy').tolist()
 
     # train/test, validation split
     sss = StratifiedShuffleSplit(data['targets'], n_iter=10, test_size=0.3, random_state=42)
