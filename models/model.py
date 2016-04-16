@@ -1,32 +1,50 @@
 
 from sklearn import svm
 from sklearn import cross_validation
-import cPickle as pickle
-import argparse
+import argparse, sys
 import numpy as np
-import scipy as sp
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.grid_search import GridSearchCV
+from sklearn.datasets import load_iris
+from time import time
 
+
+"""
+make iris into dict
+"""
+def test_data():
+    iris = load_iris()
+    return {'features': iris.data, 'targets': iris.target}
 
 """
 fit SVC models
 """
-def model_svc(kernel_type, features, targets):
-    if kernel_type == 'linear':
-        model = svm.SVC(kernel='linear', C=1, random_state=1)
-    elif kernel_type == 'rbf':
-        model = svm.SVC(kernel='rbf', C=1, gamma=0.001, random_state=1)
-    model.fit(features, targets)
+def model_svc(kernel, path, C=1, gamma=0.001):
+    print '--- in model_svc ---\n'
+    # data = np.load(path+'data_train.npy').tolist()
+    data = test_data()
 
-    return model
+    print 'shape of data:', data['features'].shape
+
+    model = svm.SVC(kernel=kernel, C=C, gamma=gamma, random_state=42)
+
+    print 'to fit model'
+    t0 = time()
+    model.fit(data['features'], data['targets'])
+    print 'time taken:', time() - t0
+
+    save_data(model, 'SVC_'+str(C)+str(gamma), path)
+
+"""
+fit random forest models
+"""
+# TODO: random forest
 
 
 """
 get cross val score
 """
-def cross_val(model, features, targets):
-    scores = cross_validation.cross_val_score(model, features, targets, cv=2)
+def cross_val(model, features, targets, cv):
+    scores = cross_validation.cross_val_score(model, features, targets, cv=cv)
     return scores.mean()
 
 
@@ -39,7 +57,7 @@ returns:
 """
 def gen_cf_model(model, features, targets):
     print 'start split'
-    train_x, test_x, train_y, test_y = cross_validation.train_test_split(features, targets, test_size = 0.3, random_state=1)
+    train_x, test_x, train_y, test_y = cross_validation.train_test_split(features, targets, test_size = 0.3, random_state=42)
     print 'end split'
     print 'start fit'
     model.fit(train_x, train_y)
@@ -53,19 +71,19 @@ def get_cf_matrix(actual, predicted):
 
 
 """
-GridSearch for parameters
-"""
-def grid_search(params_dict):
-    search = GridSearchCV()
-    # search.fit()
-    return score
-    pass
-
-"""
 store output to a file
 """
 def save_data(data, filename, path=''):
-    pickle.dump(data, open(path+filename, 'wb'))
+    np.save(path+filename, data)
+    print 'data saved'
+
+
+"""
+open file
+"""
+def load_data(filename, path=''):
+    np.load(path+filename)
+    print 'data loaded'
 
 
 """
@@ -82,10 +100,15 @@ def parser():
     p_svc.set_defaults(which='svc')
 
     # confusion matrix
-    p_cf = subparsers.add_parser('cf', help="confusion matrix")
+    p_cf = subparsers.add_parser('cf', help='confusion matrix')
     p_cf.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
     p_cf.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
-    p_svc.set_defaults(which='cf')
+    p_cf.set_defaults(which='cf')
+
+    # TODO: gridsearch
+    # p_gs = subparsers.add_parser('gridsearch', help='perform GridSearch with given input')
+    # # p_gs.add_argument()
+    # p_gs.set_defaults(which='gridsearch')
 
     return parser.parse_args()
 
@@ -96,7 +119,7 @@ check if there are any none arguments
 def check_args(args):
     for key, val in vars(args).iteritems():
         # don't check for optional keys
-        if val is None and key not in ('x', 'y'):
+        if val is None:
             return False
     return True
 
@@ -107,18 +130,33 @@ ENTRY
 main function
 """
 def main():
-    # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-    # path = '/beegfs/scratch/user/i/awll20/data/ip/'
-    pass
+    path = '/beegfs/scratch/user/i/awll20/data/ip/'
+
+    args = parser()
+    print 'args:', args
+
+    if not check_args(args):
+        print >> sys.stderr, 'invalid parameters inputted -> use -h to find out the required parameters'
+        sys.exit(1)
+
+    # find out which function to perform
+    if args.which == 'svc':
+        model_svc(args.kernel, path+'lbl/')
+    elif args.which == 'cf':
+        pass
+    else:
+        print >> sys.stderr, 'possible inputs: svc, cf'
+        sys.exit(1)
 
 
 """
 run
 """
 if __name__ == '__main__':
+    main()
     """ the data """ 
-    path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-    path = '/beegfs/scratch/user/i/awll20/data/ip/'
+    # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
+    # path = '/beegfs/scratch/user/i/awll20/data/ip/'
     #data = pickle.load(open(path+'features_targets.p', 'rb'))
 
 
@@ -151,21 +189,21 @@ if __name__ == '__main__':
     
     """ confusion matrix """
     # load data if requires
-    linear_cf_test_data = pickle.load(open(path+'linear_cf_test_data.p', 'rb')) 
-    linear_cf_predicted = pickle.load(open(path+'linear_cf_predicted.p', 'rb'))
-
-    rbf_cf_test_data = pickle.load(open(path+'rbf_cf_test_data.p', 'rb')) 
-    rbf_cf_predicted = pickle.load(open(path+'rbf_cf_predicted.p', 'rb')) 
-
-    # confusion matrices 
-    linear_cf_matrix = get_cf_matrix(linear_cf_test_data['targets'], linear_cf_predicted)
-    rbf_cf_matrix = get_cf_matrix(rbf_cf_test_data['targets'], rbf_cf_predicted)
-    
-    print 'linear_cf_matrix'
-    print linear_cf_matrix
-    print classification_report(linear_cf_test_data['targets'], linear_cf_predicted)
-    print ''
-
-    print 'rbf_cf_matrix'
-    print rbf_cf_matrix
-    print classification_report(rbf_cf_test_data['targets'], rbf_cf_predicted)
+    # linear_cf_test_data = p.load(open(path+'linear_cf_test_data.p', 'rb'))
+    # linear_cf_predicted = p.load(open(path+'linear_cf_predicted.p', 'rb'))
+    #
+    # rbf_cf_test_data = p.load(open(path+'rbf_cf_test_data.p', 'rb'))
+    # rbf_cf_predicted = p.load(open(path+'rbf_cf_predicted.p', 'rb'))
+    #
+    # # confusion matrices
+    # linear_cf_matrix = get_cf_matrix(linear_cf_test_data['targets'], linear_cf_predicted)
+    # rbf_cf_matrix = get_cf_matrix(rbf_cf_test_data['targets'], rbf_cf_predicted)
+    #
+    # print 'linear_cf_matrix'
+    # print linear_cf_matrix
+    # print classification_report(linear_cf_test_data['targets'], linear_cf_predicted)
+    # print ''
+    #
+    # print 'rbf_cf_matrix'
+    # print rbf_cf_matrix
+    # print classification_report(rbf_cf_test_data['targets'], rbf_cf_predicted)

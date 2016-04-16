@@ -1,5 +1,57 @@
 \documentclass[dissertation.tex]{subfiles}
 \begin{document}
 
-\chapter{Technical Approach}
+\chapter{Technical Background}
+
+\section{Support Vector Machine (SVM)}
+
+% FIG - linear SVM
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{svm_fitting}
+  \caption{\textit{This illustration shows how SVM works with linearly separable datasets. The squared datapoints represent support vectors for their corresponding class.}}
+  \label{fig:svm_fitting}
+\end{figure}
+
+% MATHS - linear SVM
+\begin{equation} \label{eq:linear_svm}
+  y(\mathbf{x}) = \mathbf{w}^T \phi(\mathbf{x}) + b
+\end{equation}
+
+The linear model above describes the objective of a two-class classification problem. Given a fixed feature-space, $\phi(\mathbf{x})$, there exists at least one pair of weight vector $\mathbf{w}$ and bias $b$ values that gives a solution that separates the input data exactly in the linear feature space. This input data is known as the training dataset, with input vectors $\mathbf{x}_1,...,\mathbf{x}_N$ each corresponding to a target $t$ with value -1 or 1, i.e. the two different classes. 'Separating exactly' means that
+
+\begin{empheq}[left=\empheqlbrace]{align*} 
+  & y(\mathbf{x}_n) > 0 \text{ for any point with } t_n = +1 \\
+  & y(\mathbf{x}_n) < 0 \text{ for any point with } t_n = -1 \\
+  & \text{hence, } t_n y(\mathbf{x}_n) > 0 \text{ for any point } 
+\end{empheq}
+
+If there are more than one pairs of parameters that achieve the above, the pair with the smallest generalisation error should be chosen. In SVM, this is done by finding the decision boundary with the margin maximised. The margin is the smallest perpendicular distance between the decision boundary and any datapoint. The datapoints that enables the margin to be maximised are known as the support vectors. This is illustrated in \autoref{fig:svm_fitting}.
+
+\begin{equation} \label{eq:svm_linear_dist}
+  \frac{t_n y(\mathbf{x}_n)}{||\mathbf{w}||} = \frac{t_n (\mathbf{w}^T \phi(\mathbf{x}_n) + b)}{||\mathbf{w}||}
+\end{equation}
+
+Assuming all data is classified correctly, the distance between any point $\mathbf{x}_n$ to the decision surface is given by \autoref{eq:svm_linear_dist}. Hence, the maximum margin is obtained by considering the pair of weight vector and bias that maximises the distance between the boundary and the clostest datapoint $\mathbf{x}_n$, as illustrated in \autoref{eq:svm_linear_max}. As $||\mathbf{w}||$ does not depend on any datapoint, we take out the factor outside of the $\mathrm{min}$ function. 
+
+\begin{equation} \label{eq:svm_linear_max}
+  \underset{w,b}{\mathrm{argmin}} \left \{ \frac{1}{||\mathbf{w}||} \underset{n}{\mathrm{min}} \left [ t_n \left (\mathbf{w}^T \phi \left (\mathbf{x}_n \right) + b \right) \right ] \right \} 
+\end{equation}
+
+\subsection{Overlapping Classes}
+In a realistic situation, classes may overlap. If we impose an exact separation between these classes, the classifier may become specific to just the training data. As illustrated in \autoref{svm_fitting}, points lying within the margin and the side of the hyperplane of its class
+
+
+Denoted as $C$, the cost parameter decides 
+In \autoref{svm_fitting},
+
+\subsection{Non-linear Kernel}
+So far, it is assumed that the data is linearly separable, but in most cases, like ours, we expect overlapping datapoints. 
+
+\textit{TODO: check if overlapping, and show plot}
+
+
+
+\section{K-means Clustering}
+
 \end{document}

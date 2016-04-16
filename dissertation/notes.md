@@ -55,7 +55,7 @@
       - have to create a managable dataset (291716 patches per image)
           - random
           - k-means clustering
-- Technical Approach
+- Technical Decisions 
     - 'more academic'
   - Support Vector Machine
   - Tools

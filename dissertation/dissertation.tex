@@ -7,7 +7,7 @@
 \usepackage{color}
 \usepackage[table]{xcolor}
 \usepackage{caption, subcaption}
-\usepackage{amssymb, amsmath}
+\usepackage{amssymb, amsmath, empheq}
 \usepackage{listings}
 \lstset{language=Python}
 \usepackage{array}
@@ -15,6 +15,7 @@
 \usepackage{subfiles}
 
 \graphicspath{ {images/} {lit_review/images/} }
+\numberwithin{equation}{section}
 
 % set margin
 \geometry{
@@ -112,13 +113,13 @@
 \subfile{lit_review/lit_review.tex}
 \newpage
 
-% methodology
-\subfile{sub/methodology.tex}
+% techical background 
+\subfile{sub/tech.tex}
 \newpage
 
 
-% techical approach
-\subfile{sub/tech_approach.tex}
+% methodology
+\subfile{sub/methodology.tex}
 \newpage
 
 
