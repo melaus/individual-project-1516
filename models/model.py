@@ -1,6 +1,7 @@
 
 from sklearn import svm
 from sklearn import cross_validation
+from sklearn.ensemble import RandomForestClassifier
 import argparse, sys
 import numpy as np
 from sklearn.metrics import confusion_matrix, classification_report
@@ -37,7 +38,22 @@ def model_svc(kernel, path, C=1, gamma=0.001):
 """
 fit random forest models
 """
-# TODO: random forest
+def model_rf(path):
+    print '--- in model_rf ---\n'
+    # data = np.load(path+'lbl/data_train.npy').tolist()
+    data = test_data()
+
+    print 'shape of data:', data['features'].shape
+
+    model = RandomForestClassifier(max_depth=5)
+
+    print 'to fit model'
+    t0 = time()
+    model.fit(data['features'], data['targets'])
+    print 'time taken:', time() - t0
+
+    save_data(model, 'rf_mx5', path+'model/')
+
 
 
 """
