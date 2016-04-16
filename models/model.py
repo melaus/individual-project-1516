@@ -114,6 +114,10 @@ def parser():
     p_svc.add_argument('-k', '-kernel', action='store', dest='kernel', help='choose kernel - rbf, linear')
     p_svc.set_defaults(which='svc')
 
+    # rf
+    p_rf = subparsers.add_parser('rf', help='Random Forest')
+    p_rf.set_defaults(which='svc')
+
     # confusion matrix
     p_cf = subparsers.add_parser('cf', help='confusion matrix')
     p_cf.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
@@ -157,10 +161,14 @@ def main():
     # find out which function to perform
     if args.which == 'svc':
         model_svc(args.kernel, path)
+
+    elif args.which == 'rf':
+        model_rf(path)
+
     elif args.which == 'cf':
         pass
     else:
-        print >> sys.stderr, 'possible inputs: svc, cf'
+        print >> sys.stderr, 'possible inputs: svc, rf'
         sys.exit(1)
 
 
