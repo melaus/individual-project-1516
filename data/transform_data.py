@@ -9,6 +9,7 @@ from math import ceil
 from itertools import groupby
 from operator import itemgetter
 from sklearn.cluster import KMeans
+from sklearn.cross_validation import StratifiedShuffleSplit
 import time
 #import matplotlib.pyplot as plt
 
@@ -438,6 +439,31 @@ def combine_data(path=''):
     save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
+def datasets(path):
+    data = np.load(path+'combined.npy')
+
+    # train/test, validation split
+    sss = StratifiedShuffleSplit(data['targets'], n_iter=10, test_size=0.3, random_state=42)
+    for tt_index, val_index in sss:
+        print("TRAIN:", tt_index, "TEST:", val_index)
+        X_tt, X_val = data['features'][tt_index], data['features'][val_index]
+        y_tt, y_val = data['targets'][tt_index], data['targets'][val_index]
+
+    # train/test, validation split
+    sss = StratifiedShuffleSplit(data['targets'], n_iter=10, test_size=0.3, random_state=42)
+    for train_index, test_index in sss:
+        print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, X_test = X_tt[train_index], X_tt[test_index]
+        y_train, y_test = y_tt[train_index], y_tt[test_index]
+
+    print 'size of training:  ', (len(X_train), len(y_train))
+    print 'size of testing:   ', (len(X_test), len(y_test))
+    print 'size of validation:', (len(X_val), len(y_val))
+
+    save_data(create_ft_dict(X_train, y_train), 'data_train', 'np', path)
+    save_data(create_ft_dict(X_test, y_test), 'data_test', 'np', path)
+    save_data(create_ft_dict(X_val, y_val), 'data_val', 'np', path)
+
 
 # """
 # ENTRY
@@ -532,6 +558,9 @@ def parser():
     p_com = subparsers.add_parser('combine', help='combine multiple files as one feature-target dictionary')
     p_com.set_defaults(which='combine')
 
+    p_data = subparsers.add_parser('data', help='create training dataset')
+    p_data.set_defaults(which='data')
+
     args = parser.parse_args()
     return args
 
@@ -600,6 +629,9 @@ def main():
 
     elif args.which == 'combine':
         combine_data(path+'lbl/')
+
+    elif args.which == 'data':
+        datasets(path+'lbl/')
 
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n, rand, lbl'
