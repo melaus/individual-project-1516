@@ -425,24 +425,25 @@ def combine_data(path=''):
 
         # ignore 0-length labels
         if len(data) == 0:
+            print '\n\n= lbl', lbl, 'ignored\n'
             continue
         else:
             lengths[lbl] = data.shape[0]
-            '> 0, added to lengths'
+            print 'lbl',lbl,'> 0, added to lengths'
         
         # append data to array 
         if len(features) == 0 and len(targets) == 0:
             features = data
             targets = np.array([lbl for x in range(len(data))])
-            print 'len(data):', len(data)
+            print 'len(targets) so far:', len(targets)
         else:
             features = np.append(features, data, axis=0)
-            targets = np.append(labels, np.array([lbl for x in range(len(data))]))
-            print 'len(data):', len(data)
+            targets = np.append(targets, np.array([lbl for x in range(len(data))]))
+            print 'len(targets) so far:', len(targets)
 
         print 'added to dict\n\n'
 
-    save_data(create_ft_dict(features, labels), 'combined', 'np', path)
+    save_data(create_ft_dict(features, targets), 'combined', 'np', path)
     save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
@@ -450,22 +451,27 @@ def datasets(path):
     data = np.load(path+'combined.npy').tolist()
 
     # train/test, validation split
-    sss = StratifiedShuffleSplit(data['targets'], n_iter=10, test_size=0.3, random_state=42)
+    print 'tt and val split'
+    sss = StratifiedShuffleSplit(data['targets'], n_iter=1, test_size=0.3, random_state=42)
     for tt_index, val_index in sss:
-        print("TRAIN:", tt_index, "TEST:", val_index)
-        X_tt, X_val = data['features'][tt_index], data['features'][val_index]
-        y_tt, y_val = data['targets'][tt_index], data['targets'][val_index]
+        X_tt  = data['features'][tt_index]
+        X_val = data['features'][val_index]
+        y_tt  = data['targets'][tt_index]
+        y_val = data['targets'][val_index]
+
 
     # train/test, validation split
-    sss = StratifiedShuffleSplit(data['targets'], n_iter=10, test_size=0.3, random_state=42)
+    print 'val split'
+    sss = StratifiedShuffleSplit(y_tt, n_iter=1, test_size=0.3, random_state=42)
     for train_index, test_index in sss:
-        print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = X_tt[train_index], X_tt[test_index]
-        y_train, y_test = y_tt[train_index], y_tt[test_index]
+        X_train = X_tt[train_index]
+        X_test  = X_tt[test_index]
+        y_train = y_tt[train_index]
+        y_test  = y_tt[test_index]
 
-    print 'size of training:  ', (len(X_train), len(y_train))
-    print 'size of testing:   ', (len(X_test), len(y_test))
-    print 'size of validation:', (len(X_val), len(y_val))
+    print 'shape of training:  ', X_train.shape
+    print 'shape of testing:   ', X_test.shape
+    print 'shape of validation:', X_val.shape
 
     save_data(create_ft_dict(X_train, y_train), 'data_train', 'np', path)
     save_data(create_ft_dict(X_test, y_test), 'data_test', 'np', path)
