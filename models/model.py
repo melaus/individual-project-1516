@@ -20,8 +20,8 @@ fit SVC models
 """
 def model_svc(kernel, path, C=1, gamma=0.001):
     print '--- in model_svc ---\n'
-    # data = np.load(path+'data_train.npy').tolist()
-    data = test_data()
+    data = np.load(path+'lbl/data_train.npy').tolist()
+    # data = test_data()
 
     print 'shape of data:', data['features'].shape
 
@@ -32,7 +32,7 @@ def model_svc(kernel, path, C=1, gamma=0.001):
     model.fit(data['features'], data['targets'])
     print 'time taken:', time() - t0
 
-    save_data(model, 'SVC_'+str(C)+str(gamma), path)
+    save_data(model, 'SVC_'+str(C)+'_'+str(gamma), path+'model/')
 
 """
 fit random forest models
@@ -96,7 +96,6 @@ def parser():
     # svc
     p_svc = subparsers.add_parser('svc', help='SVC')
     p_svc.add_argument('-k', '-kernel', action='store', dest='kernel', help='choose kernel - rbf, linear')
-    p_svc.add_argument('-gamma', action='store', type=int, dest='gamma', help='dimension of a patch')
     p_svc.set_defaults(which='svc')
 
     # confusion matrix
@@ -141,7 +140,7 @@ def main():
 
     # find out which function to perform
     if args.which == 'svc':
-        model_svc(args.kernel, path+'lbl/')
+        model_svc(args.kernel, path)
     elif args.which == 'cf':
         pass
     else:
