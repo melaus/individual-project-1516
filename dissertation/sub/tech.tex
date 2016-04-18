@@ -2,6 +2,9 @@
 \begin{document}
 
 \chapter{Technical Background}
+Before we attempt training models using depth information from images, we need to understand the characteristics of some of the models. In the scope of this project, we should focus on the two popular models for supervised machine learning - support vector machine and random forests, as mentioned in $(lit review section)$. 
+
+Looking ahead, we should also look into K-means Clustering, an unsupervised training model. It is not used for fitting the depth patches we intend to use, but as a way to perform our feature engineering, which will be discussed in \autoref{chap:methodology}.
 
 \section{Support Vector Machine (SVM)}
 
@@ -39,19 +42,115 @@ Assuming all data is classified correctly, the distance between any point $\math
 \end{equation}
 
 \subsection{Overlapping Classes}
-In a realistic situation, classes may overlap. If we impose an exact separation between these classes, the classifier may become specific to just the training data. As illustrated in \autoref{svm_fitting}, points lying within the margin and the side of the hyperplane of its class
+
+% FIG - overlapping SVM
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{svm_overlapping}
+  \caption{\textit{An elaborated \autoref{fig:svm_fitting} showing slack values of points based on its location in relation to the margin and decision boundary.}}
+  \label{fig:svm_overlapping}
+\end{figure}
+In a realistic situation, classes may overlap. If we impose a hard separation between these classes, the classifier may become too specific and not be able to predict new data. Therefore, there needs to be a trade-off between splitting the classes and misclassifying some of the datapoints. 
+
+The slack value describes the status of a datapoint. There are three types of values as illustrated in \autoref{fig:svm_overlapping} and \autoref{tab:slack}. Correctly classified points lie on or within the margin, whereas misclassified points are on the other side of the hyperplane. Some datapoints lie on the wrong side of the margin but within its side of the hyperplane causing margin violation.
+
+% TABLE: slack values
+\parbox{\linewidth} {
+	\centering
+  \begin{tabularx}{\textwidth}{|l|X|}
+    \hline
+    \textbf{Slack Value}		& \textbf{Description}
+    \\ \hline
+    $\xi = 0$ 							& Points that are correctly classified.
+    \\ \hline
+    $0 < \xi \leqslant 1$  	& Points that lie between the margin and the side of the hyperplane of its class.
+		\\ \hline
+    $\xi > 1$  							& Points that are misclassified.
+    \\ \hline
+
+  \end{tabularx}
+	\captionof{table}{\textit{Slack values and their meanings.}}
+	\label{tab:slack}
+}
+
+\subsubsection{The Cost Parameter ($C$)}
+By allowing some datapoints to be misclassified, we can create a more generalised SVM classifier. In other words, we impose a \textbf{soft margin} through penalising these datapoints and relaxing the contraints. In a non-linear dataset, we can think of this as the smoothness of the fit. The smoother the decision boundary, the less we take into account the exact position of all datapoints. 
+
+\begin{equation} \label{eq:soft_margin}
+	\min \left ( C \sum_{n=1}^{N} \xi_{n} + \frac{1}{2}||\mathbf{w}||^2 \right )
+\end{equation}
+
+This trade off between the margin and misclassification is controlled by the regularisation parameter, cost ($C$). The bigger $C$ is, the more correctly classified points there are, the harder the boundary becomes. As $C$ tends to infinity, we have a hard margin. Hence, we need to minimise the $C$ value in order to find our optimal margin with \autoref{eq:soft_margin}.
+
+% TABLE: C values
+\parbox{\linewidth} {
+	\centering
+  \begin{tabularx}{\textwidth}{|l|X|}
+    \hline
+    \textbf{Cost ($C > 0 $)}	  & \textbf{Description}
+    \\ \hline
+    Small $C$ 							    & Little contrained, large margin. 
+    \\ \hline
+    Large $C$  	                & A more contrained, narrower margin.
+		\\ \hline
+    $C \rightarrow \infty$      & A hard margin where all contraint is in place.
+    \\ \hline
+
+  \end{tabularx}
+	\captionof{table}{\textit{The effects of the values of $C$ on the margin.}}
+	\label{tab:c_vals}
+}
 
 
-Denoted as $C$, the cost parameter decides 
-In \autoref{svm_fitting},
+\subsection{Kernels}
+By mapping datapoints to higher dimensional feature spaces, originally non-linearly separable datasets usually become separable linearly. Recall \autoref{svm_linear_max}, this feature space raising is represented as $\phi \left (\mathbf{x}_n \right)$ which could be of infinite dimensions and unstorable. Instead, in SVM, we can represent this complex decision boundary in efficient kernel representation without. 
 
-\subsection{Non-linear Kernel}
-So far, it is assumed that the data is linearly separable, but in most cases, like ours, we expect overlapping datapoints. 
+% TABLE: available kernels
+\parbox{\linewidth} {
+  \centering
+  \def\arraystretch{1.5}
+  \begin{tabularx}{\textwidth}{|X|X|}
+    \hline
+    \textbf{Kernel}     & \textbf{Mathematical Expression}
+    \\ \hline
+    Linear              & $k(\mathbf{x},\mathbf{x'}) = \mathbf{x}^T\mathbf{x'}$
+    \\ \hline
+    D-degree polynomial & $k(\mathbf{x},\mathbf{x'}) = \left(1+\mathbf{x}^T\mathbf{x'}\right)^d$ 
+    \\ \hline
+    Radial Basis Function (RBF) & $k(\mathbf{x},\mathbf{x'}) = \exp \left( -\gamma ||\mathbf{x}-\mathbf{x'}||^2 \right)$
+		\\ \hline
+    Sigmoid             & $k(\mathbf{x},\mathbf{x'}) = \tanh \left(a\mathbf{x}^T\mathbf{x'} + r\right)$
+    \\ \hline
+  \end{tabularx} 
+  \captionof{table}{\textit{Available SVM Classifier kernels in the }\texttt{scikit-learn} \textit{library.}}
+  \label{tab:kernel_vals}
+}
 
-\textit{TODO: check if overlapping, and show plot}
+RBF is a useful and popular kernel.
+
+\subsubsection{The Gamma Parameter ($\gamma$)}
+By taking $C$ into account, we are able to create a more generalised classifier, but it would still be affected by outliers. The RBF kernel gives another parameter, $\gamma$, to control for the problem and shape of the decision boundary, as shown in \autoref{tab:kernel_vals}.
+
+$\gamma$ defines how far the influence of each datapoint reaches. The smaller $\gamma$ is, the further it reaches. The higher the value, the more the model tries to avoid misclassification. However, if the value is too high, the decision boundary become too specific, causing overfitting. Hence, the optimisation problem now includes the need to minimise $\gamma$ such that it finds the optimal decision boundary, as illustrated in \autoref{fig:svm_rbf_gamma}.
 
 
+% FIG - SVM RBF gamma
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{svm_rbf_gamma}
+  \caption{\textit{Effects of different $\gamma$ values in ascending order.}}
+  \label{fig:svm_rbf_gamma}
+\end{figure}
 
+\newpage
+\section{Random Forests (RF)}
+We now look at another classificiation algorithm, random forests.
+
+\newpage
 \section{K-means Clustering}
+%TODO: referencing back to lit review
+Recall that we looked briefly at unsupervised in \autoref{sssec:unsupervised_overview} and \ref{something}. Rather than learning from a labelled dataset, the algorithm learns from the characteristics in the data and assigns labels to the groups it identifies.
+
+Later on, in \autoref{sec:method_k-means}, we will discuss our application of K-means clustering for downsizing our dataset for training the aforementioned calssifier models in a rather unusual manner. 
 
 \end{document}

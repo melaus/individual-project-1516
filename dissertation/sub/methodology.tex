@@ -47,7 +47,7 @@ Each image is composed of 640-by-480 pixels, meaning that more than 290 000 patc
 \subsubsection{Random}
 A method for reducing the number of datapoints is to to collect a random number of datapoints from a random selection of images possessing the label. In this way, we aim to collect a vast set of data from a wide range of images. The drawback is that it is uncertain what 'random' entails. Some valuable and important features may be missed out, making the classifier less powerful.
 
-\subsubsection{K-means Clustering}
+\subsubsection{K-means Clustering} \label{sec:method_k-means}
 A better way is to spot the similarities in the data and extract those points of interestsas datapoints. By finding groups within the data, known as clusters, it is possible to generalise each of these groups by its centroid. The obtained points provide a more reliable dataset, as it does not throw away potentially important information about this label.
 
 % TODO: Clustering imagary
