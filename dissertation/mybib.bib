@@ -1,7 +1,5 @@
 @article{kinect-cam-tech,
-  author    = {Hamed Sarbolandi and
-               Damien Lefloch and
-               Andreas Kolb},
+  author    = {Hamed Sarbolandi and others},
   title     = {Kinect Range Sensing: Structured-Light versus Time-of-Flight Kinect},
   journal   = {CoRR},
   volume    = {abs/1505.05459},
@@ -11,17 +9,37 @@
   biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/SarbolandiLK15},
   bibsource = {dblp computer science bibliography, http://dblp.org}
 }
+% Damien Lefloch and Andreas Kolb
+
+@article{kinect-version-compare,
+  title={Time-of-flight camera--an introduction (Texas Instruments)},
+  author={Li, Larry},
+	year={2014}
+}
+
+@INPROCEEDINGS{kinect-tof, 
+	author={S. B. Gokturk and others}, 
+	booktitle={Computer Vision and Pattern Recognition Workshop, 2004. CVPRW '04. Conference on}, 
+	title={A Time-Of-Flight Depth Sensor - System Description, Issues and Solutions}, 
+	year={2004}, 
+	pages={35-35}, 
+	doi={10.1109/CVPR.2004.17}, 
+	month={June},
+}
+% H. Yalcin and C. Bamji
 
 @unpublished{kinect-doc,
-	author = {Microsoft Coporation},
+	author = {Microsoft},
 	title  = "{Kinect Fusion MSDN Documentation}",
-	url		 = {https://msdn.microsoft.com/en-us/library/dn188670.aspx}
+	url		 = {https://msdn.microsoft.com/en-us/library/dn188670.aspx},
+	year   = {2013}
 }
 
 @unpublished{kinect-research,
-	author = {Microsoft Coporation},
+	author = {Microsoft},
 	title = "{Kinect Fusion Project Page}",
-	url = {http://research.microsoft.com/en-us/projects/surfacerecon/}
+	url = {http://research.microsoft.com/en-us/projects/surfacerecon/},
+	year = {2013}
 }
 
 @book{chi-book,
@@ -38,85 +56,75 @@
   publisher={Springer Science \& Business Media}
 }
 
-@inproceedings{ms-3d-paper,
-  title={KinectFusion: real-time 3D reconstruction and interaction using a moving depth camera},
-  author={Izadi, Shahram and Kim, David and Hilliges, Otmar and Molyneaux, David and Newcombe, Richard and Kohli, Pushmeet and Shotton, Jamie and Hodges, Steve and Freeman, Dustin and Davison, Andrew and others},
-  booktitle={Proceedings of the 24th annual ACM symposium on User interface software and technology},
-  pages={559--568},
-  year={2011},
-  organization={ACM}
+@book{mur-book,
+  title={Machine learning: a probabilistic perspective},
+  author={Murphy, Kevin P},
+  year={2012},
+  publisher={MIT press}
 }
+
+@Inproceedings {ms-3d-paper,
+	author       = {Shahram Izadi and others}, 
+	month        = {October},
+	publisher    = {ACM Symposium on User Interface Software and Technology},
+	title        = {KinectFusion: Real-time 3D Reconstruction and Interaction Using a Moving Depth Camera},
+	url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=155416},
+	year         = {2011},
+}
+
+% author       = {Shahram Izadi and David Kim and Otmar Hilliges and David Molyneaux and Richard Newcombe and Pushmeet Kohli and Jamie Shotton and Steve Hodges and Dustin Freeman and Andrew Davison and Andrew Fitzgibbon},
+
 
 @Inproceedings {ms-surface-paper,
-abstract     = {<p>We present a system for accurate real-time mapping of complex and arbitrary
-                indoor scenes in variable lighting conditions, using only a moving low-cost depth
-                camera and commodity graphics hardware. We fuse all of the depth data streamed
-                from a Kinect sensor into a single global implicit surface model of the observed
-                scene in real-time. The current sensor pose is simultaneously obtained by
-                tracking the live depth frame relative to the global model using a coarse-to-fine
-                iterative closest point (ICP) algorithm, which uses all of the observed depth
-                data available. We demonstrate the advantages of tracking against the growing
-                full surface model compared with frame-to-frame tracking, obtaining tracking and
-                mapping results in constant time within room sized scenes with limited drift
-
-                and high accuracy. We also show both qualitative and quantitative results
-                relating to various aspects of our tracking and mapping system. Modelling of
-                natural scenes, in real-time with only commodity sensor and GPU hardware,
-                promises an exciting step forward
-
-                in augmented reality (AR), in particular, it allows dense surfaces to be
-                reconstructed in real-time, with a level of detail and robustness beyond any
-                solution yet presented using passive computer vision.</p>},
-author       = {Richard A. Newcombe and Shahram Izadi and Otmar Hilliges and David Molyneaux and
-                David Kim and Andrew J. Davison and Pushmeet Kohli and Jamie Shotton and Steve
-                Hodges and Andrew Fitzgibbon},
-booktitle    = {IEEE ISMAR},
-month        = {October},
-publisher    = {IEEE},
-title        = {KinectFusion: Real-Time Dense Surface Mapping and Tracking},
-url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=155378},
-year         = {2011},
+	author       = {Richard A. Newcombe and others}, 
+	booktitle    = {IEEE ISMAR},
+	month        = {October},
+	publisher    = {IEEE},
+	title        = {KinectFusion: Real-Time Dense Surface Mapping and Tracking},
+	url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=155378},
+	year         = {2011},
 }
-
+% author       = {Richard A. Newcombe and Shahram Izadi and Otmar Hilliges and David Molyneaux and David Kim and Andrew J. Davison and Pushmeet Kohli and Jamie Shotton and Steve Hodges and Andrew Fitzgibbon},
 
 @article{scikit-learn-paper,
- author = {Pedregosa, Fabian and Varoquaux, Ga\"{e}l and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, \'{E}douard},
- title = "{Scikit-learn: Machine Learning in Python}",
- journal = {J. Mach. Learn. Res.},
- issue_date = {2/1/2011},
- volume = {12},
- month = nov,
- year = {2011},
- issn = {1532-4435},
- pages = {2825--2830},
- numpages = {6},
- url = {http://dl.acm.org/citation.cfm?id=1953048.2078195},
- acmid = {2078195},
- publisher = {JMLR.org},
+	author = {Pedregosa, Fabian and others},
+	title = "{Scikit-learn: Machine Learning in Python}",
+	journal = {J. Mach. Learn. Res.},
+	issue_date = {2/1/2011},
+	volume = {12},
+	month = nov,
+	year = {2011},
+	issn = {1532-4435},
+	pages = {2825--2830},
+	numpages = {6},
+	url = {http://dl.acm.org/citation.cfm?id=1953048.2078195},
+	acmid = {2078195},
+	publisher = {JMLR.org},
 } 
 
 @inproceedings{nyu-dataset,
-  author    = {Nathan Silberman, Derek Hoiem, Pushmeet Kohli and Rob Fergus},
+  author    = {Nathan Silberman and others},
   title     = "{Indoor Segmentation and Support Inference from RGBD Images}",
   booktitle = {ECCV},
   year      = {2012}
 }
+%, Derek Hoiem, Pushmeet Kohli and Rob Fergus
 
 @inproceedings{precision-recall,
- author = {Davis, Jesse and Goadrich, Mark},
- title = "{The Relationship Between Precision-Recall and ROC Curves}",
- booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
- series = {ICML '06},
- year = {2006},
- isbn = {1-59593-383-2},
- location = {Pittsburgh, Pennsylvania, USA},
- pages = {233--240},
- numpages = {8},
- url = {http://doi.acm.org/10.1145/1143844.1143874},
- doi = {10.1145/1143844.1143874},
- acmid = {1143874},
- publisher = {ACM},
- address = {New York, NY, USA},
+  author = {Davis, Jesse and Goadrich, Mark},
+  title = "{The Relationship Between Precision-Recall and ROC Curves}",
+  booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
+  series = {ICML '06},
+  year = {2006},
+  isbn = {1-59593-383-2},
+  location = {Pittsburgh, Pennsylvania, USA},
+  pages = {233--240},
+  numpages = {8},
+  url = {http://doi.acm.org/10.1145/1143844.1143874},
+  doi = {10.1145/1143844.1143874},
+  acmid = {1143874},
+  publisher = {ACM},
+  address = {New York, NY, USA},
 } 
 
 @article{precision-recall-wiki,
@@ -126,11 +134,11 @@ year         = {2011},
   publisher={Bioinfo Publications}
 }
 
-@unpublished{hall-notes,
-  title="{Fundamentals of Pattern Analysis Notes}",
-  author={Hall, Peter},
-  year={2015},
-  url={http://www.cs.bath.ac.uk/~pmh/Teaching/Pattern_Analysis_files/notes.pdf}
+@misc{hall-notes,
+	title="{Fundamentals of Pattern Analysis Notes}",
+	howpublished = "\url{http://www.cs.bath.ac.uk/~pmh/Teaching/Pattern_Analysis_files/notes.pdf}",
+	author="Hall, Peter",
+	year={2015},
 }
 
 @article{class-analysis,
@@ -144,45 +152,49 @@ year         = {2011},
 	month=jul
 }
 
-@unpublished{cross-val-scikit,
-  title = "{Cross-validation: evaluating estimator performance (Documentation)}",
-  url = {http://scikit-learn.org/stable/modules/cross_validation.html},
-  author="{scikit-learn}"
-}
-
-@unpublished{scikit-docs-supervised,
-	title = "{scikit-learn: Supervised learning (Documentation)}",
-	url = {http://scikit-learn.org/stable/supervised_learning.html},
-	author= "{scikit-learn}"
-}
-
-@unpublished{scikit-docs-supervised-compare,
-	title="{Classifier comparison}",
-	url={http://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html},
-	author="{scikit-learn}"
+@unpublished{scikit-docs,
+	title="{scikit-learn Documentation}",
+	howpublished="\url{http://scikit-learn.org/stable/supervised_learning.html}",
+	author="{scikit-learn}",
+	year={2016}
 }
 
 @inproceedings{compare-supervised,
- author = {Caruana, Rich and Niculescu-Mizil, Alexandru},
- title = "{An Empirical Comparison of Supervised Learning Algorithms}",
- booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
- series = {ICML '06},
- year = {2006},
- isbn = {1-59593-383-2},
- location = {Pittsburgh, Pennsylvania, USA},
- pages = {161--168},
- numpages = {8},
- url = {http://doi.acm.org/10.1145/1143844.1143865},
- doi = {10.1145/1143844.1143865},
- acmid = {1143865},
- publisher = {ACM},
- address = {New York, NY, USA},
+  author = {Caruana, Rich and Niculescu-Mizil, Alexandru},
+  title = "{An Empirical Comparison of Supervised Learning Algorithms}",
+  booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
+  series = {ICML '06},
+  year = {2006},
+  isbn = {1-59593-383-2},
+  location = {Pittsburgh, Pennsylvania, USA},
+  pages = {161--168},
+  numpages = {8},
+  url = {http://doi.acm.org/10.1145/1143844.1143865},
+  doi = {10.1145/1143844.1143865},
+  acmid = {1143865},
+  publisher = {ACM},
+  address = {New York, NY, USA},
 }
 
+@article{compare-supervised-2,
+  author = {Amancio, Diego Raphael and others},
+  journal = {PLoS ONE},
+  publisher = {Public Library of Science},
+  title = {A Systematic Comparison of Supervised Classifiers},
+  year = {2014},
+  month = {04},
+  volume = {9},
+  howpublished = "\url{http://dx.doi.org/10.1371%2Fjournal.pone.0094137}",
+  pages = {1-14},
+  number = {4},
+  doi = {10.1371/journal.pone.0094137}
+}
+% author = {Amancio, Diego Raphael AND Comin, Cesar Henrique AND Casanova, Dalcimar AND Travieso, Gonzalo AND Bruno, Odemir Martinez AND Rodrigues, Francisco Aparecido AND da Fontoura Costa, Luciano},
+
 @MISC{taylor-notes,
-    author = {D. Michie and D. J. Spiegelhalter and C.C. Taylor},
-    title = "{Machine Learning, Neural and Statistical Classification}",
-    year = {1994}
+  author = {D. Michie and D. J. Spiegelhalter and C.C. Taylor},
+  title = "{Machine Learning, Neural and Statistical Classification}",
+  year = {1994}
 }
 
 @inproceedings{cross-val-kohavi,
@@ -215,36 +227,119 @@ year         = {2011},
 }
 
 @Article {semantic-paint,
-abstract     = {<p>We present a new interactive and online approach to 3D scene understanding.
-                Our system, SemanticPaint, allows users to simultaneously scan their environment,
-                whilst interactively segmenting the scene simply by reaching out and touching any
-                desired object or surface. Our system continuously learns from these
-                segmentations, and labels new unseen parts of the environment. Unlike offline
-                systems, where capture, labeling and batch learning often takes hours or even
-                days to perform, our approach is fully online. This provides users with
-                continuous live feedback of the recognition during capture, allowing them to
-                immediately correct errors in the segmentation and/or learning – a feature that
-                has so far been unavailable to batch and offline methods. This leads to models
-                that are tailored or personalized specifically to the user’s environments and
-                object classes of interest, opening up the potential for new applications in
-                augmented reality, interior design, and human/robot navigation. It also provides
-                the ability to capture substantial labeled 3D datasets for training large-scale
-                visual recognition systems.</p>},
-author       = {J. Valentin and V. Vineet and M.-M. Cheng and D. Kim and J. Shotton and P. Kohli
+	author       = {J. Valentin and others},
+	journal      = {ACM Trans. on Graphics (TOG)},
+	month        = {August},
+	publisher    = {ACM – Association for Computing Machinery},
+	title        = {SemanticPaint: Interactive 3D Labeling and Learning at your Fingertips},
+	url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=244725},
+	year         = {2015},
+}
+%author       = {J. Valentin and V. Vineet and M.-M. Cheng and D. Kim and J. Shotton and P. Kohli
                 and M. Niessner and A. Criminisi and S. Izadi and P. Torr},
-journal      = {ACM Trans. on Graphics (TOG)},
-month        = {August},
-publisher    = {ACM – Association for Computing Machinery},
-title        = {SemanticPaint: Interactive 3D Labeling and Learning at your Fingertips},
-url          = {http://research.microsoft.com/apps/pubs/default.aspx?id=244725},
-year         = {2015},
+
+@INPROCEEDINGS{nyu-improve, 
+	author={X. Ren and L. Bo and D. Fox}, 
+	booktitle={Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on}, 
+	title={RGB-(D) scene labeling: Features and algorithms}, 
+	year={2012}, 
+	pages={2759-2766}, 
+	doi={10.1109/CVPR.2012.6247999}, 
+	ISSN={1063-6919}, 
+	month={June},
+	organization={IEEE}
+}
+
+@misc{rgbd-datasets,
+	title="{List of RGBD datasets}",
+	howpublished = "\url{http://www0.cs.ucl.ac.uk/staff/M.Firman/RGBDdatasets/}",
+	author={Michael Firman},
+	year={2016},
+	month=mar
+}
+
+@book{bishop-book,
+  title={Pattern Recognition and Machine Learning},
+  author={Bishop, C.M.},
+  isbn={9780387310732},
+  lccn={2006922522},
+  series={Information Science and Statistics},
+  url={https://books.google.co.uk/books?id=kTNoQgAACAAJ},
+  year={2006},
+  publisher={Springer}
+}
+
+@book{elms-book,
+  title={The Elements of Statistical Learning: Data Mining, Inference, and Prediction, Second Edition},
+  author={Hastie, T. and others},
+  isbn={9780387848587},
+  lccn={2008941148},
+  series={Springer Series in Statistics},
+  url={https://books.google.co.uk/books?id=tVIjmNS3Ob8C},
+  year={2009},
+  publisher={Springer}
+}
+%Tibshirani, R. and Friedman, J.
+
+@ARTICLE{numpy, 
+	author={S. van der Walt and others}, 
+	journal={Computing in Science Engineering}, 
+	title={The NumPy Array: A Structure for Efficient Numerical Computation}, 
+	year={2011}, 
+	volume={13}, 
+	number={2}, 
+	pages={22-30}, 
+	keywords={data structures;high level languages;mathematics computing;numerical analysis;Python programming language;high level language;numerical computation;numerical data;numpy array;Arrays;Computational efficiency;Finite element methods;Numerical analysis;Performance evaluation;Resource management;Vector quantization;NumPy;Python;numerical computations;programming libraries;scientific programming}, 
+	doi={10.1109/MCSE.2011.37}, 
+	ISSN={1521-9615}, 
+	month={March},
+}
+% author={S. van der Walt and S. C. Colbert and G. Varoquaux}, 
+
+@unpublished{chinery-lec15,
+	author = {Andrew Chinery},
+	title  = "{Lecture 15 - Retargetting, Matting}",
+	year   = {2016},
+	month  = apr
+}
+
+@ARTICLE{seg-alpert, 
+	author={S. Alpert and others}, 
+	journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
+	title={Image Segmentation by Probabilistic Bottom-Up Aggregation and Cue Integration}, 
+	year={2012}, 
+	volume={34}, 
+	number={2}, 
+	pages={315-327}, 
+	doi={10.1109/TPAMI.2011.130}, 
+	ISSN={0162-8828}, 
+	month={Feb},
+}
+% author={S. Alpert and M. Galun and A. Brandt and R. Basri}, 
+
+@inproceedings{seg-grabcut,
+  title={Grabcut: Interactive foreground extraction using iterated graph cuts},
+  author={Rother, Carsten and others},
+  booktitle={ACM transactions on graphics (TOG)},
+  volume={23},
+  number={3},
+  pages={309--314},
+  year={2004},
+  organization={ACM}
+}
+% author={Rother, Carsten and Kolmogorov, Vladimir and Blake, Andrew},
+
+@article{stat-tests,
+  title={Statistical comparisons of classifiers over multiple data sets},
+  author={Dem{\v{s}}ar, Janez},
+  journal={The Journal of Machine Learning Research},
+  volume={7},
+  pages={1--30},
+  year={2006},
+  publisher={JMLR. org}
 }
 
 % Oxford SVM slides: http://www.robots.ox.ac.uk/~az/lectures/ml/
-% Chris Bishop SVM: http://www.rmki.kfki.hu/~banmi/elte/Bishop%20-%20Pattern%20Recognition%20and%20Machine%20Learning.pdf
-% SVM, RBF(212-214), springer-elms_of_stat_learning.pdf
 % C and Gamma: https://www.quora.com/What-are-C-and-gamma-with-regards-to-a-support-vector-machine 
 % C and Gamma: http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html#example-svm-plot-rbf-parameters-py
-% RBF Kernel https://en.wikipedia.org/wiki/Radial_basis_function_kernel
-5 RBF Kernel http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&doc=exercises/ex8/ex8.html
-
+% 5 RBF Kernel http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&doc=exercises/ex8/ex8.html

@@ -1,18 +1,15 @@
-\documentclass[dissertation.tex]{subfiles}
-\begin{document}
-
-\chapter{Technical Background}
+\chapter{Technical Background} \label{chap:tech}
 Before we attempt training models using depth information from images, we need to understand the characteristics of some of the models. In the scope of this project, we should focus on the two popular models for supervised machine learning - support vector machine and random forests, as mentioned in $(lit review section)$. 
 
-Looking ahead, we should also look into K-means Clustering, an unsupervised training model. It is not used for fitting the depth patches we intend to use, but as a way to perform our feature engineering, which will be discussed in \autoref{chap:methodology}.
+Looking ahead, we should also look into $K$-means clustering, an unsupervised training model. It is not used for fitting the depth patches we intend to use, but as a way to perform our feature engineering, which will be discussed in \autoref{chap:methodology}.
 
-\section{Support Vector Machine (SVM)}
-
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Support Vector Machine (SVM)} \label{sec:tech-SVM}
 % FIG - linear SVM
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\textwidth]{svm_fitting}
-  \caption{\textit{This illustration shows how SVM works with linearly separable datasets. The squared datapoints represent support vectors for their corresponding class.}}
+  \includegraphics[width=0.59\textwidth]{svm_fitting}
+  \caption{\textit{This illustration shows how SVM works with linearly separable datasets and a linear kernel. The squared datapoints represent support vectors for their corresponding class.}}
   \label{fig:svm_fitting}
 \end{figure}
 
@@ -44,7 +41,7 @@ Assuming all data is classified correctly, the distance between any point $\math
 \subsection{Overlapping Classes}
 
 % FIG - overlapping SVM
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{svm_overlapping}
   \caption{\textit{An elaborated \autoref{fig:svm_fitting} showing slack values of points based on its location in relation to the margin and decision boundary.}}
@@ -59,13 +56,13 @@ The slack value describes the status of a datapoint. There are three types of va
 	\centering
   \begin{tabularx}{\textwidth}{|l|X|}
     \hline
-    \textbf{Slack Value}		& \textbf{Description}
+    \textbf{Slack Value}	& \textbf{Description}
     \\ \hline
-    $\xi = 0$ 							& Points that are correctly classified.
+    $\xi = 0$ 					  & Points that are correctly classified.
     \\ \hline
-    $0 < \xi \leqslant 1$  	& Points that lie between the margin and the side of the hyperplane of its class.
+    $0 < \xi \leq 1$     	& Points that lie between the margin and the side of the hyperplane of its class.
 		\\ \hline
-    $\xi > 1$  							& Points that are misclassified.
+    $\xi > 1$  						& Points that are misclassified.
     \\ \hline
 
   \end{tabularx}
@@ -74,7 +71,7 @@ The slack value describes the status of a datapoint. There are three types of va
 }
 
 \subsubsection{The Cost Parameter ($C$)}
-By allowing some datapoints to be misclassified, we can create a more generalised SVM classifier. In other words, we impose a \textbf{soft margin} through penalising these datapoints and relaxing the contraints. In a non-linear dataset, we can think of this as the smoothness of the fit. The smoother the decision boundary, the less we take into account the exact position of all datapoints. 
+By allowing some datapoints to be misclassified, we can create a more generalised SVM classifier. In other words, we impose a \textbf{soft margin} through penalising these datapoints and relaxing the contraints. In a non-linear dataset, we can think of this as the smoothness of the fit. The smoother the margins, the less we take into account the exact position of all datapoints. 
 
 \begin{equation} \label{eq:soft_margin}
 	\min \left ( C \sum_{n=1}^{N} \xi_{n} + \frac{1}{2}||\mathbf{w}||^2 \right )
@@ -103,7 +100,7 @@ This trade off between the margin and misclassification is controlled by the reg
 
 
 \subsection{Kernels}
-By mapping datapoints to higher dimensional feature spaces, originally non-linearly separable datasets usually become separable linearly. Recall \autoref{svm_linear_max}, this feature space raising is represented as $\phi \left (\mathbf{x}_n \right)$ which could be of infinite dimensions and unstorable. Instead, in SVM, we can represent this complex decision boundary in efficient kernel representation without. 
+By mapping datapoints to higher dimensional feature spaces, originally non-linearly separable datasets usually become separable linearly. Recall \autoref{svm_linear_max}, this feature space raising is represented as $\phi \left (\mathbf{x}_n \right)$ which could be of infinite dimensions and unstorable. Instead, in SVM, we can represent this complex decision boundary in efficient kernel representation without computing $\phi \left (\mathbf{x}_n \right)$. 
 
 % TABLE: available kernels
 \parbox{\linewidth} {
@@ -126,31 +123,178 @@ By mapping datapoints to higher dimensional feature spaces, originally non-linea
   \label{tab:kernel_vals}
 }
 
-RBF is a useful and popular kernel.
-
 \subsubsection{The Gamma Parameter ($\gamma$)}
 By taking $C$ into account, we are able to create a more generalised classifier, but it would still be affected by outliers. The RBF kernel gives another parameter, $\gamma$, to control for the problem and shape of the decision boundary, as shown in \autoref{tab:kernel_vals}.
 
 $\gamma$ defines how far the influence of each datapoint reaches. The smaller $\gamma$ is, the further it reaches. The higher the value, the more the model tries to avoid misclassification. However, if the value is too high, the decision boundary become too specific, causing overfitting. Hence, the optimisation problem now includes the need to minimise $\gamma$ such that it finds the optimal decision boundary, as illustrated in \autoref{fig:svm_rbf_gamma}.
 
-
 % FIG - SVM RBF gamma
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{svm_rbf_gamma}
   \caption{\textit{Effects of different $\gamma$ values in ascending order.}}
   \label{fig:svm_rbf_gamma}
 \end{figure}
 
-\newpage
-\section{Random Forests (RF)}
-We now look at another classificiation algorithm, random forests.
 
+\subsection{Multiclass Extension}
+Fundamentally, SVM is designed to split between two classes. Two approaches, namely \textit{one-versus-the-rest} and \textit{one-versus-one}, have been developed to allow SVM to work with more than two classes by combining multiple binary SVMs.
+
+\begin{itemize}
+  \item \textbf{\underline{One-versus-the-Rest}} \\ \\
+    The approach trains $K$ SVM classifiers for $C_K$ classes. Each SVM classifier $y_k(\mathbf{x})$ uses the $k$\textsuperscript{th} class $C_k$ as the positive class and the rest as the negative class. However, this appraoch has a few issues. 
+
+A major issue is that this causes an imbalance of classes as the positive class will be smaller than the rest of the classes. This problem is worsened as more classes are added to the classifier, as it skews the results to the negative class, giving a false impression that the classifier has a good performance.
+\\
+
+  \item \textbf{\underline{One-versus-One}} \\ \\
+Another approach is to train many SVMs with all possible pairs of classes (i.e. $K(K-1)/2$ SVM classifiers). The relevant classifiers then 'vote' to return the highest voted class to give a prediction.
+
+However, it takes significantly longer to converge than one-versus-the-rest due to the number of classifers that needs to be trained. It trains in $O(K^2N^2)$ time compared to $O(KN)$ for one-versus-the-rest. It also takes a long time, $O(K^2N_{s})$, where $N_s$ is the number of support vectors \cite{mur-book}. 
+
+\end{itemize}
+
+% FIG - Multiclass SVM issue 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{svm_multi_issues}
+  \caption{\textit{Diagram showing abiguity regions (green) for (a) the one-versus-the-rest approach, and (b) the one-versus-one approach (based on figure 4.2 of \protect\citeasnoun{bishop-book}).}}
+  \label{fig:svm_multi_issues}
+\end{figure}
+
+Either way, it causes some ambiguity due to the separate evaluation of the classifiers. Some regions will be assigned to multiple classes due to the mulitple classifier setup. \autoref{fig:svm_multi_issue} illustrates this issue, and we can see that one-versus-one has a much smaller ambiguity area than one-versus-the-rest, in the expense of a much longer training time.
+
+
+%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{K-means Clustering}
+\section{Random Forest (RF)}
+
+We now look at a rather different classificiation algorithm, random forests. It is an ensemble method that combines results from different decision trees to give the final predition. We start by understanding what decision trees are.
+
+\subsection{Decision Tree}
+% FIG - Decision Tree 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{dt}
+  \caption{\textit{A (classification) decision tree with two classes, A and B,  and 'colour', 'shape' and 'size' as features (adapted from \protect\citeasnoun{mur-book}).}}
+  \label{fig:dt}
+\end{figure}
+
+Decision trees, formally classification and regression trees (\textbf{CART}), obtain predictions by recursively splitting the input space and defining each region with a local model. Visually, this can be displayed as a tree, with each node repsenting a split by some threshold or criteron. 
+
+Illustrated in \autoref{fig:dt}, the distirbution of class labels is stored at each leaf. This gives a probability for each class satisfying this criterion by using the number of positive and negative examples. For instance, the criterion 'if the \textit{colour} is red and the \textit{size} is less than 10' gives a predicition for class A $p(y=1|\mathbf{x}) = 4/4 = 1$ and $p(y=2|\mathbf{x}) = 0/4 = 0$ for class B. Practically, decision trees are binary such that the tree splits into 'yes' and 'no' according to some comparison criteria \cite{mur-book}.
+
+For each point $\mathbf{x}$ to be predicted, it follows down the tree from the top, known as the root, to the resulting leaf node, according to the decision criteria learned from the training data.
+
+\begin{equation} \label{eq:dt}
+  f(\mathbf{x}) = E[y|\mathbf{x}] = \sum_{m-1}^{M} w_m I(\mathbf{x} \in R_m)
+                                  = \sum_{m=1}^{M} w_m \phi(\mathbf{x}; \mathbf{v}_m)
+\end{equation}
+
+Formally, this model is defined as \autoref{eq:dt}. $R_m$ is the $m$\textsuperscript{th} region and $\mathbf{v}_m$ represents the feature used to split the node. Also, $\mathbf{w}_m$ represents the mean response in the $m$\textsuperscript{th} region. To generalise the model for classification purposes, this is replaced by the distribution of class labels as mentioned.
+
+This is essentially an adaptive basis-function model (ABM) which tries to learn kernel rather than having to be specified manually like that in SVM. Without the need to estimate the kernel parameter which is computationally expensive, Random Forest learns much quicker than kernel methods such as SVM \cite{mur-book}. 
+
+\subsubsection{Growing a Tree}
+\begin{equation} \label{eq:dt_split_fn}
+  (j*, t*) = \operatornamewithlimits{argmin}_{j \in \{1, ...,D\}} \operatornamewithlimits{min}_{t \in \tau} 
+  \left( 
+    cost \left(\{\mathbf{x}_i, y_i : x_{ij} \leq t \}\right) +
+    cost \left(\{\mathbf{x}_i, y_i : x_{ij} > t\}\right)
+  \right)
+\end{equation}
+
+We require some methods to decide which feature and what value to use for splitting. The split function in \autoref{eq:dt_split_fn} returns the best feature and best value by comparing a feature $x_{ij}$ to a numeric value $t$. This $t$ value is bounded by the feature values from the rest of the datapoints, stored as $\tau_{j}$ for each feature $j$.
+
+As seen in the equation, we want to minimise the cost of picking this feature. Cost is measured in several ways, namely, \textit{misclassification rate}, \textit{cross-entropy} and \textit{Gini index}. We want to minimise the \textit{misclassification rate}, while maximising the information gained through the split by minimising the \textit{cross-entropy}. The \textit{Gini index} is the expected error rate. 
+
+Cross-entropy and Gini index are preferred because it would choose the feature that gives a pure split, i.e. contains only one class, in case of a draw in error rate \cite{mur-book}. Such a split is more desirable as the class choice is more definite. We also need to think about how deep the tree should go. If the tree becomes too deep, it causes overfitting, which we want to avoid as discussed \cite{mur-book}. 
+
+\subsection{Linking back to Random Forests}
+
+% FIG - Random Forest 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{rf}
+  \caption{\textit{Bagging or Boosting is used to obtain a prediction by combining the results of many trees.}}
+  \label{fig:rf}
+\end{figure}
+
+Decision tree is known to perform worse than other classifiers due to the instability of the trees. These trees are called high variance estimators, as their structures are affected greatly by small changes. A solution is to use Random Forests. 
+
+\subsubsection{Bagging}
+
+\begin{equation} \label{eq:rf_ensemble}
+  f(x) = \sum_{m=1}^M \frac{1}{M}f_m(x)
+\end{equation}
+
+Bagging attempts to reduce the variance by averaging the results from many noisy but approximately unbiased trees, created by a randomly selected subset of datapoints. Each tree in the forest casts a vote to decide on the predicted class through averaging the reuslts of the trees in the forest, as illustrated in \autoref{eq:rf_ensemble}.
+
+However, simply by growing multiple trees with different sets of data would create highly correlated trees, which curbs the amount that the variance can go down. Random forests attempt to avoid this by not only randomising the dataset to be used, but also the features for building each tree. 
+
+The randomness of data selection for each tree may introduce extra bias in the forest. But, the averaging of trees usually decrease the variance, which results in a better model.
+
+As a note, we would want to find the optimal number of trees to build and the number of features to avoid overfitting \cite{scikit-doc}.
+
+
+%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{$K$-means Clustering}
 %TODO: referencing back to lit review
-Recall that we looked briefly at unsupervised in \autoref{sssec:unsupervised_overview} and \ref{something}. Rather than learning from a labelled dataset, the algorithm learns from the characteristics in the data and assigns labels to the groups it identifies.
+%TODO: change reference to section rather than subsections
+Recall that we looked briefly at unsupervised classifiers in Section \ref{sssec:unsupervised_overview} and *something*. Rather than learning from a labelled dataset, the algorithm compares values between points and creates $K$ groups, or clusters, in a multi-dimensional space as specified.
 
-Later on, in \autoref{sec:method_k-means}, we will discuss our application of K-means clustering for downsizing our dataset for training the aforementioned calssifier models in a rather unusual manner. 
+Later on, in Section \ref{ssec:datapoint-reduction}, we will look at how $K$-means clustering is utilised to downsize the training dataset so that we can perform tests with the aforementioned calssification models. But first, let us understand the mathematical basis of $K$-means clustering.
 
-\end{document}
+% FIG - SVM RBF gamma
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{k-means}
+  \caption{\textit{An example of two clusters found with centroids $\mathbf{\mu}_1$ and $\mathbf{\mu}_2$.}}
+  \label{fig:k-means}
+\end{figure}
+
+The algorithm aims to split the data into $K$ clusters where the differences of distances between the points in the group is smaller than that to the points outside of the group. 
+
+Formally, we have to minimise the distortion measure, shown as \autoref{eq:k-means_minimise}, by finding the appropriate \{$r_{nk}$\} and \{$\mathbf{\mu}_k$\}, and through the sum squared differences between each datapoint and each $\mathbf{\mu}_k$. For each point $\mathbf{x}_n$, $r_{nk}$ is a set of binary values indicating which cluster the point belongs to. $\mathbf{\mu}_k$ is a set of vectors associated with the $k$\textsuperscript{th} cluster, representing the centres of each cluster. 
+
+\begin{equation} \label{eq:k-means_minimise}
+  J = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk}||\mathbf{x}_n - \mathbf{\mu}_k||^2
+\end{equation}
+
+\autoref{eq:k-means_minimise} is a two-stage optimisation problem, first by finding $r_{nk}$ by fixing $\mathbf{\mu}_k$ (the expectation stage, \textbf{E}) and vice versa (the maximisation stage, \textbf{M}):
+
+\newpage
+\begin{itemize}
+  % finding optimal r
+  \item \textbf{\underline{Stage 1: Finding Optimal $r_{nk}$}} \\ \\
+	\begin{equation} \label{eq:k-means_r_nk}
+		r_{nk} =
+		\begin{cases}
+			1 & \text{if } k=\mathrm{argmin}_j ||\mathbf{x}_n - \mathbf{\mu}_j||^2\\
+			0 & \text{otherwise}
+		\end{cases}
+  \end{equation} \\
+	
+  Staring with some randomly selected datapoints from the dataset as $\mathbf{\mu}_k$, we compute the sum squared differences between each point and the proposed cluster centres. We assign each datapoint to its corresponding closest cluster centres. In the end, we will have a set of datapoints that belong to a cluster centre, hence finding groups in the data.
+\\
+  % finding optimal mu
+  \item \textbf{\underline{Stage 2: Finding Optimal $\mathbf{\mu}_k$}} \\ \\ 
+    \begin{align} \label{eq:k-means_mu_min}
+    \begin{split}
+    2\sum_{n=1}^{N}r_{nk}(\mathbf{x}_n - \mathbf{\mu}_k) &=  0 \\ 
+    \mathbf{\mu}_k &= \frac{\sum_n r_{nk}\mathbf{x}_n}{\sum_n r_{nk}}
+    \end{split}
+	\end{align} \\
+  
+  These potential clusters might not be optimised to minimise \autoref{eq:k-means_minimise}. So, We have to do so by computing the derivative with respective to $\mathbf{\mu}_k$ as illustrated in \autoref{eq:k-means_mu_min}. Also, notice that by finding $\mathbf{\mu}_k$, we find out that they are the means of all the datapoints assigned to them, i.e. the centroids of the groups.
+\end{itemize}
+
+The two stages are repeated until the model converges, meaning that no further reassignment happens. The end result will be $K$ groups governed by the mean values of their corresponding cluster, but note that these means may not necessarily be concrete datapoints from the dataset. 
+
+\section{Summary}
+So far, we have learnt that SVM contains a main parameter, $C$ that controls for the trade-off between the margin and misclassification. With an RBF kernel, we can control the shape of the decision boundary through the $\gamma$ parameter. By finding the appropriate parameters, we can obtain an optimal SVM classifier that gives the best possible accuracy with the given dataset.
+
+Also, we have learnt about the randomisation of data and features used to train random forest trees, which provides much better accurary than pure decision trees. Comparing with SVM, we have learnt that random forests can be trained faster. Rather than having to estimate the correct parameters for the base kernel, Random Forests learn it themselves. However, we do have choose an appropriate height of the tree and the the number of the trees to train to avoid overfitting.
+
+We shall now discuss the overall process used for training these algorithms.

@@ -1,52 +1,71 @@
 \documentclass[11pt,openright,a4paper]{report}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{titlesec}
-\usepackage[margin=35mm,footskip=0.5in]{geometry}
-\usepackage{tabularx}
-\usepackage{tabulary}
-\usepackage{color}
-\usepackage[table]{xcolor}
-\usepackage{caption, subcaption}
-\usepackage{amssymb, amsmath, empheq}
-\usepackage{listings}
-\lstset{language=Python}
-\usepackage{array}
-\usepackage{longtable}
-\usepackage{subfiles}
+%%
+%% This document template assumes you will use pdflatex.  If you are using
+%% latex and dvipdfm to translate to pdf, insert dvipdfm into the options.
+%%
 
-\graphicspath{ {images/tech/} {images/methodology/} {lit_review/images/} }
-\numberwithin{equation}{section}
+\include{DissertationDefs}    %% These are the includes required for the doc 
 
-% set margin
-\geometry{
-  a4paper,
-  top=25mm,
-  bottom=35mm
-}
-
-% self-defined colours
-\definecolor{newgrey}{HTML}{e5e5e5}
 
 % title
-\title{
-  Final Year Project \textit{Work In Progress…}
-  \\~\\
-  \textbf{Using Machine-learning Techniques to Achieve Quality Mutilclass Classification Results(Working Title)}
-}
-\author{Alan Lau (awll20)}
-%\date{MComp Computer Science\\University of Bath\\October 2015}
+\title{\textbf{Using Supervised Machine-learning Techniques to Perform Mutilclass Classification using Depth Data}}
+\author{Alan Lau}
+\date{MComp (hons) Computer Science\\University of Bath\\April 2016}
 
-% set section depth
-\setcounter{tocdepth}{4}
-\setcounter{secnumdepth}{5}
 
-% tab spacing
-\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+%%%%%%%%%%%%%
 
-% set chapter format
-\titleformat{\chapter}[hang]{\LARGE\bfseries}{\thechapter\hspace{20pt}}{0pt}{\LARGE\bfseries}
-\titlespacing{\chapter}{0pt}{0pt}{5pt}
+\begin{document}
+
+
+
+
+\setcounter{page}{0}
+\pagenumbering{roman}
+
+
+\maketitle
+\newpage
+
+
+% Set this to the number of years consultation prohibition, or 0 if no limit
+\consultation{0}
+\newpage
+
+
+\declaration{Using Supervised Machine-learning Techniques to Perform Mutilclass Classification using Depth Data}{Alan Lau}
+\newpage
+
+
+
+
+
+% abstract
+\input{sub/abstract}
+
+% Table of things
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+% acknowledgement
+\pagenumbering{gobble}
+\thispagestyle{empty}
+\input{sub/ack}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+% Style settings
+%%%%%%%%%%%%%%%%
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
 
 % set section format
 \titleformat{\section}[hang]{\Large\bfseries}{\thesection\hspace{20pt}}{0pt}{\Large\bfseries}
@@ -59,152 +78,45 @@
 % set subsubsection format
 \titleformat{\subsubsection}[hang]{\bfseries}{\thesubsubsection\hspace{20pt}}{0pt}{\bfseries}
 \titlespacing{\subsubsection}{0pt}{10pt}{-5pt}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\begin{document}
-
-\pagenumbering{gobble}
-
-% title page
-\maketitle
-\newpage
-
-\begingroup
-% set pagragraph style
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{\baselineskip}
-
-% abstract
-\subfile{sub/abstract.tex}
-\newpage
-
-
-% acknowledgements
-\subfile{sub/ack.tex}
-\newpage
-\endgroup
-
-% ToC
-\tableofcontents
-\newpage
-% reset page number
-\pagenumbering{arabic}
-\setcounter{page}{1}
-
-% set pagragraph style
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{\baselineskip}
-\newpage
+%%%%%%%%%%%%%%%%%
 
 
 % introduction
-\subfile{sub/introduction.tex}
-\newpage
+\input{sub/introduction}
 
-% image - dot product illustration
-%\begin{figure}[h]
-  %\centering
-  %\includegraphics[width=0.6\textwidth]{dot_product}
-  %\caption{\textit{An example of how dot product is performed during the convolution process. The dot product between a 3x3 image patch centred around a pixel, \texttt{x}, and the kernel, produces a new value, \texttt{x'}. This is stored at the same position as \texttt{x} in the output image.}}
-  %\label{fig:dot_product}
-%\end{figure}
+% literature review
+\input{lit_review/lit_review}
 
-\subfile{lit_review/lit_review.tex}
-\newpage
-
-% techical background 
-\subfile{sub/tech.tex}
-\newpage
-
+% technical background
+\input{sub/tech}
 
 % methodology
-\subfile{sub/methodology.tex}
-\newpage
-
+\input{sub/methodology}
 
 % results
-\subfile{sub/results.tex}
-\newpage
-
+\input{sub/results}
 
 % conclusion
-\subfile{sub/conclusion.tex}
-\newpage
+\input{sub/conclusion}
 
+% future work
+\input{sub/future}
 
-\newpage
-\subsubsection{Table}
+%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{longtable}{ | m{2.3cm} | m{3.8cm} | c | }
-  \hline
-  Name & Kernel & Image \\ \hline
-  
-  Edge 
-  
-  Enhancement
-  &
-  \[ \begin{bmatrix} 0 & 0 & 0 \\ -1 & 1 & 0 \\ 0 & 0 & 0 \end{bmatrix} \]
-  & 
-  \begin{minipage}{.6\textwidth}
-    %\includegraphics[width=\linewidth]{en.png}
-  \end{minipage}
-  \\ \hline
-  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
-  \\ \hline
+%\chapter{Test}
+%%% Uncomment this to include a separate tex file wih the introduction contents
+%%\include{litsurvey.tex}
+%This is the chapter for your Literature Survey.
 
-  Edge 
-  
-  Detection
-  &
-  \[ \begin{bmatrix} 0 & 1 & 0 \\ 1 & -4 & 1 \\ 0 & 1 & 0 \end{bmatrix} \]
-  &
-  \begin{minipage}{.6\textwidth}
-    %\includegraphics[width=\linewidth]{ed.png}
-  \end{minipage}
-  \\ \hline
-  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
-  \\ \hline
-
-  Sharpen 
-  &
-  \[ \begin{bmatrix} 0  &  0  &  0  &  0  &  0 \\ 
-                     0  &  0  & -1  &  0  &  0 \\
-                     0  & -1  &  5  & -1  &  0 \\ 
-                     0  &  0  & -1  &  0  &  0 \\
-                     0  &  0  &  0  &  0  &  0
-   \end{bmatrix} \]
-  & 
-  \begin{minipage}{.6\textwidth}
-    %\includegraphics[width=\linewidth]{sharp.png}
-  \end{minipage}
-  \\ \hline
-  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
-  \\ \hline
-
-  
-  Box Blur 
-  &
-  \[ \frac{1}{9}\begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} \]
-  & 
-  \begin{minipage}{.6\textwidth}
-    %\includegraphics[width=\linewidth]{blur.png}
-  \end{minipage}
-  \\ \hline
-  \multicolumn{1}{|c}{} & \multicolumn{1}{c}{} &\multicolumn{1}{c|}{}
-  \\ \hline
-
-  \caption{Convoluation results}
-  \label{tbl:conv}
-\end{longtable}
-
+%You will wish to cite authors like \cite{semantic-paint} or \cite{semantic-paint}.  Alternate
+%commands are used to cite \citeasnoun{semantic-paint} as a noun, or cite
+%\possessivecite{semantic-paint} work possessively, or add text to the citation, 
+%\citeaffixed{semantic-paint}{e.g.}, \cite{semantic-paint}.
 
 \newpage
-
-% bibliography
-\pagenumbering{gobble}
-\bibliographystyle{unsrt}
+\setcounter{page}{0}
+\pagenumbering{roman}
 \bibliography{mybib}
 
 
