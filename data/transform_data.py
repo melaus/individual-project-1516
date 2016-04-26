@@ -5,6 +5,7 @@ import sys
 import math as m
 import argparse
 import glob
+import re
 from math import ceil
 from itertools import groupby
 from operator import itemgetter
@@ -401,7 +402,7 @@ def kmeans(init, n_clusters, n_init, label_s, label_e, path):
 
 def combine_data(path=''):
     print '--- combine_data ---'
-    labels = range(0,895)
+    labels = range(4,6)
     all_kmeans = np.load(path+'all_kmeans.npy')
     
     features = np.array([])
@@ -443,12 +444,12 @@ def combine_data(path=''):
 
         print 'added to dict\n\n'
 
-    save_data(create_ft_dict(features, targets), 'combined', 'np', path)
-    save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
+    save_data(create_ft_dict(features, targets), 'combined_4_5', 'np', path)
+    # save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
-def datasets(path):
-    data = np.load(path+'combined.npy').tolist()
+def datasets(filename, path):
+    data = np.load(path+filename).tolist()
 
     # train/test, validation split
     print 'tt and val split'
@@ -473,9 +474,10 @@ def datasets(path):
     print 'shape of testing:   ', X_test.shape
     print 'shape of validation:', X_val.shape
 
-    save_data(create_ft_dict(X_train, y_train), 'data_train', 'np', path)
-    save_data(create_ft_dict(X_test, y_test), 'data_test', 'np', path)
-    save_data(create_ft_dict(X_val, y_val), 'data_val', 'np', path)
+    id = re.search('_[0-9]_[0-9]', filename).group(0)
+    save_data(create_ft_dict(X_train, y_train), 'data_train'+id, 'np', path)
+    save_data(create_ft_dict(X_test, y_test), 'data_test'+id, 'np', path)
+    save_data(create_ft_dict(X_val, y_val), 'data_val'+id, 'np', path)
 
 
 # """
@@ -572,6 +574,7 @@ def parser():
     p_com.set_defaults(which='combine')
 
     p_data = subparsers.add_parser('data', help='create training dataset')
+    p_data.add_argument('-f', '-filename', action='store', dest='filename', help='filename')
     p_data.set_defaults(which='data')
 
     args = parser.parse_args()
@@ -644,7 +647,7 @@ def main():
         combine_data(path+'lbl/')
 
     elif args.which == 'data':
-        datasets(path+'lbl/')
+        datasets(args.filename, path+'lbl/')
 
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n, rand, lbl'

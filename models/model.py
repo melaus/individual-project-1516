@@ -4,9 +4,12 @@ from sklearn import cross_validation
 from sklearn.ensemble import RandomForestClassifier
 import argparse, sys
 import numpy as np
+import cPickle as p
+import re
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.datasets import load_iris
 from time import time
+from sklearn.externals import joblib as j
 
 
 """
@@ -19,40 +22,52 @@ def test_data():
 """
 fit SVC models
 """
-def model_svc(kernel, path, C=1, gamma=0.001):
+def model_svc(kernel, path): # , C=1, gamma=0.001):
     print '--- in model_svc ---\n'
     data = np.load(path+'lbl/data_train.npy').tolist()
     # data = test_data()
 
     print 'shape of data:', data['features'].shape
 
-    model = svm.SVC(kernel=kernel, C=C, gamma=gamma, random_state=42)
+    model = svm.SVC(kernel=kernel) #, C=C, gamma=gamma, random_state=42)
 
     print 'to fit model'
     t0 = time()
     model.fit(data['features'], data['targets'])
     print 'time taken:', time() - t0
 
-    save_data(model, 'SVC_'+str(C)+'_'+str(gamma), path+'model/')
+    save_data(model, 'SVC_none_test.npy', path+'model/')
 
 """
 fit random forest models
 """
-def model_rf(path):
+def model_rf(filename, path):
     print '--- in model_rf ---\n'
-    # data = np.load(path+'lbl/data_train.npy').tolist()
-    data = test_data()
+    data = np.load(path+'lbl/'+filename).tolist()
+    # data = test_data()
+
+    max_depth = 'inf'
 
     print 'shape of data:', data['features'].shape
 
-    model = RandomForestClassifier(max_depth=5)
+    model = RandomForestClassifier() # max_depth=5)
 
     print 'to fit model'
     t0 = time()
     model.fit(data['features'], data['targets'])
     print 'time taken:', time() - t0
 
-    save_data(model, 'rf_mx5', path+'model/')
+    print('')
+    print(model)
+    print('')
+
+    id = re.search('_[0-9]_[0-9]', filename).group(0) 
+    p.dump(model, open(path+'model/rf_mx'+str(max_depth)+id+'.p', 'wb'))
+    print('saved pickle')
+    j.dump(model, path+'model/rf_mx'+str(max_depth)+id+'.jl')
+    print('saved joblib')
+    save_data(model, 'rf_mx'+str(max_depth)+id+'.npy', path+'model/')
+
 
 
 
@@ -116,7 +131,8 @@ def parser():
 
     # rf
     p_rf = subparsers.add_parser('rf', help='Random Forest')
-    p_rf.set_defaults(which='svc')
+    p_rf.add_argument('-file', '-filename', action='store', dest='filename', help='filename')
+    p_rf.set_defaults(which='rf')
 
     # confusion matrix
     p_cf = subparsers.add_parser('cf', help='confusion matrix')
@@ -163,7 +179,7 @@ def main():
         model_svc(args.kernel, path)
 
     elif args.which == 'rf':
-        model_rf(path)
+        model_rf(args.filename, path)
 
     elif args.which == 'cf':
         pass
