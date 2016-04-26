@@ -1,8 +1,4 @@
-\documentclass[dissertation.tex]{subfiles}
-\begin{document}
-
-\chapter{Methodology}
-\label{chap:methodology}
+\chapter{Methodology} \label{chap:methodology}
 
 %TODO: linear SVM
 \begin{figure}[h]
@@ -26,7 +22,7 @@ The solution is to obtain a patch around a pixel. This would provide some contex
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.6\textwidth]{patches}
-  \caption{\textit{Showing how each patch represents a window on the original image in this simplified view. Two classes, red and blue, are represented in this illustration.}}
+  \caption{\textit{Showing how each patch represents a window on the original image in this simplified view. Two classes, red and blue, are represented in this illustration. We shall illustrate the green patch in \protect\autoref{fig:patch_process}.}}
   \label{fig:patches}
 \end{figure}
 
@@ -36,19 +32,22 @@ Each patch is then normalised by deducting the mean of the patch from each pixel
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{patch_process}
-  \caption{\textit{An example patch with the- from its original form }}
+  \caption{\textit{An example of how we obtain a patch around a pixel (coordinate) and normalise it.}}
   \label{fig:patch_process}
 \end{figure}
 
-\subsection{Reducing Number of Datapoints}
+\subsection{Reducing Number of Datapoints} \label{ssec:datapoint-reduction}
 Each image is composed of 640-by-480 pixels, meaning that more than 290 000 patches are generated from each image. If all 1449 images are used, 460 million patches are generated. A Support Vector Classifier would take months to train with this unrealistically large dataset. Given the time and technical limitations, a manageable dataset is required. 
 
-\rule{200pt}{1pt}
-\subsubsection{Random}
-A method for reducing the number of datapoints is to to collect a random number of datapoints from a random selection of images possessing the label. In this way, we aim to collect a vast set of data from a wide range of images. The drawback is that it is uncertain what 'random' entails. Some valuable and important features may be missed out, making the classifier less powerful.
-
-\subsubsection{K-means Clustering}
+\begin{itemize}
+  \item \textbf{Randomly Select Datapoints} \\ \\
+A method for reducing the number of datapoints is to to collect a random number of datapoints from a random selection of images possessing the label. In this way, we aim to collect a vast set of data from a wide range of images. The drawback is that it is uncertain what 'random' entails. Some valuable and important features may be missed out, making the classifier less powerful. \\
+  
+  \item \textbf{K-means Clustering} \\ \\
 A better way is to spot the similarities in the data and extract those points of interestsas datapoints. By finding groups within the data, known as clusters, it is possible to generalise each of these groups by its centroid. The obtained points provide a more reliable dataset, as it does not throw away potentially important information about this label.
+
+By doing so, we can be more cetain that our dataset is representative. We want to represent datapoints across all images, rather than picking random points from a big pool of datapoints risking to miss out key features as we cannot guarantee these randomly picked points cover all images.
+\end{itemize}
 
 % TODO: Clustering imagary
 %\begin{figure}[h]
@@ -58,7 +57,6 @@ A better way is to spot the similarities in the data and extract those points of
   %\label{fig:svm_fitting}
 %\end{figure}
 
-\rule{200pt}{1pt}
 
 Due to the number of patches present in some of the labels and computational limitations, both methods are used to obtain the datasets. K-means clustering is directly applied to labels with at most 120 000 datapoints for them to compute within the six-hour time limit on Balena as a free user. A random 100 000 datapoints are selected for labels with datapoints more than the limit. A few exceptions require a random number of images to be chosen before performing the random pick and clustering, due to the amount of images containing those labels and the number of patches that are generated. 
 
@@ -72,19 +70,28 @@ The datasets are created by combining all the datapoints generated through k-mea
 Some scenes are not used for any of the datasets above, so that they may be used as another way to assess the performance of the classifier in the end. This is discussed later in \autoref{chap:results}.
 
 \subsection{Detailed View of Dataset}
-% TODO: information about how we get to 1000 samples and how are we going to split
 
-% TODO: graph to illustrate the split
+%TODO: information about how we get to 1000 samples and how are we going to split \\
+%TODO: graph to illustrate the split
 
 \section{Training a Classifier}
 A classifier is then trained using the obtained data. Although the datasets have been carefully crafted, there is no guarantee that the dataset would provide any useful results. Perhaps more features is required to provide enough information for the classifier to effectively split the labelled data correctly, or that our assumption that depth is a useful metric is ill-founded.
 
-\subsection{Support Vector Machine}
-% TODO: REFERENCE TO SOMEWHERE
-As discussed in \ref{somewhere}, the SVM algorithm requires a few optional but influential parameters depending on the chosen kernel. If the selected kernel is RBF, the parameters - cost (\texttt{C}) and the efficient of the kernel (\texttt{gamma}) have to be specified to achieve optimal results. An exhaustive search can be used to find the best parameters. The scikit-learn \texttt{GridSearch} runs a model for each combination of a given list of testing parameters. 
+One of the important aspect is finding the correct parameters to enable optimal prediction power of our trained classifiers.
 
-However, the number of datapoints means that this method would take a long time and most likely over the time limitation on Balena. The next best option is to fit multiple models and examine their output performance score. In turn, this would work better as it results in fitted models that can be used for predictions and performance evaluations.
+\subsection{Finding Optimal Parameters}
+An exhaustive search, also known as grid search, can be used to find the best parameters for classifiers that supports them, such as SVM. It trains a model for each combination of a given list of testing parameters. 
 
-% TODO: Random Forest?
+\begin{itemize}
+  \item \textbf{\underline{Support Vector Machine}}
+As discussed in \autoref{sec:tech-SVM}, the SVM algorithm requires a few optional but influential parameters depending on the chosen kernel. If the selected kernel is RBF, the parameters - cost ($C$) and the efficient of the kernel ($\gamma$) have to be specified to achieve optimal results. 
 
-\end{document}
+We will attempt two methods in finding an optimal set of parameters. The first way is to use grid search with a subset of the data with less classes. If these parameters become stable for a few relatively large subsets, we would assume this works best in general. The next best option is to perform manual grid search by training multiple classifiers with different parameters and examine their performance score. Also, this is bounded the training time required. We will examine all of this in next chapter.\\ \\
+
+  \item \textbf{\underline{Random Forest}}
+We need to obtain the optimal set of parameters to ensure that the forest does not overfit. At a tree level, it includes the maximum depth and the maximum number of features.
+
+As Random Forest is a much more efficient algorithm, we expect that the classifier converge much quicker than SVM and be able to handle all the classes and data. Similarly, we could at least manually train a few classifiers with different parameters to find out the optimal settings.
+\end{itemize}
+
+The next step is to train some SVM and Random Forest classifiers with our dataset. 

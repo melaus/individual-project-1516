@@ -1,10 +1,27 @@
-\documentclass[dissertation.tex]{subfiles}
-\begin{document}
+\chapter{Introduction} \label{chap:introduction}
+Machine learning has been an interest since the early days of the invention of computers. It aims to learn from images by finding distinctive characteristics in the underlying numerical or categorical values through methods like curve fitting or splitting up the data. One active area of research of the application of machine learning is computer vision. For humans, we understand the context of an image so that we can still recognise objects in it even if they are of different colour or made from different materials, but it is a challenging problem for computers. 
 
-\chapter{Introduction}
-Machine-learning has been an interest since the early days in computer research. 
+Images are inherently difficult to model as they have complicated distribution in the data level. An orange in different images may appear different due to the environment it is in, and the angle or colour temperature of the scene. Hence, simply using pixel (colour) information will not make the cut.
 
-How can we make use of depth information for classifying objects?
+These days, some cameras are able to capture not only colours, but also depth information to show where an object sits in a 3-dimensional space. One particular interesting project is KinectFusion, where it enables images to be fused together to create a 3-dimensional reconstruction of the scene and represent it in a 3-dimensional space.
+
+In fact, researches, such as Semantic Paint \cite{semantic-paint}, make use of this new source of information to create a way to label objects in a scene and apply the same effect on other similar recognised objects at real-time, providing a virtual reality experience. However, these recognised objects are not stored. Can we find a generalised model using depth information to correctly predict objects in a scene? This way, we could use this information to enable more interesting virtual/ augmented reality experience. 
+
+A good use-case would be a real-time system that can suggest what can be placed on top of a given recognised object. For instance, the system might suggest that bowls, cups and bottles can be placed on top of a table, and a different set of suggestions is given when a chair is recognised. 
+
+Such recognition is a classification problem. How can we optimise the decision boundary that splits the data into regions in order to get a model that can predict unseen input? Together with a complex distribution, this optimisation problem becomes even more complicated and requires careful consideration. This contributes to an accuracy and speed trade-off which we will look into in greater detail.
 
 
-\end{document}
+\section{Aim}
+There are several aims with this project. For one, we want to find out how popular classification algorithms perform in real-world applications. Formally, these models are very robust with measures to avoid common issues such as overfitting. But, it is hard to know how they perform with 'real' data (depth data in our case). The raw dataset will contain many images hence many possible datapoints. In \autoref{chap:methodology}, we will discuss our approach in dealing with such situations.
+
+Also, we want to investigate the usefulness of depth data alone in predicting objects in a scene. Could we obtain a classifier with high enough accuracy that can predict objects in an image to good quality? With a high accuracy classifier, we can integrate it into the aforementioned use-case in conjunction with other computer vision techniques such as segmentation. 
+
+To limit the scope of the project, we will focus on training supervised classification models, which we will discuss briefly in section \ref{sec:classification} and in detail in \autoref{chap:tech}.
+
+\section{Evaluating Success}
+In order to evaluate how well our classifiers perform, we use various quantitative approaches, including confusion matrix, accuracy rate and precision-recall rates. With these values, we can examine whether we have trained a useful classifier with good prediction power. 
+
+Also, we want to ensure that we find the best decision boundary fit to avoid overfitting. An overfitted classifier does not possess any meaningful prediction power although it might provide impressive results in hindsight. We want to avoid being too specific by using every detail without compromise, otherwise we will end up with a classifier that is tailored only the input dataset. 
+
+We will discuss all these concepts in detail in the upcoming chapters.
