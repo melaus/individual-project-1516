@@ -1,6 +1,7 @@
 
 from sklearn import svm
 from sklearn import cross_validation
+from sklearn.grid_search import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 import argparse, sys
 import numpy as np
@@ -18,6 +19,21 @@ make iris into dict
 def test_data():
     iris = load_iris()
     return {'features': iris.data, 'targets': iris.target}
+
+
+"""
+perform GridSearch
+"""
+def gridsearch(model, param_grid, data, filename):
+    grid = GridSearchCV(model, param_grid=param_grid, cv=3, verbose=4)
+
+    grid = grid.fit(data['features'], data['target'])
+
+    print('\n\n\n'+filename)
+    print('best params: ', grid.best_params_)
+
+    return grid.best_params_
+
 
 """
 fit SVC models
@@ -37,6 +53,7 @@ def model_svc(kernel, path): # , C=1, gamma=0.001):
     print 'time taken:', time() - t0
 
     save_data(model, 'SVC_none_test.npy', path+'model/')
+
 
 """
 fit random forest models
@@ -113,8 +130,7 @@ def save_data(data, filename, path=''):
 open file
 """
 def load_data(filename, path=''):
-    np.load(path+filename)
-    print 'data loaded'
+    return np.load(path+filename)
 
 
 """
@@ -141,9 +157,9 @@ def parser():
     p_cf.set_defaults(which='cf')
 
     # TODO: gridsearch
-    # p_gs = subparsers.add_parser('gridsearch', help='perform GridSearch with given input')
-    # # p_gs.add_argument()
-    # p_gs.set_defaults(which='gridsearch')
+    p_gs = subparsers.add_parser('gridsearch', help='perform GridSearch with given input')
+    p_gs.add_argument('-f', '-filename', action='store', dest='filename', help='file to be loaded')
+    p_gs.set_defaults(which='gridsearch')
 
     return parser.parse_args()
 
@@ -183,6 +199,19 @@ def main():
 
     elif args.which == 'cf':
         pass
+
+    elif args.which == 'gridsearch':
+        model = svm.SVC(kernel='linear')
+        param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
+        data = load_data(args.filename, path+'lbl/')
+
+        # model = svm.SVC(kernel='rbf')
+
+        # model = RandomForestClassifier()
+
+        gridsearch(model, param_grid, data, args.filename)
+
+
     else:
         print >> sys.stderr, 'possible inputs: svc, rf'
         sys.exit(1)
