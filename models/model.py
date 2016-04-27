@@ -3,6 +3,7 @@ from sklearn import svm
 from sklearn import cross_validation
 from sklearn.grid_search import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 import argparse, sys
 import numpy as np
 import cPickle as p
@@ -219,8 +220,13 @@ def main():
             param_grid = {'n_estimators': [2, 5, 10, 20, 50, 100, 500, 1000], 'max_features': ["auto", "log2"]}
             model = RandomForestClassifier()
 
-        elif ags.model == 'ada':
-            pass
+        elif 'ada' in args.model:
+            # base_estimator = dt_stump, learning_rate = learning_rate, n_estimators = n_estimators,
+            param_grid = {'learning_rate': [1,1.5,2], 'n_estimator': [50, 100, 500, 1000, 2000]}
+            if args.model == 'ada':
+                model = AdaBoostClassifier(algorithm="SAMME")
+            elif args.model == 'ada-r':
+                model = AdaBoostClassifier(algorithm="SAMME.R")
 
         else:
             print('invalid model')
