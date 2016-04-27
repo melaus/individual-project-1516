@@ -25,12 +25,13 @@ def test_data():
 perform GridSearch
 """
 def gridsearch(model, param_grid, data, filename):
-    grid = GridSearchCV(model, param_grid=param_grid, cv=3, verbose=4)
+    grid = GridSearchCV(model, param_grid=param_grid, cv=3, verbose=4, n_jobs=10)
 
-    grid = grid.fit(data['features'], data['target'])
+    grid = grid.fit(data['features'], data['targets'])
 
     print('\n\n\n'+filename)
     print('best params: ', grid.best_params_)
+    print('best score:  ', grid.best_score_)
 
     return grid.best_params_
 
@@ -158,7 +159,8 @@ def parser():
 
     # TODO: gridsearch
     p_gs = subparsers.add_parser('gridsearch', help='perform GridSearch with given input')
-    p_gs.add_argument('-f', '-filename', action='store', dest='filename', help='file to be loaded')
+    p_gs.add_argument('-f', '-file', action='store', dest='filename', help='file to be loaded')
+    p_gs.add_argument('-m', '-model', action='store', dest='model', help='model used (e.g. svc-rbf, rf)')
     p_gs.set_defaults(which='gridsearch')
 
     return parser.parse_args()
@@ -201,19 +203,33 @@ def main():
         pass
 
     elif args.which == 'gridsearch':
-        model = svm.SVC(kernel='linear')
-        param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
-        data = load_data(args.filename, path+'lbl/')
+        data  = load_data(args.filename, path+'lbl/').tolist()
 
-        # model = svm.SVC(kernel='rbf')
+        if 'svc' in args.model:
+            param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
+            # param_grid = {'C': [0.1], 'gamma': np.logspace(-9, 0, 3)}
+            # param_grid = {'C': [10], 'gamma': np.logspace(-9, 0, 3)}
+            # param_grid = {'C': [1000], 'gamma': np.logspace(-9, 0, 3)}
+            if args.model == 'svc-linear':
+                model = svm.SVC(kernel='linear')
+            elif args.model == 'svc-rbf':
+                model = svm.SVC(kernel='rbf')
 
-        # model = RandomForestClassifier()
+        elif args.model == 'rf':
+            param_grid = {'n_estimators': [2, 5, 10, 20, 50, 100, 500, 1000], 'max_features': ["auto", "log2"]}
+            model = RandomForestClassifier()
+
+        elif ags.model == 'ada':
+            pass
+
+        else:
+            print('invalid model')
 
         gridsearch(model, param_grid, data, args.filename)
 
 
     else:
-        print >> sys.stderr, 'possible inputs: svc, rf'
+        print >> sys.stderr, 'possible inputs: svc, rf, gridsearch'
         sys.exit(1)
 
 
