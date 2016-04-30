@@ -16,5 +16,7 @@ py_data
 *.pdf
 *.blg
 *.bbl
+*.lof
+*.lot
 
 data/nyu_depth_v2_labeled.mat

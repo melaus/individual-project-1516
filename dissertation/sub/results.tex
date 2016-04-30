@@ -1,5 +1,66 @@
-\chapter{Results}
-\label{chap:results}
+\chapter{Results} \label{chap:results}
+
+Recall that our goal is to try to find out if depth data is a useful dataset for classifying objects into classes. In this chaper, we attempt to obtain the best possible results through optimising their corresponding parameters and how different classifiers fit with our purpose. 
+
+Broadly speaking, we have to perform the following tasks:
+
+\begin{itemize}
+  \item train the 'out-of-the-box' classifiers with the whole training dataset without parameter optimisation; 
+  \item finding the appropriate parameters that return the highest accuracy score with cross validation; and,
+  \item evalute highest achieving classifiers through precision-recall and confusion matrix.
+\end{itemize}
+
+In fact, optimising parameters can make a big difference. When we attempted to train classifiers on the whole dataset without any parameter optimisation, the classifiers either did not converge within the Balena time limit. For instance, the RF classifier was overfitted, reporting a training accuracy of 55.8\% and a testing accuracy of 1.8\%, while the SVM classifier with an RBF kernel did not converge.
+
+
+\section{Finding Appropriate Parameters}
+It is a challenging task to find the optimal parameters. Ideally, we would want to run an exhaustive search on all possible parameter values by running classifiers with all combinations of those parameters. Given the contraints on Balena, this task becomes even more complicated. 
+
+Hence, before dwelling into the entire dataset, it would be logical to see how these parameters change as the number of classes increases. For this, we are going to pick the first 2, 5, 10, 50 and 100 classes, and try to optimise their parameters with different algorithms. Although these classes may possess very different properties, we aim to narrow down the range of values we have to search for. Also, this gives a sense of how the classifier fair with our dataset.
+
+By performing cross-validated grid and randomised searches, we achieve the highest accuracy scores, as shown in \autoref{tab:best_params}. Here, we can see that RF works the best for our dataset, even though boosted decision trees such as ADA are found to be the top performing classifiers by tests run by \citeasnoun{compare-supervised}. 
+  
+We will discuss more about it below.
+
+% TABLE: 
+\parbox{\linewidth} {
+	\centering
+  \begin{tabular}{|M{0.1\textwidth}|M{0.17\textwidth}|M{0.17\textwidth}|M{0.13\textwidth}|M{0.13\textwidth}|M{0.1\textwidth}|}
+		\hline 
+    \textbf{No. of Classes} & 
+    \textbf{ADA (SAMME)} & 
+    \textbf{ADA (SAMME.R)} & 
+    \textbf{RF} & 
+    \textbf{SVM (Linear)} & 
+    \textbf{SVM (RBF)} 
+		\\ \hline 
+    2   & 0.660  & 0.652  & 0.701 & 0.610 & 0.648
+		\\ \hline
+    5   & 0.389  & 0.384  & 0.440 & 0.357 & 0.387
+		\\ \hline
+    10  & 0.308  & 0.247  & 0.441 & 0.321 & 0.343
+		\\ \hline
+    50  & 0.0866 & 0.0876 & 0.338 & 0.131 & 0.189
+		\\ \hline
+    100 & 0.0485 & 0.0547 & 0.336 & 0.109 & 0.156
+		\\ \hline
+	\end{tabular}
+	\captionof{table}{\textit{Best accuracy scores found using grid search with 3-fold cross validation for various classifiers - AdaBoost with the two different algorithms, Random Forest and SVM with two different kernels.}}
+\label{tab:best_params}
+}
+
+\subsection{Random Forest}
+There are four main adjustable variables - n\_estimators (\textit{default=`auto'}), \textit{max\_depth}, \textit{min\_samples\_split} and \textit{class\_weight}, which we discussed briefly in \textit{TODO: WHERE}.
+
+We want to minimise the number of samples per split, maximise the depth of each tree in the forest and maximise the number of trees required, without overfitting the model. Recall that overfitting causes the trained model to be specifically tuned to the training data, which has low predictive power on new datapoints.
+
+
+Random Forest - 1000 estimators for 100 classes $>$ 64GB memory.
+
+
+
+
+% TABLE : comparing parameters 
 
 - show overfitting results \\ 
 - compare first 2, 5, 10, 50, 100 (etc.) \\

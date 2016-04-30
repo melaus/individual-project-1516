@@ -5,7 +5,7 @@ Images are inherently difficult to model as they have complicated distribution i
 
 These days, some cameras are able to capture not only colours, but also depth information to show where an object sits in a 3-dimensional space. One particular interesting project is KinectFusion, where it enables images to be fused together to create a 3-dimensional reconstruction of the scene and represent it in a 3-dimensional space.
 
-In fact, researches, such as Semantic Paint \cite{semantic-paint}, make use of this new source of information to create a way to label objects in a scene and apply the same effect on other similar recognised objects at real-time, providing a virtual reality experience. However, these recognised objects are not stored. Can we find a generalised model using depth information to correctly predict objects in a scene? This way, we could use this information to enable more interesting virtual/ augmented reality experience. 
+In fact, research, such as Semantic Paint \cite{semantic-paint}, make use of this new source of information to create a virtual/ augmented reality experience. \citeasnoun{semantic-paint} provides a way to label objects in a scene and apply the same effect on other similar recognised objects in real-time. However, these recognised objects are not stored. Can we find a generalised model using depth information to correctly predict objects in a scene? This way, we could use this information to enable more interesting virtual/ augmented reality experience. 
 
 A good use-case would be a real-time system that can suggest what can be placed on top of a given recognised object. For instance, the system might suggest that bowls, cups and bottles can be placed on top of a table, and a different set of suggestions is given when a chair is recognised. 
 
@@ -13,11 +13,11 @@ Such recognition is a classification problem. How can we optimise the decision b
 
 
 \section{Aim}
-There are several aims with this project. For one, we want to find out how popular classification algorithms perform in real-world applications. Formally, these models are very robust with measures to avoid common issues such as overfitting. But, it is hard to know how they perform with 'real' data (depth data in our case). The raw dataset will contain many images hence many possible datapoints. In \autoref{chap:methodology}, we will discuss our approach in dealing with such situations.
+There are several aims with this project. For one, we want to find out how popular classification algorithms perform in real-world applications. Formally, these models are very robust with techniques to avoid common issues such as overfitting (taking noise in the training data as features for the whole datasets) . But, it is hard to know how they perform with 'real' data. The raw dataset will contain many images hence many possible datapoints. In \autoref{chap:methodology}, we will discuss our approach in dealing with such situation.
 
 Also, we want to investigate the usefulness of depth data alone in predicting objects in a scene. Could we obtain a classifier with high enough accuracy that can predict objects in an image to good quality? With a high accuracy classifier, we can integrate it into the aforementioned use-case in conjunction with other computer vision techniques such as segmentation. 
 
-To limit the scope of the project, we will focus on training supervised classification models, which we will discuss briefly in section \ref{sec:classification} and in detail in \autoref{chap:tech}.
+To limit the scope of the project, we will focus on training supervised classification models, which we will discuss briefly in \autoref{sec:classification} and in detail in \autoref{chap:tech}.
 
 \section{Evaluating Success}
 In order to evaluate how well our classifiers perform, we use various quantitative approaches, including confusion matrix, accuracy rate and precision-recall rates. With these values, we can examine whether we have trained a useful classifier with good prediction power. 
