@@ -402,7 +402,7 @@ def kmeans(init, n_clusters, n_init, label_s, label_e, path):
 
 def combine_data(path=''):
     print '--- combine_data ---'
-    labels = range(4,6)
+    labels = range(1,3)
     all_kmeans = np.load(path+'all_kmeans.npy')
     
     features = np.array([])
@@ -444,7 +444,7 @@ def combine_data(path=''):
 
         print 'added to dict\n\n'
 
-    save_data(create_ft_dict(features, targets), 'combined_4_5', 'np', path)
+    save_data(create_ft_dict(features, targets), 'combined_1_2', 'np', path)
     # save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
@@ -474,7 +474,7 @@ def datasets(filename, path):
     print 'shape of testing:   ', X_test.shape
     print 'shape of validation:', X_val.shape
 
-    id = re.search('_[0-9]_[0-9]', filename).group(0)
+    id = re.search('_[0-9]*_[0-9]*', filename).group(0)
     save_data(create_ft_dict(X_train, y_train), 'data_train'+id, 'np', path)
     save_data(create_ft_dict(X_test, y_test), 'data_test'+id, 'np', path)
     save_data(create_ft_dict(X_val, y_val), 'data_val'+id, 'np', path)

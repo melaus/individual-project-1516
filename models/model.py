@@ -2,6 +2,7 @@
 from sklearn import svm
 from sklearn import cross_validation
 from sklearn.grid_search import GridSearchCV
+from sklearn.grid_search import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 import argparse, sys
@@ -25,8 +26,11 @@ def test_data():
 """
 perform GridSearch
 """
-def gridsearch(model, param_grid, data, filename):
-    grid = GridSearchCV(model, param_grid=param_grid, cv=3, verbose=4, n_jobs=10)
+def gridsearch(model, param_grid, data, filename, mode):
+    if mode == 'gs':
+        grid = GridSearchCV(model, param_grid=param_grid, cv=3, verbose=4, n_jobs=6)
+    elif mode == 'rs':
+        grid = RandomizedSearchCV(model, param_distributions=param_grid, cv=3, verbose=6, n_iter=3, n_jobs=6)
 
     grid = grid.fit(data['features'], data['targets'])
 
@@ -40,9 +44,9 @@ def gridsearch(model, param_grid, data, filename):
 """
 fit SVC models
 """
-def model_svc(kernel, path): # , C=1, gamma=0.001):
+def model_svc(filename, path, id, kernel): # , C=1, gamma=0.001):
     print '--- in model_svc ---\n'
-    data = np.load(path+'lbl/data_train.npy').tolist()
+    data = np.load(path+'lbl/'+filename).tolist()
     # data = test_data()
 
     print 'shape of data:', data['features'].shape
@@ -54,13 +58,18 @@ def model_svc(kernel, path): # , C=1, gamma=0.001):
     model.fit(data['features'], data['targets'])
     print 'time taken:', time() - t0
 
-    save_data(model, 'SVC_none_test.npy', path+'model/')
+    print('')
+    print(model)
+    print('')
+
+    j.dump(model, path+'model/'+id+'.jl')
+    print('saved joblib')
 
 
 """
 fit random forest models
 """
-def model_rf(filename, path):
+def model_rf(filename, path, id):
     print '--- in model_rf ---\n'
     data = np.load(path+'lbl/'+filename).tolist()
     # data = test_data()
@@ -68,26 +77,50 @@ def model_rf(filename, path):
     max_depth = 'inf'
 
     print 'shape of data:', data['features'].shape
-
-    model = RandomForestClassifier() # max_depth=5)
+    
+    model = RandomForestClassifier(n_estimators=50, n_jobs=5, verbose=5) 
 
     print 'to fit model'
     t0 = time()
-    model.fit(data['features'], data['targets'])
+    model = model.fit(data['features'], data['targets'])
     print 'time taken:', time() - t0
 
     print('')
     print(model)
     print('')
 
-    id = re.search('_[0-9]_[0-9]', filename).group(0) 
-    p.dump(model, open(path+'model/rf_mx'+str(max_depth)+id+'.p', 'wb'))
-    print('saved pickle')
-    j.dump(model, path+'model/rf_mx'+str(max_depth)+id+'.jl')
+    j.dump(model, path+'model/'+id+'.jl')
     print('saved joblib')
-    save_data(model, 'rf_mx'+str(max_depth)+id+'.npy', path+'model/')
+    # save_data(model, 'rf_mx'+str(max_depth)+id+'.npy', path+'model/')
 
 
+"""
+fit AdaBoost models
+"""
+def model_ada(filename, path, id, alg):
+    print '--- in model_ada ---\n'
+    data = np.load(path+'lbl/'+filename).tolist()
+    # data = test_data()
+
+    print 'shape of data:', data['features'].shape
+    
+    if alg == 'ada':
+        model = AdaBoostClassifier(algorithm='SAMME') 
+    elif alg == 'ada-r':
+        model = AdaBoostClassifier(algorithm='SAMME.R')
+
+    print 'to fit model'
+    t0 = time()
+    model = model.fit(data['features'], data['targets'])
+    print 'time taken:', time() - t0
+
+    print('')
+    print(model)
+    print('')
+
+    j.dump(model, path+'model/'+id+'.jl')
+    print('saved joblib')
+    # save_data(model, 'rf_mx'+str(max_depth)+id+'.npy', path+'model/')
 
 
 """
@@ -144,13 +177,23 @@ def parser():
 
     # svc
     p_svc = subparsers.add_parser('svc', help='SVC')
+    p_svc.add_argument('-file', '-filename', action='store', dest='filename', help='filename')
+    p_svc.add_argument('-id', action='store', dest='id', help='storage name')
     p_svc.add_argument('-k', '-kernel', action='store', dest='kernel', help='choose kernel - rbf, linear')
     p_svc.set_defaults(which='svc')
 
     # rf
     p_rf = subparsers.add_parser('rf', help='Random Forest')
     p_rf.add_argument('-file', '-filename', action='store', dest='filename', help='filename')
+    p_rf.add_argument('-id', action='store', dest='id', help='storage name')
     p_rf.set_defaults(which='rf')
+
+    # ada
+    p_ada = subparsers.add_parser('ada', help='AdaBoost')
+    p_ada.add_argument('-file', '-filename', action='store', dest='filename', help='filename')
+    p_ada.add_argument('-id', action='store', dest='id', help='storage name')
+    p_ada.add_argument('-alg', '-algorithm', action='store', dest='alg', help='algorithm to be used (SAMME, SAMME.R)')
+    p_ada.set_defaults(which='ada')
 
     # confusion matrix
     p_cf = subparsers.add_parser('cf', help='confusion matrix')
@@ -161,7 +204,8 @@ def parser():
     # TODO: gridsearch
     p_gs = subparsers.add_parser('gridsearch', help='perform GridSearch with given input')
     p_gs.add_argument('-f', '-file', action='store', dest='filename', help='file to be loaded')
-    p_gs.add_argument('-m', '-model', action='store', dest='model', help='model used (e.g. svc-rbf, rf)')
+    p_gs.add_argument('-mdl', '-model', action='store', dest='model', help='model used (e.g. svc-rbf, rf)')
+    p_gs.add_argument('-m', '-mode', action='store', dest='mode', help='gridsaerch or randomised search')
     p_gs.set_defaults(which='gridsearch')
 
     return parser.parse_args()
@@ -195,10 +239,13 @@ def main():
 
     # find out which function to perform
     if args.which == 'svc':
-        model_svc(args.kernel, path)
+        model_svc(args.filename, path, args.id, args.kernel)
 
     elif args.which == 'rf':
-        model_rf(args.filename, path)
+        model_rf(args.filename, path, args.id)
+
+    elif args.which == 'ada':
+        model_ada(args.filename, path, args.id, args.alg)
 
     elif args.which == 'cf':
         pass
@@ -208,30 +255,30 @@ def main():
 
         if 'svc' in args.model:
             param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
-            # param_grid = {'C': [0.1], 'gamma': np.logspace(-9, 0, 3)}
-            # param_grid = {'C': [10], 'gamma': np.logspace(-9, 0, 3)}
-            # param_grid = {'C': [1000], 'gamma': np.logspace(-9, 0, 3)}
+            # param_grid = {'C': [0.1], 'gamma': [np.logspace(-9, 0, 3)[0]], 'decision_function_shape': [None, 'ovr']}
+            # param_grid = {'C': [10], 'gamma': [np.logspace(-9, 0, 3)[2]]}
+            # param_grid = {'C': [1000], 'gamma': [np.logspace(-9, 0, 3)[2]]}
             if args.model == 'svc-linear':
                 model = svm.SVC(kernel='linear')
             elif args.model == 'svc-rbf':
                 model = svm.SVC(kernel='rbf')
 
         elif args.model == 'rf':
-            param_grid = {'n_estimators': [2, 5, 10, 20, 50, 100, 500, 1000], 'max_features': ["auto", "log2"]}
+            param_grid = {'n_estimators': [50, 100, 500, 1000], 'max_depth': [None, 10, 100, 500, 1000], 'min_samples_split': [2, 5, 10], 'class_weight': [None, 'balanced']}
             model = RandomForestClassifier()
 
         elif 'ada' in args.model:
             # base_estimator = dt_stump, learning_rate = learning_rate, n_estimators = n_estimators,
-            param_grid = {'learning_rate': [1,1.5,2], 'n_estimator': [50, 100, 500, 1000, 2000]}
-            if args.model == 'ada':
-                model = AdaBoostClassifier(algorithm="SAMME")
-            elif args.model == 'ada-r':
-                model = AdaBoostClassifier(algorithm="SAMME.R")
+            param_grid = {'learning_rate': [1,1.5,2,0.5,0.2], 'n_estimators': [50, 100, 500, 1000, 2000]}
+            if args.model == 'ada-r':
+                model = AdaBoostClassifier(algorithm='SAMME.R')
+            else:
+                model = AdaBoostClassifier(algorithm='SAMME')
 
         else:
             print('invalid model')
 
-        gridsearch(model, param_grid, data, args.filename)
+        gridsearch(model, param_grid, data, args.filename, args.mode)
 
 
     else:
