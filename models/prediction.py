@@ -5,6 +5,7 @@ import cPickle as pickle
 import sys, argparse
 from random import randrange
 from matplotlib import pyplot as plt
+from sklearn.externals import joblib as jl
 
 
 """
@@ -62,6 +63,12 @@ def save_figure(img, filename, dpi_val, path=''):
 
 
 """
+
+"""
+
+
+
+"""
 save data to file
 
 input:
@@ -97,46 +104,25 @@ def prediction(model, data):
 
 
 
-# TODO: DELETE THIS
-"""
-ENTRY
-
-perform prediction, and generate and store image
-"""
-def entry_prediction(model, patches, img_s, img_e, colours, dim, path):
-
-    pass
-    # for img in range(img_s, img_e+1):
-    #     print 'image', img, '- start prediction for image'
-    #
-    #     save_data(prediction(model, patches[img]), 'predictions_'+str(img)+'.p', path+'predictions/')
-    #
-    #     print 'image', img, '- end prediction for image'
-    #     print 'image', img, '- prediction saved'
-
-    # print 'start generated'
-    # generated = gen_image(predicted, colours, dim)
-    # print 'end generated'
-    # print 'start save figure'
-    # save_figure(generated, 'generated_pp_6', 150, path)
-    # print 'end save figure'
-    # print 'done prediction and generation'
-
-
 """
 command line argument parser
 """
 def parser():
-    parser = argparse.ArgumentParser(description='transform some given data into a desired format')
+    parser = argparse.ArgumentParser(description='obtain predictions and create predicted image')
+    subparsers = parser.add_subparsers(help='different arguments for different activities')
 
-    parser.add_argument('-fn', '-function', action='store', dest='fn', help='operation to perform')
-    parser.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
-    parser.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    p_predict = subparsers.add_parser('predict', help='prediction')
+    p_predict.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
+    p_predict.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    p_predict.set_defaults(which='predict')
 
     # optional parameters
-    parser.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
-    parser.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
+    p_gen = subparsers.add_parser('')
+
+    p_gen.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
+    p_gen.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
     args = parser.parse_args()
+
     return args
 
 
@@ -146,7 +132,7 @@ check if there are any none arguments
 def check_args(args):
     for key, val in vars(args).iteritems():
         # don't check for optional keys
-        if val is None and key not in ('x', 'y'):
+        if val is None:
             return False
     return True
 
@@ -157,7 +143,6 @@ ENTRY
 main function
 """
 def main():
-    # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
     path = '/beegfs/scratch/user/i/awll20/data/ip/'
 
     args = parser()
@@ -169,20 +154,20 @@ def main():
 
     # find out which function to perform
     # possible functions: pre, gen
-    if args.fn == 'pre':
-        model = load_data(args.model+'.p', 'rb', path)
-        patches = load_data('px_'+str(args.dim)+'_'+args.img+'.p', 'rb', path)
+    if args.which == 'predict':
+        model = load_data(args.model+'.p', 'jl', path)
+        patches = load_data('px_'+str(args.dim)+'_'+args.img+'.p', 'np', path)
 
-        save_data(prediction(model, patches), 'pre_'+str(args.img)+'_all.p', path+'prediction/')
+        save_data(prediction(model, patches), 'pre_'+str(args.img)+'_all.npy', path+'prediction/')
         print 'saved prediction'
 
-    elif args.fn == 'gen':
-        colours = load_data('colours_f.p', 'rb', path)
-        pre = load_data('pre_'+str(args.dim)+'_'+str(args.img)+'.p', 'rb', path)
+    elif args.which == 'gen':
+        colours = load_data('colours_f.npy', 'np', path)
+        pre = load_data('pre_'+str(args.dim)+'_'+str(args.img)+'.npy', 'np', path)
 
-        generated = gen_image(pre, colours, args.dim, args.x, args.y) \
-            if args.x is not None and args.y is not None \
-            else gen_image(pre, colours, args.dim)
+        generated = gen_image(pre, colours, args.dim, args.x, args.y) #\
+            # if args.x is not None and args.y is not None \
+            # else gen_image(pre, colours, args.dim)
 
         save_data(generated, 'gen_'+str(args.img)+'.p', path+'generated/')
         save_figure(generated, 'gen_'+str(args.img)+'.png', 150, path)
