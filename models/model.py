@@ -5,6 +5,8 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.grid_search import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import BaggingClassifier
+from sklearn.multiclass import OneVsRestClassifier
 import argparse, sys
 import numpy as np
 import cPickle as p
@@ -28,7 +30,7 @@ perform GridSearch
 """
 def gridsearch(model, param_grid, data, filename, mode):
     if mode == 'gs':
-        grid = GridSearchCV(model, param_grid=param_grid, cv=3, verbose=4, n_jobs=6)
+        grid = GridSearchCV(model, param_grid=param_grid, cv=2, verbose=4, n_jobs=6)
     elif mode == 'rs':
         grid = RandomizedSearchCV(model, param_distributions=param_grid, cv=3, verbose=6, n_iter=3, n_jobs=6)
 
@@ -254,22 +256,22 @@ def main():
         data  = load_data(args.filename, path+'lbl/').tolist()
 
         if 'svc' in args.model:
-            param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
-            # param_grid = {'C': [0.1], 'gamma': [np.logspace(-9, 0, 3)[0]], 'decision_function_shape': [None, 'ovr']}
-            # param_grid = {'C': [10], 'gamma': [np.logspace(-9, 0, 3)[2]]}
-            # param_grid = {'C': [1000], 'gamma': [np.logspace(-9, 0, 3)[2]]}
             if args.model == 'svc-linear':
-                model = svm.SVC(kernel='linear')
+                param_grid = {'C': np.logspace(-7, -1, 6)}
+                model = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear')))
             elif args.model == 'svc-rbf':
+                param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
                 model = svm.SVC(kernel='rbf')
 
         elif args.model == 'rf':
-            param_grid = {'n_estimators': [50, 100, 500, 1000], 'max_depth': [None, 10, 100, 500, 1000], 'min_samples_split': [2, 5, 10], 'class_weight': [None, 'balanced']}
-            model = RandomForestClassifier()
+            # param_grid = {'n_estimators': [50, 100, 500, 1000], 'max_depth': [None, 10, 100, 500, 1000], 'min_samples_split': [2, 5, 10], 'class_weight': [None, 'balanced']}
+            # param_grid = {'n_estimators': [500, 1000], 'max_depth': [1000], 'min_samples_split': [2, 5], 'class_weight': [None]}
+            param_grid = {'n_estimators': [50], 'max_depth': [50], 'min_samples_split': [2], 'class_weight': ['balanced']} # 'best' params
+            model = RandomForestClassifier(n_jobs=10, verbose=5)
 
         elif 'ada' in args.model:
             # base_estimator = dt_stump, learning_rate = learning_rate, n_estimators = n_estimators,
-            param_grid = {'learning_rate': [1,1.5,2,0.5,0.2], 'n_estimators': [50, 100, 500, 1000, 2000]}
+            param_grid = {'learning_rate': [1,0.5,0.2,0.1], 'n_estimators': [30, 50, 100, 500, 1000]}
             if args.model == 'ada-r':
                 model = AdaBoostClassifier(algorithm='SAMME.R')
             else:
@@ -278,6 +280,8 @@ def main():
         else:
             print('invalid model')
 
+        print(model)
+        # param_grid = dict()
         gridsearch(model, param_grid, data, args.filename, args.mode)
 
 
