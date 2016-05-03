@@ -63,12 +63,6 @@ def save_figure(img, filename, dpi_val, path=''):
 
 
 """
-
-"""
-
-
-
-"""
 save data to file
 
 input:
@@ -76,17 +70,26 @@ input:
     - (string) filename: the name of the file to be saved
     - (string) path: store it outside of 'root'
 """
-def save_data(data, filename, path=''):
-    pickle.dump(data, open(path+filename, 'wb'))
+def save_data(data, filename, mode, path=''):
+    if mode == 'np':
+        np.save(path+filename, data)
+        print 'data saved'
+    elif mode == 'jl':
+        jl.dump(data, path+filename+'.jl')
+        print 'data saved'
+    else:
+        print 'data not save'
 
-    print 'data saved'
 
 
 """
 load data from file
 """
 def load_data(filename, mode, path=''):
-    return pickle.load(open(path+filename, mode))
+    if mode == 'np':
+        return np.load(path+filename+'.npy')
+    elif mode == 'jl':
+        return jl.load(path+filename+'.jl')
 
 
 
@@ -100,7 +103,8 @@ output:
     - (np.array) prediction
 """
 def prediction(model, data):
-    return model.predict(data)
+    print('average score using .score():', model.score(data['features'], data['targets']))
+    return model.predict(data['features'])
 
 
 
@@ -111,16 +115,19 @@ def parser():
     parser = argparse.ArgumentParser(description='obtain predictions and create predicted image')
     subparsers = parser.add_subparsers(help='different arguments for different activities')
 
-    p_predict = subparsers.add_parser('predict', help='prediction')
-    p_predict.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
-    p_predict.add_argument('-dim', '-dimension', action='store', type=int, dest='dim', help='dimension of a patch')
+    p_predict = subparsers.add_parser('predict', help='predict some given data on a given trained model')
+    p_predict.add_argument('-df', '-datafile', action='store', dest='file', help='filename of the data file to be predicted')
+    p_predict.add_argument('-mf', '-modelfile', action='store', dest='model', help='filename of the model to be used')
+    p_predict.add_argument('-save', action='store', dest='save', help='filename of the saved file')
+    p_predict.add_argument('-s_flag', action='store', type=int, dest='s_flag', help='whether to save the file')
     p_predict.set_defaults(which='predict')
 
     # optional parameters
-    p_gen = subparsers.add_parser('')
+    p_gen = subparsers.add_parser('gen', help='generate an image based on prediction')
+    p_gen.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
+    p_gen.add_argument('-p_file', '-pre_file', action='store', dest='pre_file', help='the prediction file we need')
+    p_gen.set_defaults(which='gen')
 
-    p_gen.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
-    p_gen.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
     args = parser.parse_args()
 
     return args
@@ -153,31 +160,35 @@ def main():
         sys.exit(1)
 
     # find out which function to perform
-    # possible functions: pre, gen
+    # possible functions: predict, gen
     if args.which == 'predict':
-        model = load_data(args.model+'.p', 'jl', path)
-        patches = load_data('px_'+str(args.dim)+'_'+args.img+'.p', 'np', path)
+        # TODO: predict some given data on a given trained model
+        model = load_data(args.model+'.jl', 'jl', path+'model/')
+        dataset = load_data(args.file+'.npy', 'np', path+'lbl/').tolist()
 
-        save_data(prediction(model, patches), 'pre_'+str(args.img)+'_all.npy', path+'prediction/')
-        print 'saved prediction'
+        if args.save_flag == 1:
+            save_data(prediction(model, dataset), args.savename, 'np', path+'prediction/')
+        elif args.save_flag == 0:
+            prediction(model, dataset)
 
     elif args.which == 'gen':
+        # TODO: predict all patches, gen images with those labels
         colours = load_data('colours_f.npy', 'np', path)
-        pre = load_data('pre_'+str(args.dim)+'_'+str(args.img)+'.npy', 'np', path)
+        predicted = load_data(args.pre_file, 'np', path)
 
-        generated = gen_image(pre, colours, args.dim, args.x, args.y) #\
+        generated = gen_image(predicted, colours) #\
             # if args.x is not None and args.y is not None \
             # else gen_image(pre, colours, args.dim)
 
-        save_data(generated, 'gen_'+str(args.img)+'.p', path+'generated/')
-        save_figure(generated, 'gen_'+str(args.img)+'.png', 150, path)
+        save_data(generated, 'gen_'+str(args.img)+'.npy', 'np', path+'generated/')
+        save_figure(generated, 'gen_'+str(args.img)+'.png', 150, path+'generated/')
         print 'saved generated image'
 
     else:
         # error message
-        print >> sys.stderr, 'possible inputs: pre, gen, pre_gen\n', \
-                             '    pre     - predict and save prediction      , given image patches\n', \
-                             '    gen     - generate and save image          , given prediction'
+        print >> sys.stderr, 'possible inputs: predict, gen\n', \
+                             '    predict - predict and save prediction , given image patches\n', \
+                             '    gen     - predict, generate and save image , given prediction'
         sys.exit(1)
 
 
