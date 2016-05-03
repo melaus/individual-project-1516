@@ -30,7 +30,7 @@ perform GridSearch
 """
 def gridsearch(model, param_grid, data, filename, mode):
     if mode == 'gs':
-        grid = GridSearchCV(model, param_grid=param_grid, cv=2, verbose=4, n_jobs=6)
+        grid = GridSearchCV(model, param_grid=param_grid, cv=2, verbose=5, n_jobs=16)
     elif mode == 'rs':
         grid = RandomizedSearchCV(model, param_distributions=param_grid, cv=3, verbose=6, n_iter=3, n_jobs=6)
 
@@ -76,11 +76,9 @@ def model_rf(filename, path, id):
     data = np.load(path+'lbl/'+filename).tolist()
     # data = test_data()
 
-    max_depth = 'inf'
-
     print 'shape of data:', data['features'].shape
     
-    model = RandomForestClassifier(n_estimators=50, n_jobs=5, verbose=5) 
+    model = RandomForestClassifier(n_estimators=40, max_depth=40, min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
 
     print 'to fit model'
     t0 = time()
@@ -258,7 +256,7 @@ def main():
         if 'svc' in args.model:
             if args.model == 'svc-linear':
                 param_grid = {'C': np.logspace(-7, -1, 6)}
-                model = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear')))
+                model = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear')), n_jobs=30)
             elif args.model == 'svc-rbf':
                 param_grid = {'C': np.logspace(-1, 3, 3), 'gamma': np.logspace(-9, 0, 3)}
                 model = svm.SVC(kernel='rbf')
@@ -266,8 +264,11 @@ def main():
         elif args.model == 'rf':
             # param_grid = {'n_estimators': [50, 100, 500, 1000], 'max_depth': [None, 10, 100, 500, 1000], 'min_samples_split': [2, 5, 10], 'class_weight': [None, 'balanced']}
             # param_grid = {'n_estimators': [500, 1000], 'max_depth': [1000], 'min_samples_split': [2, 5], 'class_weight': [None]}
-            param_grid = {'n_estimators': [50], 'max_depth': [50], 'min_samples_split': [2], 'class_weight': ['balanced']} # 'best' params
-            model = RandomForestClassifier(n_jobs=10, verbose=5)
+            param_grid = {'n_estimators': [40], 'max_depth': [40], 'min_samples_split': [2], 'class_weight': [None]} # 'best' params
+            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced']} # case 2 
+            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[50]} # case 3 
+            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[50], 'max_depth':[40]} # case 4 
+            model = RandomForestClassifier(n_jobs=50, verbose=5)
 
         elif 'ada' in args.model:
             # base_estimator = dt_stump, learning_rate = learning_rate, n_estimators = n_estimators,
