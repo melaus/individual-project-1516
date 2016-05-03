@@ -451,7 +451,7 @@ def combine_data(path=''):
 """
 create required datasets
 """
-def datasets(filename, id, path):
+def datasets(filename, tag, path):
     data = np.load(path+filename).tolist()
 
     # train/test, validation split
@@ -477,10 +477,9 @@ def datasets(filename, id, path):
     print 'shape of testing:   ', X_test.shape
     print 'shape of validation:', X_val.shape
 
-    id = re.search('_[0-9]*_[0-9]*', filename).group(0)
-    save_data(create_ft_dict(X_train, y_train), 'data_train_'+id, 'np', path)
-    save_data(create_ft_dict(X_test, y_test), 'data_test_'+id, 'np', path)
-    save_data(create_ft_dict(X_val, y_val), 'data_val_'+id, 'np', path)
+    save_data(create_ft_dict(X_train, y_train), 'data_train_'+tag, 'np', path)
+    save_data(create_ft_dict(X_test, y_test), 'data_test_'+tag, 'np', path)
+    save_data(create_ft_dict(X_val, y_val), 'data_val_'+tag, 'np', path)
 
 
 """
@@ -593,7 +592,7 @@ def parser():
 
     p_data = subparsers.add_parser('data', help='create training dataset')
     p_data.add_argument('-f', '-filename', action='store', dest='filename', help='filename')
-    p_data.add_argument('-id', action='store', dest='filename', help='id of this dataset split')
+    p_data.add_argument('-tag', action='store', dest='tag', help='id of this dataset split')
     p_data.set_defaults(which='data')
 
     p_merge = subparsers.add_parser('merge', help='create training dataset')
@@ -671,7 +670,7 @@ def main():
         merge_labels(args.filename, args.info, path)
 
     elif args.which == 'data':
-        datasets(args.filename, args.id, path+'lbl/')
+        datasets(args.filename, args.tag, path+'lbl/')
 
     else:
         print >> sys.stderr, 'possible inputs: per_pixel, co, top_n, rand, lbl'
