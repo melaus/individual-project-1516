@@ -71,6 +71,12 @@
   {\end{minipage}\end{center}}
 
 
+%%
+%% New column header command
+%% 
+\newcolumntype{Z}{ >{\centering\arraybackslash}X }
+\newcolumntype{M}[1]{ >{\centering\arraybackslash}m{#1}}
+
 % declaration
 \newcommand{\declaration}[2]{
   \thispagestyle{empty}
