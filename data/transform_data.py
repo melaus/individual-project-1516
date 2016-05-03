@@ -448,6 +448,9 @@ def combine_data(path=''):
     # save_data(lengths, 'per_lbl_lengths_ked', 'np', path)
 
 
+"""
+create required datasets
+"""
 def datasets(filename, path):
     data = np.load(path+filename).tolist()
 
@@ -479,6 +482,21 @@ def datasets(filename, path):
     save_data(create_ft_dict(X_test, y_test), 'data_test'+id, 'np', path)
     save_data(create_ft_dict(X_val, y_val), 'data_val'+id, 'np', path)
 
+
+"""
+merge labels in datasets
+"""
+def merge_labels(filename, merge_file_info, path):
+    dataset = np.load(path+'lbl/'+filename).tolist()
+    to_merge = np.load(path+'lbl/per_lbl_'+merge_file_info+'.npy').tolist()
+
+    for key in to_merge.keys():
+        locs = np.where(dataset['targets'] == key)[0]
+
+        for loc in locs:
+            dataset['targets'][loc] = 900
+
+    save_data(dataset, 'combined_'+merge_file_info, 'np', path+'lbl/')
 
 # """
 # ENTRY
@@ -577,6 +595,11 @@ def parser():
     p_data.add_argument('-f', '-filename', action='store', dest='filename', help='filename')
     p_data.set_defaults(which='data')
 
+    p_merge = subparsers.add_parser('merge', help='create training dataset')
+    p_merge.add_argument('-f', '-filename', action='store', dest='filename', help='filename')
+    p_merge.add_argument('-info', '-merge_file_info', action='store', dest='info', help='the criteria for labels to be merge')
+    p_merge.set_defaults(which='merge')
+
     args = parser.parse_args()
     return args
 
@@ -599,9 +622,6 @@ main function
 def main():
     # path = '/Users/melaus/repo/uni/individual-project/data/'
     path = '/beegfs/scratch/user/i/awll20/data/ip/'
-
-    # depths = pickle.load(open('test_depths.p', 'rb'))
-    # labels = pickle.load(open('test_labels.p', 'rb'))
 
     args = parser()
     print 'args:', args
@@ -645,6 +665,9 @@ def main():
 
     elif args.which == 'combine':
         combine_data(path+'lbl/')
+
+    elif args.which == 'merge':
+        merge_labels(args.filename, args.info, path)
 
     elif args.which == 'data':
         datasets(args.filename, path+'lbl/')
