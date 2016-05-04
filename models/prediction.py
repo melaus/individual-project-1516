@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import numpy as np
-import cPickle as pickle
 import sys, argparse
 from random import randrange
 from matplotlib import pyplot as plt
 from sklearn.externals import joblib as jl
+from sklearn.ensemble import RandomForestClassifier
 
 
 """
@@ -89,7 +89,7 @@ def load_data(filename, mode, path=''):
     if mode == 'np':
         return np.load(path+filename+'.npy')
     elif mode == 'jl':
-        return jl.load(path+filename+'.jl')
+        return jl.load(path+filename+'.jl', mmap_mode='r+')
 
 
 
@@ -163,17 +163,17 @@ def main():
     # possible functions: predict, gen
     if args.which == 'predict':
         # TODO: predict some given data on a given trained model
-        model = load_data(args.model+'.jl', 'jl', path+'model/')
-        dataset = load_data(args.file+'.npy', 'np', path+'lbl/').tolist()
+        model = load_data(args.model, 'jl', path+'model/')
+        dataset = load_data(args.file, 'np', path+'lbl/').tolist()
 
-        if args.save_flag == 1:
+        if args.s_flag == 1:
             save_data(prediction(model, dataset), args.savename, 'np', path+'prediction/')
-        elif args.save_flag == 0:
+        elif args.s_flag == 0:
             prediction(model, dataset)
 
     elif args.which == 'gen':
         # TODO: predict all patches, gen images with those labels
-        colours = load_data('colours_f.npy', 'np', path)
+        colours = load_data('colours_f', 'np', path)
         predicted = load_data(args.pre_file, 'np', path)
 
         generated = gen_image(predicted, colours) #\

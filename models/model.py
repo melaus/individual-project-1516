@@ -32,7 +32,7 @@ def gridsearch(model, param_grid, data, filename, mode):
     if mode == 'gs':
         grid = GridSearchCV(model, param_grid=param_grid, cv=2, verbose=5, n_jobs=16)
     elif mode == 'rs':
-        grid = RandomizedSearchCV(model, param_distributions=param_grid, cv=3, verbose=6, n_iter=3, n_jobs=6)
+        grid = RandomizedSearchCV(model, param_distributions=param_grid, cv=3, verbose=6, n_iter=1, n_jobs=50)
 
     grid = grid.fit(data['features'], data['targets'])
 
@@ -53,7 +53,7 @@ def model_svc(filename, path, id, kernel): # , C=1, gamma=0.001):
 
     print 'shape of data:', data['features'].shape
 
-    model = svm.SVC(kernel=kernel) #, C=C, gamma=gamma, random_state=42)
+    model = svm.SVC(kernel=kernel, C=0.1) #, C=C, gamma=gamma, random_state=42)
 
     print 'to fit model'
     t0 = time()
@@ -78,7 +78,8 @@ def model_rf(filename, path, id):
 
     print 'shape of data:', data['features'].shape
     
-    model = RandomForestClassifier(n_estimators=40, max_depth=40, min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
+    # model = RandomForestClassifier(n_estimators=40, max_depth=40, min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
+    model = RandomForestClassifier(min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
 
     print 'to fit model'
     t0 = time()
@@ -263,12 +264,12 @@ def main():
 
         elif args.model == 'rf':
             # param_grid = {'n_estimators': [50, 100, 500, 1000], 'max_depth': [None, 10, 100, 500, 1000], 'min_samples_split': [2, 5, 10], 'class_weight': [None, 'balanced']}
-            # param_grid = {'n_estimators': [500, 1000], 'max_depth': [1000], 'min_samples_split': [2, 5], 'class_weight': [None]}
-            param_grid = {'n_estimators': [40], 'max_depth': [40], 'min_samples_split': [2], 'class_weight': [None]} # 'best' params
-            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced']} # case 2 
-            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[50]} # case 3 
-            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[50], 'max_depth':[40]} # case 4 
-            model = RandomForestClassifier(n_jobs=50, verbose=5)
+            # param_grid = {'min_samples_split': [2], 'class_weight': [None], 'n_estimators':[40], 'max_depth':[40]} # model 1 
+            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[50], 'max_depth':[40]} # model 2 
+            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[45], 'max_depth':[45]} # model 3 
+            # param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[60], 'max_depth':[60]} # model 4 
+            param_grid = {'min_samples_split': [2], 'class_weight': ['balanced'], 'n_estimators':[100], 'max_depth':[100]} # model 5 
+            model = RandomForestClassifier(n_jobs=50, verbose=6)
 
         elif 'ada' in args.model:
             # base_estimator = dt_stump, learning_rate = learning_rate, n_estimators = n_estimators,
