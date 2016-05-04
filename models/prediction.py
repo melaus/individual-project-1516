@@ -6,6 +6,7 @@ from random import randrange
 from matplotlib import pyplot as plt
 from sklearn.externals import joblib as jl
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 
 
 """
@@ -106,6 +107,11 @@ def prediction(model, data):
     print('average score using .score():', model.score(data['features'], data['targets']))
     return model.predict(data['features'])
 
+"""
+precision-recall report
+"""
+def precision_recall(predicted, original):
+    print classification_report(original, predicted)
 
 
 """
@@ -127,6 +133,11 @@ def parser():
     p_gen.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
     p_gen.add_argument('-p_file', '-pre_file', action='store', dest='pre_file', help='the prediction file we need')
     p_gen.set_defaults(which='gen')
+
+    p_pc = subparsers.add_parser('precall', help='precision-recall report')
+    p_pc.add_argument('-p', '-predicted', action='store', dest='predicted', help='filename of predicted values')
+    p_pc.add_argument('-o', '-original', action='store', dest='original', help='filename of original dataset')
+    p_pc.set_defaults(which='precall')
 
     args = parser.parse_args()
 
@@ -183,6 +194,12 @@ def main():
         save_data(generated, 'gen_'+str(args.img)+'.npy', 'np', path+'generated/')
         save_figure(generated, 'gen_'+str(args.img)+'.png', 150, path+'generated/')
         print 'saved generated image'
+
+    elif args.which == 'precall':
+        predicted = load_data(args.predicted, 'np', path+'prediction/').tolist()
+        original = load_data(args.original, 'np', path+'lbl/').tolist()
+
+        precision_recall(predicted, original)
 
     else:
         # error message
