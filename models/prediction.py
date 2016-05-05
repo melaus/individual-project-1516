@@ -165,6 +165,12 @@ def parser():
     p_pcimg.add_argument('-p', '-predicted', action='store', dest='predicted', help='filename of predicted values')
     p_pcimg.add_argument('-img', '-image', action='store', dest='img', help='the image we are dealing with')
     p_pcimg.set_defaults(which='precall-img')
+
+    p_save = subparsers.add_parser('save-fig', help='save figure from image matrices')
+    p_save.add_argument('-img_file', action='store', dest='img_file', help='image data file')
+    p_save.add_argument('-out_file', action='store', dest='out_file', help='filename of the final image')
+    p_save.set_defaults(which='save-fig')
+
     args = parser.parse_args()
 
     return args
@@ -244,6 +250,9 @@ def main():
             print original
 
         precision_recall(original, predicted)
+
+    elif args.which == 'save-fig':
+        save_figure(args.img_file, args.out_file, 150, path+'generated/')
 
     else:
         # error message
