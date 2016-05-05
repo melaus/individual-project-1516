@@ -108,7 +108,7 @@ def prediction(model, data, type):
         print('average score using .score():', model.score(data['features'], data['targets']))
         return model.predict(data['features'])
     elif type == 'img':
-        return model.predict(data.reshape(data.shape()[0], 225))
+        return model.predict(data)
 
 """
 precision-recall report
@@ -182,7 +182,7 @@ def main():
             dataset = load_data(args.file, 'np', path+'lbl/').tolist()
         elif args.type == 'img':
             dataset = load_data(args.file, 'np', path+'px/')
-            dataset = dataset.reshape(dataset.shape()[0], 225)
+            dataset = dataset.reshape(dataset.shape[0], 225)
 
         if args.s_flag == 1:
             save_data(prediction(model, dataset, args.type), args.save, 'np', path+'prediction/')
