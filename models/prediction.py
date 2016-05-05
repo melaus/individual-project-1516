@@ -118,7 +118,7 @@ def precision_recall(original, predicted):
 
 
 def merge_labels(labels, path):
-    to_merge = load_data('per_lbl_less1000', 'np', path+'lbl/').tolist() 
+    to_merge = load_data('per_lbl_less1000', 'np', path+'lbl/').tolist()
 
     for key in to_merge.keys():
         locs = np.where(labels == key)[0]
@@ -126,7 +126,7 @@ def merge_labels(labels, path):
         for loc in locs:
             labels[loc] = 900
 
-     return labels
+    return labels
 
 """
 command line argument parser
