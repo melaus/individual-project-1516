@@ -178,7 +178,7 @@ def main():
         dataset = load_data(args.file, 'np', path+'lbl/').tolist()
 
         if args.s_flag == 1:
-            save_data(prediction(model, dataset), args.savename, 'np', path+'prediction/')
+            save_data(prediction(model, dataset), args.save, 'np', path+'prediction/')
         elif args.s_flag == 0:
             prediction(model, dataset)
 
