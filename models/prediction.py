@@ -214,6 +214,13 @@ def main():
 
         elif args.which == 'precall-img':
             original = load_data('labels', 'np', path)[args.img][7:(640-8), 7:(480-8)].reshape(626,466)
+            to_merge = load_data('per_lbl_less1000', np, path+'lbl/').tolist()
+
+            for key in to_merge.keys():
+                locs = np.where(original == key)[0]
+
+                for loc in locs:
+                    original[loc] = 900
 
         precision_recall(original, predicted)
 
