@@ -209,10 +209,10 @@ def main():
     elif 'precall' in args.which :
         predicted = load_data(args.predicted, 'np', path+'prediction/')
 
-        if args.type == 'precall-data':
+        if args.which == 'precall-data':
             original = load_data(args.original, 'np', path+'lbl/').tolist()['targets']
 
-        elif args.type == 'precall-img':
+        elif args.which == 'precall-img':
             original = load_data('labels', 'np', path)[args.img][7:(640-8), 7:(480-8)].reshape(626,466)
 
         precision_recall(original, predicted)
