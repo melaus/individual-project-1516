@@ -24,19 +24,27 @@ def gen_colours(size=894):
 """
 generate output image using predictions of each pixel
 """
-def gen_image(predictions, colours_dict, dim, x_im=626, y_im=466):
+def gen_image(predictions, colours_dict, dim=15, x_im=626, y_im=466):
 
     # size of x y
-    x, y = x_im-(dim-1), y_im-(dim-1)
+    # x, y = x_im-(dim-1), y_im-(dim-1)
+    x,y = x_im, y_im
 
+    # print predictions =shape
     predictions = predictions.reshape(x,y)
+    print 'predictions.shape', predictions.shape
     # output = np.array(np.array([ np.array([None for i in range(y)]).astype('float_') for j in range(x) ]).astype('float_')).reshape(x,y)
-    output = np.array([ [[None for colour in range(3)] for i in range(y)] for j in range(x) ]).astype('float_')
+    output = np.array([ [np.array([None for colour in range(3)]) for i in range(y)] for j in range(x) ]).astype('float_')
+    # output = np.array([ [None for i in range(y)] for j in range(x) ]).astype('float_')
+    print 'output.shape', output.shape
 
     for row in range(x):
         for col in range(y):
             # fill in the colours
-            output[row, col] = np.array(colours_dict[predictions[row, col]]).astype('float_')
+            print 'row,col:', (row,col), ', predictions[row,col]:', predictions[row,col]
+            print np.array(colours_dict[predictions[row, col]])
+            # output[row, col] = np.array(colours_dict[predictions[row, col]]).astype('float_')
+            output[row, col] = np.array(colours_dict[predictions[row, col]])
             # output[row, col] = predictions[row, col]
 
     print 'output shape:', output.shape
@@ -194,20 +202,24 @@ def main():
         # TODO: predict some given data on a given trained model
         model = load_data(args.model, 'jl', path+'model/')
         if args.type == 'data':
+            print 'in data'
             dataset = load_data(args.file, 'np', path+'lbl/').tolist()
         elif args.type == 'img':
+            print 'in img'
             dataset = load_data(args.file, 'np', path+'px/')
             dataset = dataset.reshape(dataset.shape[0], 225)
 
         if args.s_flag == 1:
+            print 'to save'
             save_data(prediction(model, dataset, args.type), args.save, 'np', path+'prediction/')
         elif args.s_flag == 0:
+            print 'to not save'
             prediction(model, dataset, args.type)
 
     elif args.which == 'gen':
         # TODO: predict all patches, gen images with those labels
-        colours = load_data('colours_f', 'np', path)
-        predicted = load_data(args.pre_file, 'np', path)
+        colours = load_data('colours_f', 'np', path).tolist()
+        predicted = load_data(args.pre_file, 'np', path+'prediction/')
 
         generated = gen_image(predicted, colours) #\
             # if args.x is not None and args.y is not None \
@@ -224,16 +236,12 @@ def main():
             original = load_data(args.original, 'np', path+'lbl/').tolist()['targets']
 
         elif args.which == 'precall-img':
-            original = load_data('labels', 'np', path)[args.img, 7:633, 7:473] 
-            original = merge_labels(original, path)
+            original = load_data('labels', 'np', path)[args.img, 7:633, 7:473]
+            # original = np.transpose(original).reshape(466,626).reshape(626*466,)
+            original = original.reshape(626*466)
+            # original = merge_labels(original, path)
             
-            # to_merge = load_data('per_lbl_less1000', 'np', path+'lbl/').tolist()
-
-            # for key in to_merge.keys():
-                # locs = np.where(original == key)[0]
-
-                # for loc in locs:
-                    # original[loc] = 900
+            print original
 
         precision_recall(original, predicted)
 

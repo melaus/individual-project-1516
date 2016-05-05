@@ -78,8 +78,8 @@ def model_rf(filename, path, id):
 
     print 'shape of data:', data['features'].shape
     
-    # model = RandomForestClassifier(n_estimators=40, max_depth=40, min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
-    model = RandomForestClassifier(min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
+    model = RandomForestClassifier(n_estimators=100, max_depth=100, min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
+    # model = RandomForestClassifier(min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
 
     print 'to fit model'
     t0 = time()
