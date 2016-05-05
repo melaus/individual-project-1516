@@ -140,8 +140,12 @@ def parser():
     p_pc = subparsers.add_parser('precall', help='precision-recall report')
     p_pc.add_argument('-p', '-predicted', action='store', dest='predicted', help='filename of predicted values')
     p_pc.add_argument('-o', '-original', action='store', dest='original', help='filename of original dataset')
-    p_pc.set_defaults(which='precall')
+    p_pc.set_defaults(which='precall-data')
 
+    p_pcimg = subparsers.add_parser('precall', help='precision-recall report')
+    p_pcimg.add_argument('-p', '-predicted', action='store', dest='predicted', help='filename of predicted values')
+    p_pcimg.add_argument('-img', '-image', action='store', dest='img', help='the image we are dealing with')
+    p_pcimg.set_defaults(which='precall-img')
     args = parser.parse_args()
 
     return args
@@ -202,17 +206,23 @@ def main():
         save_figure(generated, 'gen_'+str(args.img)+'.png', 150, path+'generated/')
         print 'saved generated image'
 
-    elif args.which == 'precall':
+    elif 'precall' in args.which :
         predicted = load_data(args.predicted, 'np', path+'prediction/')
-        original = load_data(args.original, 'np', path+'lbl/').tolist()
 
-        precision_recall(original['targets'], predicted)
+        if args.type == 'precall-data':
+            original = load_data(args.original, 'np', path+'lbl/').tolist()['targets']
+
+        elif args.type == 'precall-img':
+            original = load_data('labels', 'np', path)[args.img][7:(640-8), 7:(480-8)].reshape(626,466)
+
+        precision_recall(original, predicted)
 
     else:
         # error message
         print >> sys.stderr, 'possible inputs: predict, gen\n', \
-                             '    predict - predict and save prediction , given image patches\n', \
-                             '    gen     - predict, generate and save image , given prediction'
+            '    predict-data - predict and save prediction , given image patches (dataset)\n', \
+            '    predict-img  - predict and save prediction , given image patches (image)\n', \
+            '    gen          - predict, generate and save image , given prediction'
         sys.exit(1)
 
 
