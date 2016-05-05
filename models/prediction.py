@@ -24,7 +24,7 @@ def gen_colours(size=894):
 """
 generate output image using predictions of each pixel
 """
-def gen_image(predictions, colours_dict, dim, x_im=640, y_im=480):
+def gen_image(predictions, colours_dict, dim, x_im=626, y_im=466):
 
     # size of x y
     x, y = x_im-(dim-1), y_im-(dim-1)
@@ -103,9 +103,12 @@ input:
 output:
     - (np.array) prediction
 """
-def prediction(model, data):
-    print('average score using .score():', model.score(data['features'], data['targets']))
-    return model.predict(data['features'])
+def prediction(model, data, type):
+    if type == 'data':
+        print('average score using .score():', model.score(data['features'], data['targets']))
+        return model.predict(data['features'])
+    elif type == 'img':
+        return model.predict(data.reshape(data.shape()[0], 225))
 
 """
 precision-recall report
@@ -126,9 +129,9 @@ def parser():
     p_predict.add_argument('-mf', '-modelfile', action='store', dest='model', help='filename of the model to be used')
     p_predict.add_argument('-save', action='store', dest='save', help='filename of the saved file')
     p_predict.add_argument('-s_flag', action='store', type=int, dest='s_flag', help='whether to save the file')
+    p_predict.add_argument('-t', '-type', action='store', dest='type', help='whether to predict data sets or img')
     p_predict.set_defaults(which='predict')
 
-    # optional parameters
     p_gen = subparsers.add_parser('gen', help='generate an image based on prediction')
     p_gen.add_argument('-img', '-image', action='store', type=int, dest='img', help='the image we are dealing with')
     p_gen.add_argument('-p_file', '-pre_file', action='store', dest='pre_file', help='the prediction file we need')
@@ -175,12 +178,16 @@ def main():
     if args.which == 'predict':
         # TODO: predict some given data on a given trained model
         model = load_data(args.model, 'jl', path+'model/')
-        dataset = load_data(args.file, 'np', path+'lbl/').tolist()
+        if args.type == 'data':
+            dataset = load_data(args.file, 'np', path+'lbl/').tolist()
+        elif args.type == 'img':
+            dataset = load_data(args.file, 'np', path+'px/')
+            dataset = dataset.reshape(dataset.shape()[0], 225)
 
         if args.s_flag == 1:
-            save_data(prediction(model, dataset), args.save, 'np', path+'prediction/')
+            save_data(prediction(model, dataset, args.type), args.save, 'np', path+'prediction/')
         elif args.s_flag == 0:
-            prediction(model, dataset)
+            prediction(model, dataset, args.type)
 
     elif args.which == 'gen':
         # TODO: predict all patches, gen images with those labels
