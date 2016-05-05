@@ -110,7 +110,7 @@ def prediction(model, data):
 """
 precision-recall report
 """
-def precision_recall(predicted, original):
+def precision_recall(original, predicted):
     print classification_report(original, predicted)
 
 
@@ -196,10 +196,10 @@ def main():
         print 'saved generated image'
 
     elif args.which == 'precall':
-        predicted = load_data(args.predicted, 'np', path+'prediction/').tolist()
+        predicted = load_data(args.predicted, 'np', path+'prediction/')
         original = load_data(args.original, 'np', path+'lbl/').tolist()
 
-        precision_recall(predicted, original)
+        precision_recall(original['targets'], predicted)
 
     else:
         # error message
