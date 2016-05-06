@@ -78,8 +78,8 @@ def model_rf(filename, path, id):
 
     print 'shape of data:', data['features'].shape
     
-    model = RandomForestClassifier(n_estimators=100, max_depth=100, min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
-    # model = RandomForestClassifier(min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
+    # model = RandomForestClassifier(n_estimators=40, max_depth=40, min_samples_split=2, class_weight=None, n_jobs=16, verbose=5) 
+    model = RandomForestClassifier(min_samples_split=2, class_weight='balanced', n_jobs=16, verbose=5) 
 
     print 'to fit model'
     t0 = time()
@@ -196,13 +196,7 @@ def parser():
     p_ada.add_argument('-alg', '-algorithm', action='store', dest='alg', help='algorithm to be used (SAMME, SAMME.R)')
     p_ada.set_defaults(which='ada')
 
-    # confusion matrix
-    p_cf = subparsers.add_parser('cf', help='confusion matrix')
-    p_cf.add_argument('-x', '-width', action='store', type=int, dest='x', help='width of image')
-    p_cf.add_argument('-y', '-height', action='store', type=int, dest='y', help='height of image')
-    p_cf.set_defaults(which='cf')
-
-    # TODO: gridsearch
+    # gridsearch
     p_gs = subparsers.add_parser('gridsearch', help='perform GridSearch with given input')
     p_gs.add_argument('-f', '-file', action='store', dest='filename', help='file to be loaded')
     p_gs.add_argument('-mdl', '-model', action='store', dest='model', help='model used (e.g. svc-rbf, rf)')
@@ -247,9 +241,6 @@ def main():
 
     elif args.which == 'ada':
         model_ada(args.filename, path, args.id, args.alg)
-
-    elif args.which == 'cf':
-        pass
 
     elif args.which == 'gridsearch':
         data  = load_data(args.filename, path+'lbl/').tolist()
@@ -297,56 +288,3 @@ run
 """
 if __name__ == '__main__':
     main()
-    """ the data """ 
-    # path = '/Users/melaus/repo/uni/individual-project/data/py-data/'
-    # path = '/beegfs/scratch/user/i/awll20/data/ip/'
-    #data = pickle.load(open(path+'features_targets.p', 'rb'))
-
-
-    """ train model """
-    #store_output(model_svc('linear', data['features'], data['targets']), 'svc_linear_6.p', path)
-    #store_output(model_svc('rbf', data['features'], data['targets']), 'svc_rbf_6.p', path)
-
-
-    """ cross validation """
-    #model = svm.SVC(kernel='linear', C=1, random_state=1)
-    #print 'linear score:', cross_val(model, data['features', data['targets'])
-    
-    #model = svm.SVC(kernel='rbf', C=1, gamma=0.001, random_state=1)
-    #print 'rbf score:', cross_val(model, data['features'], data['targets'])
-
-
-    """ model and test data for confusion matrix """
-    # linear 
-    #model = svm.SVC(kernel='linear', C=1, random_state=1)
-    #trained_model, test_data = gen_cf_model(model, data['features'], data['targets']) 
-    #store_output(trained_model, 'linear_cf_model.p', path)
-    #store_output(test_data, 'linear_cf_test_data.p', path)
-     
-    # rbf
-    #model = svm.SVC(kernel='rbf', C=1, gamma=0.001, random_state=1)
-    #trained_model, test_data = gen_cf_model(model, data['features'], data['targets'])
-    #store_output(trained_model, 'rbf_cf_model.p', path)
-    #store_output(test_data, 'rbf_cf_test_data.p', path)
-
-    
-    """ confusion matrix """
-    # load data if requires
-    # linear_cf_test_data = p.load(open(path+'linear_cf_test_data.p', 'rb'))
-    # linear_cf_predicted = p.load(open(path+'linear_cf_predicted.p', 'rb'))
-    #
-    # rbf_cf_test_data = p.load(open(path+'rbf_cf_test_data.p', 'rb'))
-    # rbf_cf_predicted = p.load(open(path+'rbf_cf_predicted.p', 'rb'))
-    #
-    # # confusion matrices
-    # linear_cf_matrix = get_cf_matrix(linear_cf_test_data['targets'], linear_cf_predicted)
-    # rbf_cf_matrix = get_cf_matrix(rbf_cf_test_data['targets'], rbf_cf_predicted)
-    #
-    # print 'linear_cf_matrix'
-    # print linear_cf_matrix
-    # print classification_report(linear_cf_test_data['targets'], linear_cf_predicted)
-    # print ''
-    #
-    # print 'rbf_cf_matrix'
-    # print rbf_cf_matrix
-    # print classification_report(rbf_cf_test_data['targets'], rbf_cf_predicted)

@@ -3,10 +3,12 @@
 import numpy as np
 import sys, argparse
 from random import randrange
-from matplotlib import pyplot as plt
 from sklearn.externals import joblib as jl
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
 
 
 """
@@ -252,7 +254,8 @@ def main():
         precision_recall(original, predicted)
 
     elif args.which == 'save-fig':
-        save_figure(args.img_file, args.out_file, 150, path+'generated/')
+        data = load_data(args.img_file, 'np', path+'generated/')
+        save_figure(data, args.out_file, 150, path+'generated/')
 
     else:
         # error message
@@ -268,61 +271,3 @@ run
 """
 if __name__ == '__main__':
     main()
-
-    # load data
-    # svc_rbf    = pickle.load(open(path+'svc_rbf_6.p', 'rb'))
-    # svc_linear = pickle.load(open(path+'svc_linear_6.p', 'rb'))
-    # data       = pickle.load(open(path+'area_depths_6.p', 'rb'))
-
-
-    """ RBF """
-    ## see what elements are being predicted
-    #rbf_predicted_2 = svc_rbf.predict(data_np)
-    #print 'rbf length:', len(rbf_predicted_2)
-    #print 'rbf set:   ', set(list(rbf_predicted_2))
-    
-    #pickle.dump(rbf_predicted_2, open(path+'rbf_predicted_2.p', 'wb'))
-    #print 'written to file rbf_predicted.p'
-    
-    ## predicted colours
-    #colours = gen_colours(rbf_predicted_2, 15) 
-    #print 'colours for those pixels'
-
-    ## predicted image matrix
-    ##img = [list(i) for i in gen_image(630,480,15, colours).reshape(480,630)]
-    #img = list([list(j) for j in gen_image(630,480,15,colours)])
-    #pickle.dump(img, open(path+'rbf_predicted_img_2.p', 'wb'))
-    #print 'stored predicted image matrix'
-    #print 'done'
-
-    """ linear """
-    ## see what elements are being predicted
-    #linear_predicted = svc_linear.predict(data_np)
-    #print 'linear length:', len(linear_predicted)
-    #print 'linaer set:   ', set(list(linear_predicted))
-    
-    #pickle.dump(linear_predicted, open(path+'linear_predicted.p', 'wb'))
-    #print 'written to file linear_predicted.p'
-    
-    ## predicted colours
-    #colours = gen_colours(linear_predicted, 15) 
-    #print 'colours for those pixels'
-
-    ## predicted image matrix
-    #img = list(list(k) for k in gen_image(630,480,15, colours))
-    ##img = gen_image(630,480,15, colours)
-    #pickle.dump(img, open(path+'linear_predicted_img.p', 'wb'))
-    #print 'stored predicted image matrix'
-    #print 'done'
-
-    """ confusion prediction - rbf """
-    #linear_cf_model = pickle.load(open(path+'linear_cf_model.p','rb'))
-    #linear_cf_test_data = pickle.load(open(path+'linear_cf_test_data.p', 'rb'))
-
-    #pickle.dump(linear_cf_model.predict(linear_cf_test_data["features"]), open(path+'linear_cf_predicted.p', 'wb'))
-
-    """ confusion prediction - linear """
-    # rbf_cf_model = pickle.load(open(path+'rbf_cf_model.p','rb'))
-    # rbf_cf_test_data = pickle.load(open(path+'rbf_cf_test_data.p', 'rb'))
-    #
-    # pickle.dump(rbf_cf_model.predict(rbf_cf_test_data["features"]), open(path+'rbf_cf_predicted.p', 'wb'))
