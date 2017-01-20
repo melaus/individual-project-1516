@@ -1,0 +1,196 @@
+\appendix
+\chapter{Python Script Documentation} \label{chap:appx}
+
+%%%%%%%%%%%%%%%%%%%
+\section{General Descriptions} \label{sec:appx-desc}
+There are four main scripts to perform the tasks required for this project:
+
+% list of files
+\begin{itemize}
+  \item \texttt{extract.py} \\
+    The script extracts the raw data from the HDF5 binary data format into more Python friendly objects, such as \texttt{numpy} arrays (as discussed in \autoref{sec:lit-tools}) and dictionaries (maps between unique names and some values). This facilitates feature engineering and classification tasks using Python and \texttt{scikit-learn}. Number datasets can be extracted easily, while datasets containing texts and MatLab maps require more conversion due to the different representation used.
+
+  \item \texttt{transform.py} \\
+    The script contains functions that transform raw data into the final traininng, testing and validation datasets. By using the depth maps, the script creates normalised patches around each pixel of sizes specified by the user. Together with the class label information, these patches can be used by the script to generate a list of patches for a given class. Then, then random selection (self-implemented function) and $K$-means clustering (enabled by \texttt{scikit-learn}) can be performed, which can then be combined into one list, and then stratifiedly randomly split into the three datasets.
+
+  \item \texttt{model.py} \\
+    The script performs exhaustive and randomised parameter search, and model training. It uses the \texttt{scikit-learn} library to perform these tasks. With the script, classifiers of support vector machine, random forest and AdaBoost can be optimised and trained with input data created by \texttt{transform.py}. Also, it produces confusion matrices and precision-recall rates to measure the performance of the classifier. 
+
+  \item \texttt{prediction.py} \\
+    The script is used to predict an entire image and store the predicted results as an image. A generated colour dicitonary (generated once before this script is being used) assigns a unique colour to each label. This can be used to visualise the performance of the resultant classifier by comparing the results with the original image and segmentation image provided by the NYU Depth Dataset.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%
+\section{Technical Documentation} \label{sec:appx-doc}
+\subsection{General Usage Guide}
+These scripts can be run on any system that supports Python. To simplify usage, part of the process uses command line arguments to provide arguments for functions within the code:
+
+\centerline{\texttt{python} \textit{[script.py]} \textit{[function]} \textit{[-option1 value1 ... -optionN valueN]}} 
+
+For each script except \texttt{extract.py}, there are different functions to run different parts of the code for each script. Each command line function argument contains various options to act as arguments for those functions in the code. The option \texttt{-h} or \texttt{-help} shows all available functions and options when the script is being called.
+
+On Balena, a Bash-styled SLURM script is used to specify the properties of a job. This Python command forms the `execution' part of the code. By using command line arguments, only one script has to be changed to perform different functions, making the process much simplier. 
+
+The \href{https://wiki.bath.ac.uk/display/BalenaHPC/Balena+High+Performance+Computing+Service}{Balena Wiki} produced by the Universtiy provides useful guides and documentation about SLURM scripts.
+
+
+\subsection{Commands for Each Python Script}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% TABLE: model.py
+{\renewcommand{\arraystretch}{1.3}%
+\parbox{\linewidth} {
+	\centering
+  \begin{tabular}{|m{0.17\textwidth}|m{0.15\textwidth}|m{0.1\textwidth}|m{0.48\textwidth}|}
+		\hline 
+    \textbf{Script} & \textbf{Function}  & \textbf{Option} & \textbf{Description}
+		\\ \hline 
+    
+%%%%%%%% svc
+    \multirow{15}{*}{\texttt{model.py}} & \multirow{3}{*}{\texttt{svc}} & \texttt{-file} & supply the filename of the input data 
+    \\ \cline{3-4} & & \texttt{-id} & supply the filename for the output 
+    \\ \cline{3-4} & & \texttt{-k} & kernel used by the classifier
+    \\ \cline{2-4}
+%%%%%%%% svc
+
+%%%%%%%% rf 
+    & \multirow{2}{*}{\texttt{rf}} & \texttt{-file} & supply the filename of the input data 
+    \\ \cline{3-4} & & \texttt{-id} & supply the filename for the output
+    \\ \cline{2-4}
+%%%%%%%% rf 
+    
+%%%%%%%% ada
+    & \multirow{4}{*}{\texttt{ada}} & \texttt{-file} & supply the filename of the input data
+    \\ \cline{3-4} & & \texttt{-id} & supply the filename for the output
+    \\ \cline{3-4} & & \texttt{-alg} & algorithm used - discrete (SAMME) or real (SAMME.R) 
+    \\ \cline{2-4}
+%%%%%%%% ada
+
+%%%%%%%% gridsearch
+    & \multirow{3}{*}{\texttt{gridsearch}} & \texttt{-f} & supply the filename of the input data
+    \\ \cline{3-4} & & \texttt{-mdl} & model to be trained (\texttt{ada}, \texttt{ada-r}, \texttt{rf}, \texttt{svc-linear}, \texttt{svc-rbf})
+    \\ \cline{3-4} & & \texttt{-m} & specify to use do grid (\texttt{gs}) or randomised (\texttt{rs}) search
+%%%%%%%% gridsearch
+
+    \\ \hline
+	\end{tabular}
+\captionof{table}{\textit{Function and options for} \texttt{model.py}.}
+\label{tab:script-model}
+}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% TABLE: doc for transform.py 
+{\renewcommand{\arraystretch}{1.3}%
+\parbox{\linewidth} {
+  \centering
+  \begin{tabular}{|m{0.17\textwidth}|m{0.12\textwidth}|m{0.14\textwidth}|m{0.47\textwidth}|}
+    \hline 
+    \textbf{Script} & \textbf{Function}  & \textbf{Option} & \textbf{Description}
+    \\ \hline 
+    
+%%%%%%%%% patches
+    \multirow{17}{*}{\texttt{transform.py}} & \multirow{4}{*}{\texttt{patches}} & \texttt{-fn} & a patch-related functionality (per{\_}pixel - obtain a patch for each pixel)
+    \\ \cline{3-4} & & \texttt{-dim} & specify the dimension of each patch
+    \\ \cline{3-4} & & \texttt{-img{\_}s} & first image to be processed
+    \\ \cline{3-4} & & \texttt{-img{\_}e} & last image to be processed
+    \\ \cline{2-4}
+%%%%%%%%% patches
+
+%%%%%%%%% rand
+    & \multirow{2}{*}{\texttt{rand}} & \texttt{-ls} & first label to be explored 
+    \\ \cline{3-4} & & \texttt{-le} & last label to be explored 
+    \\ \cline{3-4} & & \texttt{-n} & the number of random samples required
+    \\ \cline{2-4}
+%%%%%%%%% rand
+
+%%%%%%%%% lbl
+    & \multirow{4}{*}{\texttt{lbl}} & \texttt{-ls} & first label to be explored 
+    \\ \cline{3-4} & & \texttt{-le} & last label to be explored 
+    \\ \cline{3-4} & & \texttt{-d} & dimension of patches
+    \\ \cline{2-4}
+%%%%%%%%% lbl
+
+%%%%%%%%% pts 
+    & \multirow{5}{*}{\texttt{pts}} & \texttt{-n{\_}init} & the number of runs with different starting centroids
+    \\ \cline{3-4} & & \texttt{-n{\_}cluster} & the number of clusters/ points to generate 
+    \\ \cline{3-4} & & \texttt{-ls} & first label to be explored 
+    \\ \cline{3-4} & & \texttt{-le} & last label to be explored 
+    \\ \cline{2-4}
+%%%%%%%%% pts 
+
+%%%%%%%%% combine 
+    & \texttt{combine} & --  & combine multiple files into one feature-target dictionary
+    \\ \cline{2-4}
+%%%%%%%%% combine 
+
+%%%%%%%%% data
+    & \texttt{data} & \texttt{-f} & filename of the input data 
+		\\ \cline{2-4}
+%%%%%%%%% data
+
+%%%%%%%%% merge
+    & \texttt{merge} & -- & merge a given set of labels into one new label
+%%%%%%%%% merge
+
+    \\ \hline
+
+  \end{tabular}
+  \captionof{table}{\textit{Function and options for} \texttt{transform.py}.}
+\label{tab:script-transform}
+}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% TABLE: prediction.py
+{\renewcommand{\arraystretch}{1.3}%
+\parbox{\linewidth} {
+  \centering
+  \begin{tabular}{|m{0.17\textwidth}|m{0.16\textwidth}|m{0.12\textwidth}|m{0.47\textwidth}|}
+    \hline 
+    \textbf{Script} & \textbf{Function}  & \textbf{Option} & \textbf{Description}
+    \\ \hline 
+    
+%%%%%%%% predict 
+    \multirow{13}{*}{\texttt{prediction.py}} & \multirow{3}{*}{\texttt{predict}} & \texttt{-df} & filename of patches to be predicted
+    \\ \cline{3-4} & & \texttt{-mf} & filename of the model to be used for predictions
+    \\ \cline{3-4} & & \texttt{-save} & save filename
+    \\ \cline{3-4} & & \texttt{-s{\_}flag} & whether to save the prediction
+    \\ \cline{3-4} & & \texttt{-t} & whether to predict the test set or an image
+    \\ \cline{2-4}
+%%%%%%%% predict
+
+%%%%%%%% gen 
+    & \multirow{2}{*}{\texttt{gen}} & \texttt{-img} & the image used for the predictions 
+    \\ \cline{3-4} & & \texttt{-p{\_}file} & filename of the prediction file 
+    \\ \cline{2-4}
+%%%%%%%% gen 
+    
+%%%%%%% precall-data
+    & \multirow{2}{*}{\texttt{precall-data}} & \texttt{-p} & filename of the predicted values 
+    \\ \cline{3-4} & & \texttt{-o} & filename of original dataset
+    \\ \cline{2-4}
+%%%%%%%% precall-data
+
+%%%%%%%% precall-img
+    & \multirow{3}{*}{\texttt{precall-img}} & \texttt{-p} & filename of the predicted values 
+    \\ \cline{3-4} & & \texttt{-img} & image we are dealing with (to obatin original labels)
+    \\ \cline{2-4}
+%%%%%%%% precall-img
+
+%%%%%%%% save-fig
+    & \multirow{3}{*}{\texttt{save-fig}} & \texttt{-img{\_}file} & filename of the data to be plotted as an image
+    \\ \cline{3-4} & & \texttt{-out{\_}file} & filename of the output image 
+%%%%%%%% save-fig
+
+    \\ \hline
+  \end{tabular}
+\captionof{table}{\textit{Function and options for} \texttt{prediction.py}.}
+\label{tab:script-prediction}
+}
+%%%%%%%%%%%%%%%%%%%%%%%

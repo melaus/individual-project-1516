@@ -1,5 +1,72 @@
-\chapter{Conclusion}
-Even with the help of a sophisticated and easy to use machine-learning library, the process of producing an accurate and precise classifier is rather complicated. The hurdle starts with feature engineering. With this amount of datapoints,
+\chapter{Conclusion} \label{chap:conclusion}
+Even with the help of a sophisticated and easy-to-use machine-learning library, the process of producing an accurate and precise classifier requires much consideration. 
 
-- More features - colours, orientation \\
-- large dataset - hard to pick out all important features at a low level
+The first hurdle comes from feature engineering. It is crucial to obtain a well-defined dataset so that classification methods can generalise the dataset and learn about the features about different classes. Thorough experimentation is then required to understand which algorithm performs the best with our dataset, and to make sure it is not just a coincidence that it appears to work.
+
+Recall our goals of this project: we aim to explore if we can use depth to accurately predict classes of objects in an image using depth information with supervised classification models, and how to proceed with a large, real-world classification problem. 
+
+%TODO : change percentage
+We successfully trained a random forest classifier, giving a cross validation score of 43.8\%, precision rate of 51\% and recall rate of 49\%. However, it is shown to be an over-estimate when it is used to predict test images. In this chapter, we will collate what we have learnt about classifiers and depth data for classification, and discuss in more detail what we have achieved with our classification problem within the scope of this project.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Achievements} \label{sec:conc-achieve}
+
+\subsection*{Overview}
+In \autoref{chap:tech}, we learnt about the characteristics of three supervised classification methods, namely, \textbf{support vector machine} (a kernel method), \textbf{random forest} (an ensemble method) and \textbf{AdaBoost} (a boosting method), for which \citeasnoun{compare-supervised} and \citeasnoun{compare-supervised-2} found to perform the best in baseline tests. We also looked into the unsupervised technique, $K$-means clustering to facilitate our feature engineering. Knowledge about these classifiers have also informed our decisions on training and testing. 
+
+\subsection*{Effectiveness of Different Classification Algorithms}
+Through our tests, we learnt that AdaBoost algorithms did not perform well especially when there are many classes in the data with our complex and closely-packed dataset. Our tests clearly demonstrated the weaknesses of AdaBoost algorithms, that they are prone to noise and outliers. With the preliminary test results shown in tables \ref{tab:params_classes} and \ref{tab:unop_score}, we were able to rule out AdaBoost algorithms for being useful with our dataset or other datasets with similar set-up.
+
+In our `different number of classes' test (\autoref{tab:params_classes}), we found out that support vector machine (SVM) classifiers did not scale well as we increased the number of classes to be used in training. Neither a linear nor RBF kernel could define effective decision boundaries to separate the data. 
+
+They also took significantly longer to run due to the number of binary classifiers it needs to build behind-the-scene. It was soon realised that this weakness became problematic when we attempted to train on our complete training dataset. No SVM classifier could converge under the time constraints of Balena. Even though we were not able to compare the performance on SVM on the whole dataset empirically, the evidence showed in \autoref{tab:params_classes} suggests that it would not result in a classifier with good enough quality.
+
+Random forest was found to be the most resilient to our dataset, which displayed its ability to handle complex datasets. We saw small decreases in cross validation scores as the number of classes increases in our `different number of classes' test. In fact, we were able to achieve higher cross validation scores on the whole dataset with some parameter tuning than this test. 
+
+\newpage
+\subsection*{Performance of the Best Classifier}
+Our best model was produced using the random forest algorithm. It achieved a cross validation score of 43.8\%, test score (score obtained by predicting the test set) of 49\%, precision rate of 51\% and recall rate of 49\%.  
+
+% TODO: compare test score on test images
+In hindsight, one might suggest that this is not of high accuracy. However, we have to bear in mind that a classification problem in the computer vision domain is inherently difficult due to the complex distribution of the underlying data. The ability to predict better than random would have been a good achievement. Here, our classifier showed to be performing much better than random -- in fact, 43.7\% better. 
+
+Parameter tuning is key to achieve the potential ability of a classification algorithm. As seen in \autoref{tab:rf_models}, a well-tuned classifier (classifier 5) performed 18\% better than a poorly-tuned classifier (classifier 0) in terms of cross-validated accuracy.
+
+Our classifier is heading towards the right direction, obtaining good accuracy values. As seen in our tests, figures \ref{fig:predict-bathroom} to \ref{fig:predict-bedroom}, our classifier performed much better than random. Even if it did not perform as well as the precision-recall values suggested (which is expected), we can still observe the outline of the original scene, and in some cases, recognising a continuous area in the scene, such as the that of the bathroom scene (\autoref{fig:predict-bathroom}).
+
+Again, this shows the complexity of creating an effective classifier. Empirical evaluations can only provide an estimate of how the classifier would perform. Much application evaluations is required to provide a full picture of how the classifier perform in reality. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Other Lessons Learnt} \label{sec:conc-lessons}
+Although random forest classifiers are fast to train (100 estimators with a maximum depth of 100 on the training dataset took about 20 minutes to train, compared to unconverged SVM classifiers), they use up a large amount of memory. Memory requirement increased significantly as we attempted to build a forest with more estimators or deeper trees. In fact, we found out that it required more than 512 GB of RAM with \texttt{scikit-learn} and Python to build a random forest with more than 150 trees. 
+
+Our feature engineering approach with $K$-means clustering took a long time to be performed. $K$-means, whilst appeared to have successfully given a representative subset of the originally very large dataset, took a long time to converge. In fact, we were only able to obtain centroids with a dataset of at most 120,000 datapoints to compute within the constraints of Balena. 
+
+While we emphasise on accuracy, time and computer resources evidently became the bottleneck for some of our experiments. For instance, we were unable to obtain an SVM classifier on the whole dataset, and were unable to run random forest classifiers with more than 150 estimators as it consumed too much memory. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Future Work} \label{sec:conc-future}
+Building on top of this encouraging result, there are more that we can do to find a classifier or classification algorithm that works well with our dataset. 
+
+In this project, it is fortunate that our approach appeared to have worked. Random forest is found to be the best classifier for this category of problem through our tests. Much work can be  
+
+More tests should be performed. We could compare the effects different sizes of patches have on the resultant classifier. In our feature engineering stage, we hypothetically decided that 15x15 patches would give us a good balance between complexity and noise for our dataset. We could only justify that we were heading to the right decision through such comparisons. Also, we could perform more parameter tuning. As we have seen in \autoref{tab:rf_models}, using appropriate parameters would enable the true potential of the given model. 
+
+Moreover, we could introduce new features such as orientation and image (RGB) information to complement the patches. Before doing so, much consideration is required as more features may not mean a better outcome but noise. 
+
+Few scenes in the NYU Depth Dataset have scans from different angles. Inspired by SemanticPaint \cite{semantic-paint} which continuously learn from user defined objects and `paint' recognised objects with the same colour as the user explores the area, we can create scans that covers different angles of a scene to achieve a good classifier. With different angles, we will be able to learn from more distinctive features of different objects in the same class, and combine this knowledge about the scene using ensemble methods not dissimilar to random forest.
+
+Furthermore, we could obtain better predictions by taking into account the information of the surroundings. As mentioned, \citeasnoun{nyu-dataset} used support inferences to improve their segmentation classification problem. Together with the classifier, we could vote on the most probable class by incorporating the predictions of surrounding patches, so that outlying prediction can be `reverted' to the correct class. 
+
+We should also attempt other sampling techniques to see if they could obtain a better representative dataset more efficiently. For example, Markov Chain Monte Carlo (MCMC) is a more sophisticated and popular algorithm for machine learning-related data sampling tasks.
+
+Lastly, we could experiment with clustering techniques to see how they compare with supervised classification techniques. Clustering techniques $K$-means are used in computer vision for class or instance recognition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Final Thoughts} \label{sec:conc-final}
+A classification problem is more difficult than it may seem. There are many factors contributing to the success of a classifier, and it is a challenge to have consider all possibilities. 
+
+In this project, we looked at three different classification models in detail and attempted to create classifiers with depth information. We then discussed our approach and performed tests to attempt to find the best classifier within the scope of this project. We shared some interesting findings where much more can be done in search for the best classifier utilising depth information to predict classes of objects.

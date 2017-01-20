@@ -1,13 +1,9 @@
-%\documentclass[dissertation.tex]{subfiles}
-%\begin{document}
-
 \begin{abstract}
-- machine-learning has been a study for many years
-- how to separate data into classes
 
-- in this dissertation 
-- generalise classification of classes using depth data\\
-- demonstrate the process of applying machine learning on a relatively large problem\\
+This project is an investigation of whether depth information captured using an RGB-D camera was useful in classifying classes of objects in a scene, and how classification models perform in a complex, real-world problem. We will look into three supervised classifiers - support vector machines (SVM), random forest and AdaBoost.
+
+Basing on the \textit{NYU Depth Dataset}, feature engineering was performed using methods such as $K$-means to obtain our training dataset. Then, tests were conducted to evaluate how these algorithms perform with depth data, and whether they were suitable for our problem.
+
+It was found that random forest was best at dealing with a complex and noisy datasets, achieving an accuracy of 43.8\%, with precision at 51\% and recall at 49\% with the training and testing datasets. The accuracy and precision-recall rates demonstrate that depth can be made useful in prediction classes of objects in a scene. In fact, the classifier was able to resemble the key parts of an image despite an expectataion of lower performance than the approximate accuracy scores may suggest. We then discuss the future work that can be performed to build on the findings of this project.
+
 \end{abstract}
-
-%\end{document}

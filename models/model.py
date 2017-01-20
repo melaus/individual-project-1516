@@ -9,8 +9,6 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.multiclass import OneVsRestClassifier
 import argparse, sys
 import numpy as np
-import cPickle as p
-import re
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.datasets import load_iris
 from time import time

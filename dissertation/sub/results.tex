@@ -1,72 +1,267 @@
 \chapter{Results} \label{chap:results}
 
-Recall that our goal is to try to find out if depth data is a useful dataset for classifying objects into classes. In this chaper, we attempt to obtain the best possible results through optimising their corresponding parameters and how different classifiers fit with our purpose. 
+Recall that our goal is to find out if depth data is a useful dataset for classifying object classes. In this chapter, we attempt to obtain the best possible results through optimising their corresponding parameters and discuss how different classifiers might fit for our problem. We will look at these classifiers:
+
+\begin{itemize}
+  \item Support vector machine with a linear kernel (SVM (linear))
+  \item Support vector machine with a RBF kernel (SVM (RBF))
+  \item Random Forest (RF)
+  \item discrete AdaBoost (ADA)
+  \item discrete AdaBoost (ADA.R)
+\end{itemize}
+
+For clarity, we will be referring to these classifiers by their acronyms most of the time.
 
 Broadly speaking, we have to perform the following tasks:
 
 \begin{itemize}
-  \item train the 'out-of-the-box' classifiers with the whole training dataset without parameter optimisation; 
-  \item finding the appropriate parameters that return the highest accuracy score with cross validation; and,
-  \item evalute highest achieving classifiers through precision-recall and confusion matrix.
+  \item finding the range of potentially appropriate parameters using smaller subsets of our dataset;
+  \item training the 'out-of-the-box' classifiers with the whole training dataset without parameter optimisation; and, 
+  \item optimising parameters for the highest achieving classifier and evaluate it through precision-recall and visualising the predicted images.
 \end{itemize}
 
-In fact, optimising parameters can make a big difference. When we attempted to train classifiers on the whole dataset without any parameter optimisation, the classifiers either did not converge within the Balena time limit. For instance, the RF classifier was overfitted, reporting a training accuracy of 55.8\% and a testing accuracy of 1.8\%, while the SVM classifier with an RBF kernel did not converge.
+Optimising parameters could make a big difference, especially for SVM. For instance, in one of the SVM parameter searching operations, one set of parameters obtained a cross-validated accuracy of more than twice of another set. Let us now look at how unoptimised classifiers perform with our dataset.
 
 
-\section{Finding Appropriate Parameters}
-It is a challenging task to find the optimal parameters. Ideally, we would want to run an exhaustive search on all possible parameter values by running classifiers with all combinations of those parameters. Given the contraints on Balena, this task becomes even more complicated. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Finding Appropriate Parameters} \label{sec:res-params}
+It is a challenging task to find the optimal parameters for a classification model. Ideally, we want to run an exhaustive search over all possible parameter values for each classifier. Realistically and taking into account the constraints of Balena, this task is more difficult than it appears. 
 
-Hence, before dwelling into the entire dataset, it would be logical to see how these parameters change as the number of classes increases. For this, we are going to pick the first 2, 5, 10, 50 and 100 classes, and try to optimise their parameters with different algorithms. Although these classes may possess very different properties, we aim to narrow down the range of values we have to search for. Also, this gives a sense of how the classifier fair with our dataset.
+To simplify the problem, we will look at how these parameters change as the number of classes increases. For each algorithm, we perform grid or randomised search on the first 2, 5, 10, 50 and 100 classes to find the parameters that produce the best cross validation score. Note that these are purely patches from some specified number of classes. We want to find out how the algorithms perform in a binary situation (2 classes), small multiclass situations (5 and 10 classes) and large multiclass situations (50 and 100 classes).
 
-By performing cross-validated grid and randomised searches, we achieve the highest accuracy scores, as shown in \autoref{tab:best_params}. Here, we can see that RF works the best for our dataset, even though boosted decision trees such as ADA are found to be the top performing classifiers by tests run by \citeasnoun{compare-supervised}. 
-  
-We will discuss more about it below.
+As more classes are used, we expect the accuracy score to fall, due to the added complexity of the increased number of classes and the distributions of them. Their results can help us decide if we should continue to pursue these algorithms, and the range of parameters we should focus on when evaluating the algorithms using the whole dataset.
 
-% TABLE: 
+Recall that the accuracy score is the ratio between correctly classified datapoints and the whole dataset. Generally speaking, the higher the score, the better the classifier performs. We will use 3-fold cross validation to find an average accuracy score, which we will refer to as cross validation score. 
+
+Note that we are purely taking datapoints from some number of classes rather than considering how it fits with classifying datapoints in the context of an image. We will do so when we have our final classifier trained in \autoref{sec:res-eval}. Thus, our aim here is to narrow down the range of values we have to search for, and to get a sense of how these algorithms scale as the number of classes increases, before digging into the whole dataset.
+
+
+% TABLE: params_classes
+\vspace{15pt}
+\parbox{\linewidth} {
+  \centering
+  \begin{tabular}{|M{0.1\textwidth}|M{0.13\textwidth}|M{0.1\textwidth}|M{0.13\textwidth}|M{0.17\textwidth}|M{0.17\textwidth}|}
+    \hline 
+    \textbf{No. of Classes} & 
+    \textbf{SVM (Linear)} & 
+    \textbf{SVM (RBF)} &
+    \textbf{RF} & 
+    \textbf{ADA (SAMME)} & 
+    \textbf{ADA (SAMME.R)} 
+    \\ \hline 
+    2   &  61.0\% & 64.8\% & $\mathbf{70.1\%}$ & 67.5\% & 67.1\%
+    \\ \hline
+    5   &  35.7\% & 38.7\% & $\mathbf{44.0\%}$ & 39.8\% & 40.6\%
+    \\ \hline
+    10  &  32.1\% & 34.4\% & $\mathbf{44.1\%}$ & 31.6\% & 31.9\%
+    \\ \hline
+    50  &  13.1\% & 18.9\% & $\mathbf{33.8\%}$ & 9.94\% & 10.9\%
+    \\ \hline
+    100 &  10.9\% & 15.6\% & $\mathbf{33.6\%}$ & 5.17\% & 7.47\%
+    \\ \hline
+  \end{tabular}
+  \captionof{table}{\textit{Best accuracy scores found using grid search with 3-fold cross validation or the best of 3 randomised searches with 3-fold cross validation for various classifiers -- (in order) SVM with linear kernel, SVM with RBF kernel, RF, discrete AdaBoost and continuous AdaBoost.}}
+\label{tab:params_classes}
+}
+%\vspace{15pt}
+
+
+\subsection*{Random Forest}
+\autoref{tab:params_classes} shows the cross-validated accuracy scores of our chosen algorithms. We can see that RF outperformed all other classifiers. Not only did it give the best scores across different number of classes, it also scaled the best with our dataset where its accuracy dropped only by about 10\% when going from 10 classes to 50 classes and stabilised thereafter, compared to around 20\% with other algorithms and seeing a continual drop with more classes. 
+
+RF worked well with our dataset with its ability to locate outliers and find subtle relationships within the input features. 
+
+\subsection*{AdaBoost}
+On the other hand, even though boosted decision trees such as ADA and ADA.R were found to be the top performing classifier by \citeasnoun{compare-supervised}, it performed the worst with our dataset. This could reflect the composition of our dataset. We would expect our dataset to be closely packed together due to the nature of the data and the normalisation method we used. This also means that the data could be `noisy' and with outliers, which is a weak point of AdaBoost algorithms.
+
+ADA.R is known to require fewer trees to achieve a similar or even better accuracy score than ADA. In our parameter searches, we see that ADA used a maximum of 1000 decision trees to compose its final classifier, compared to a maximum of just about 100 trees for ADA-R throughout. This means that if we were going to use an AdaBoost classifier, we should pick the ADA.R algorithm.
+
+
+\subsection*{Support Vector Machine}
+Like many complex problems, our dataset performed better with SVM (RBF) than SVM (linear), especially with many classes. However, the scores decreased more quickly when more classes were used to train an SVM (RBF) than SVM (linear).
+
+It appears that SVM could not find a good balance between misclassification and being specific, due to the complexity of our dataset. Also, it took much longer than RF and ADA's to search on the same number of parameters.
+
+\subsection{Overview}
+These tests show some interesting characteristics about classification problems in general. We expect binary classification to perform well, as it is a rather simple problem bounded by few factors. As we moved on to multiclass classification (from 2 classes to 5 classes in our case), the scores dropped rapidly. This shows that multiclass classification gets complicated quickly. When many more classes were used (from 10 to 50 classes for example), the scores dropped rapidly again. The added variance and noise made it even harder for the classifier to distinguish between their subtle characteristics.
+
+Another interesting characteristic is that classifiers have similar or even stronger predictive powers as the number of classes increases, even though the accuracy rates decreases. This is particularly clear with the SVMs and RF results as shown in \autoref{tab:params_classes}. 
+
+Take the accuracy scores of RF as an example: it is 20.1\% better than random when it is trained on 2 classes. More impressively, it is 32.6\% better than random for 100 classes, which is a 12.5\% increase despite a 36.5\% decrease in the accuracy score. Hence, in-depth evaluation is important in understanding the characteristics and performance of classifiers. 
+
+The complexity of our dataset means that RF seems to best suited for our problem amongst the other two algorithms. It produced the most consistent results and scaled very well with classification results due to its robustness to outliers and noise. Also, we saw that SVMs are more resilient to noise than AdaBoost algorithms. 
+
+For now, we should continue to pursue all classification models mentioned here, as we need more concrete information before we can rule out their usefulness to our problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Unoptimised Classifiers} \label{sec:res-unoptimised}
+From now on, we are going to examine how effective these algorithms are by using the whole training dataset. Recall that our training dataset contains 875 classes, which was created using $K$-means clustering. With our analysis in the previous section, we expect to see RF to remain rather stable and be the most effective classifier with our dataset.
+
+% TABLE - results of 'raw' classifiers
+\vspace{15pt}
 \parbox{\linewidth} {
 	\centering
-  \begin{tabular}{|M{0.1\textwidth}|M{0.17\textwidth}|M{0.17\textwidth}|M{0.13\textwidth}|M{0.13\textwidth}|M{0.1\textwidth}|}
+  \begin{tabular}{|m{0.20\textwidth}|M{0.35\textwidth}|}
 		\hline 
-    \textbf{No. of Classes} & 
-    \textbf{ADA (SAMME)} & 
-    \textbf{ADA (SAMME.R)} & 
-    \textbf{RF} & 
-    \textbf{SVM (Linear)} & 
-    \textbf{SVM (RBF)} 
+    \textbf{Classifier} & 
+    \textbf{Cross Validation Score} 
 		\\ \hline 
-    2   & 0.660  & 0.652  & 0.701 & 0.610 & 0.648
+    SVM (Linear) & --
 		\\ \hline
-    5   & 0.389  & 0.384  & 0.440 & 0.357 & 0.387
+    SVM (RBF)    & --
 		\\ \hline
-    10  & 0.308  & 0.247  & 0.441 & 0.321 & 0.343
+    RF           & 28.7\%
 		\\ \hline
-    50  & 0.0866 & 0.0876 & 0.338 & 0.131 & 0.189
+    ADA          & 2.33\%
 		\\ \hline
-    100 & 0.0485 & 0.0547 & 0.336 & 0.109 & 0.156
+    ADA.R        & 3.97\%
 		\\ \hline
 	\end{tabular}
-	\captionof{table}{\textit{Best accuracy scores found using grid search with 3-fold cross validation for various classifiers - AdaBoost with the two different algorithms, Random Forest and SVM with two different kernels.}}
-\label{tab:best_params}
+  \captionof{table}{\textit{3-fold cross validation scores with unoptimised classifiers.}}
+\label{tab:unop_score}
 }
+\vspace{15pt}
 
-\subsection{Random Forest}
-There are four main adjustable variables - n\_estimators (\textit{default=`auto'}), \textit{max\_depth}, \textit{min\_samples\_split} and \textit{class\_weight}, which we discussed briefly in \textit{TODO: WHERE}.
+In fact, RF remained rather stable, achieving an accuracy score of 28.7\%, with only a small drop in the score when compared to the score of 100 classes. Although ADA and ADA.R performed much worse than RF, they still performed better than random ($1/875 = 0.0114\%$). Again, the complicated and closely-packed dataset makes it difficult for AdaBoost algorithms to be of any use. 
 
-We want to minimise the number of samples per split, maximise the depth of each tree in the forest and maximise the number of trees required, without overfitting the model. Recall that overfitting causes the trained model to be specifically tuned to the training data, which has low predictive power on new datapoints.
+We attempted to run the SVM classifiers on the whole dataset but it did not converge within the time constraints of Balena. This is unfortunate, as it would be a good comparison to see how SVM classifiers fair against RF.
+
+Thus, we will focus on optimising and evaluating an RF classifier as our final classifier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Evaluating the Best Classifier} \label{sec:res-eval}
+The fact that our training dataset is rather big -- containing about 390 000 datapoints across 875 classes in our training set -- makes it difficult to work with. Large exhaustive searches with cross validation and many parameter candidates would not converge under the time and memory constraints on Balena.
+
+Our workaround is to run a few models with different parameters informed by the optimal parameters obtained in our previous tests. We then compute a 3-fold cross validation score for each of these models and predict the test set with the corresponding trained model. The score will provide us with some confidence about the performance of the classifier. 
+
+Following on, we should look into the precision-recall rates to understand how these classifiers actually perform. Remember that precision-recall aims to find out the predictive power and sensitivity of a classifier. We will also attempt to predict some images with our final classifier to see how it works.
+
+\subsection*{Optimising parameters}
+Recall that we want to minimise the number of samples for a split to occur \\(\texttt{min{\_}samples{\_}split}), maximise the depth of each tree (\texttt{max{\_}depth}) and maximise the number of trees used (\texttt{n{\_}estimators}). We also want to decide on how we want to weight our classes (\texttt{n{\_}weight}).
+
+% TODO: TABLE - RF models
+\vspace{15pt}
+\parbox{\linewidth} {
+	\centering
+  \begin{tabular}{|M{0.14\textwidth}|M{0.12\textwidth}|M{0.15\textwidth}|M{0.15\textwidth}|M{0.15\textwidth}|M{0.11\textwidth}|}
+		\hline 
+    \textbf{Name} & 
+    \textbf{min{\_}\newline samples{\_}\newline split} & 
+    \textbf{max{\_}depth} & 
+    \textbf{n{\_}estimator} & 
+    \textbf{class{\_}weight} &
+    \textbf{cross val score}
+		\\ \hline 
+    Classifier 0 & 2 & --  & --  & balanced & 25.8\%
+		\\ \hline
+    Classifier 1 & 2 & 40  & 40  & None     & 39.3\%
+		\\ \hline
+    Classifier 2 & 2 & 40  & 40  & balanced & 42.2\%
+		\\ \hline
+    Classifier 3 & 2 & 45  & 45  & balanced & 41.6\%
+		\\ \hline
+    Classifier 4 & 2 & 60  & 60  & balanced & 42.5\%
+		\\ \hline
+    Classifier 5 & 2 & 100 & 100 & balanced & 43.8\%
+		\\ \hline
+	\end{tabular}
+  \captionof{table}{\textit{Random forest models with various parameter settings and their 3-fold cross validation scores.}}
+\label{tab:rf_models}
+}
+\vspace{15pt}
+
+Given our knowledge from previous tests, we expect similar or even better performance from RF than its unoptimised version, if we tune the parameters properly. In fact, as seen in \autoref{tab:rf_models}, we found that depth and the number of estimators in the forest are the key in obtaining a good RF classifier. Classifier 2 was 13.5\% better than classifier 0 which had none of those parameters set. 
+
+Also, if we supply an insufficient set of parameters, we risk making the classifier worst than its `out-of-the-box' state, as we demonstrated with classifier 0 (see \autoref{tab:rf_models}) and the unoptimised RF classifier (see \autoref{tab:unop_score}).
+
+We are only testing some parameters here as the constraints on Balena mean that we could not test a higher maximum depth or number of estimators. Classifier 5, with the highest values for \texttt{max{\_}depth} and \texttt{n{\_}estimators}, performed the best with a cross validation score of 43.8\%, which is 15.1\% better than an unoptimised RF classifier. We are going to use this as our `resultant classifier' from now on.
+
+We also found that a `balanced' weighting (i.e. a weight that is inversely proportional to the class frequency in the input data) gave better results for our unbalanced dataset (shown in \autoref{fig:dis-classes}) than no weighting at all. The small increase suggests that the RF classifier is rather resilient to an unbalanced situation. Nonetheless, a balanced weighting produced better results.
+
+% TODO: TABLE - RF scores
+\vspace{15pt}
+\parbox{\linewidth} {
+	\centering
+  \begin{tabular}{|M{0.15\textwidth}|M{0.15\textwidth}|M{0.15\textwidth}|M{0.15\textwidth}|}
+		\hline 
+    \textbf{Name} & 
+    \textbf{cross val score} & 
+    \textbf{test score} &
+    \textbf{time taken to predict (min:sec)} 
+		\\ \hline
+    Classifier 0 & 25.8\% & 34.9\% & 0:57
+		\\ \hline
+    Classifier 1 & 39.3\% & 44.9\% & 2:29
+		\\ \hline
+    Classifier 2 & 42.2\% & 46.7\% & 2:48
+		\\ \hline
+    Classifier 3 & 41.6\% & 45.6\% & 3:55
+		\\ \hline
+    Classifier 4 & 42.5\% & 48.0\% & 3:38
+		\\ \hline
+    Classifier 5 & 43.8\% & 49.0\% & 5:43
+		\\ \hline
+	\end{tabular}
+  \captionof{table}{\textit{3-fold cross validation and test scores for some random forest classifiers we ran.}}
+\label{tab:rf_scores}
+}
+\vspace{15pt}
+
+The influence of the depth of each tree and the number of trees in the forest is shown more clearly through predicting the test set in \autoref{tab:rf_scores}. 
+
+It is worth noting that while classifier 5 is the highest achieving classifier, the performance improvement is marginal. However, the increased number of trees and maximum depth for each tree in the forest when compared with that of classifier 4 (100 versus 60 for both parameters) mean that the classifier became more complex, causing it to use up more memory (more than 128 GB of RAM is required) and longer to perform prediction on the test set. Here, we focus on the performance of the classifier, so we will continue to use classifier 5 as our preferred classifier.
 
 
-Random Forest - 1000 estimators for 100 classes $>$ 64GB memory.
+\newpage
+\subsection*{Precision and Recall}
+
+%TODO: figure for classifiers 1-5 
+
+We obtained a precision of 51\% and recall of 49\% on our test dataset with classifier 5. Here, precision is about `how many of the selected items are relevant' and recall is `how many relevant items are selected'. In other words, our classifier is able to pick up 51\% of the whole set of the test datapoints, of which it correctly classified 49\% of them.
+
+This is in-line with our expectation of the classifier through our tests. We expect our classifier to be accurate no less than 40\% of the time. Give the complexity of our training dataset, RF is holding up to the challenging of noise and outliers, and appear to continue to perform well with a large multiclass classification problem.
+
+\subsection*{Predicting Images}
+So far, the evidence we gathered seem to suggest that our approach is performing well. We should attempt to predict some images with our best classifier, classifier 5, to see if it would work well with out dataset.
+
+Not dissimilar to how we approached our training and testing stages, we are going to predict each pixel patch and assign a colour for its corresponding pixel based on its prediction. By predicting all pixel patch of an image, we can combine them into a resultant image, and examine if it is able to resemble the scene. 
+
+We performed three image tests -- an image from a bathroom (\autoref{fig:predict-bathroom}), another from an office (\autoref{fig:predict-office}) and one from a bedroom (\autoref{fig:predict-bedroom}).
+
+We observe that the precision rates varied. While the bathroom scene performed the best with a precision rate of 47\%, the bedroom scene obtained a precision of 17\%. Flat surfaces with little variation, such as the walls in the bedroom and the tables in the office scene, did not perform very well. The little variance between surrounding areas make it difficult for the classifier to decide what they actually are. A flat surface could potentially be classed as anything.
+
+%Unexpectedly, the classifier gave 0\% recall rates on all three images we attempted to predict, as shown below. This means that out of the datapoints picked up by the classifier, it was unable to find any relevant points within this pool of datapoints. 
+
+%An explanation is that despite our attempt in trying to obtain a representative dataset using $K$-means clustering rather than randomly selecting datapoints as features, the centroids of the clusters found did not represent the true data values very well. After all, these centroids are the means of some clusters found by the algorithm which might not be representative at all. 
+
+%Interestingly, even though our empirical analyses suggest that the classifier does not perform well in predicting an actual image using its depth information, the predicted results resembled the actual scenes. Figures \autoref{fig:predict-bathroom}, \autoref{fig:predict-office} and \autoref{fig:predict-bedroom} show three examples, in which they all resembled their scenes, but with some noise and probably with wrongly classified classes. Flat surfaces such as the walls in \autoref{fig:predict-bedroom} and the desks in \autoref{fig:predict-office} appeared to be much more difficult to predict. 
+
+\newpage
+% FIG - Bathroom
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{combined_169}
+  \caption{\textit{(Left) a bathroom scene from the NYU Depth Dataset; (right) our prediction.}}
+  \label{fig:predict-bathroom}
+\end{figure}
 
 
+% FIG - Office  
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{combined_270}
+  \caption{\textit{(Left) an office scene from the NYU Depth Dataset; (right) our prediction.}}
+  \label{fig:predict-office}
+\end{figure}
 
 
-% TABLE : comparing parameters 
+% FIG - Bedroom 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{combined_57}
+  \caption{\textit{(Left) a bedroom scene from the NYU Depth Dataset; (right) our prediction}}
+  \label{fig:predict-bedroom}
+\end{figure}
 
-- show overfitting results \\ 
-- compare first 2, 5, 10, 50, 100 (etc.) \\
-- combine small classes \\ \\
-
-- SVM - linear and RBF \\
-- Random Forests \\ \\
-
-Could try GridSearch to find best params with few classes? 
+Again, this illustrates the complexity of such a classification problem. On one hand, we appeared to have trained a good enough classifier through the majority of our testing. On the other hand, not until the last hurdle when we put the classifier into application could we evaluate if it is performing well.

@@ -1,7 +1,7 @@
 \chapter{Technical Background} \label{chap:tech}
-Before we attempt training models using depth information from images, we need to understand the characteristics of some of the models. In the scope of this project, we should focus on the two popular models for supervised machine learning - support vector machine and random forests, as mentioned in section \ref{ssec:classifiers}. 
+Before we attempt to train models using depth information from images, we need to understand the characteristics of them. In the scope of this project, we are going to focus on three popular models for supervised classification - support vector machine (SVM), random forest (RF) and AdaBoost (ADA), as mentioned in section \ref{ssec:classifiers}. 
 
-Looking ahead, we should also look into $K$-means clustering, an unsupervised training model. It is not used for fitting the depth patches we intend to use, but as a way to perform our feature engineering, which will be discussed in \autoref{chap:methodology}.
+Looking ahead, we should also look into $K$-means clustering, an unsupervised classification model. Rather than create a classifier using $K$-means clustering, we intend to use it to engineer our dataset. We will discuss this in \autoref{chap:methodology}.
 
 %%%%%%%%%%%%%%%%%%%%%%
 \section{Support Vector Machine (SVM)} \label{sec:tech-SVM}
@@ -26,7 +26,7 @@ The linear model above describes the objective of a two-class classification pro
   & \text{hence, } t_n y(\mathbf{x}_n) > 0 \text{ for any point } 
 \end{empheq}
 
-If there are more than one pairs of parameters that achieve the above, the pair with the smallest generalisation error should be chosen. In SVM, this is done by finding the decision boundary with the margin maximised. The margin is the smallest perpendicular distance between the decision boundary and any datapoint. The datapoints that enables the margin to be maximised are known as the support vectors. This is illustrated in \autoref{fig:svm_fitting}.
+If there is more than one pair of parameters that achieve the above, the pair with the smallest generalisation error should be chosen. In SVM, this is done by finding the decision boundary when the margins are maximised. A margin is the smallest perpendicular distance between the decision boundary and any datapoint. The datapoints that enable the margins to be maximised are known as the support vectors. This is illustrated in \autoref{fig:svm_fitting}.
 
 \begin{equation} \label{eq:svm_linear_dist}
   \frac{t_n y(\mathbf{x}_n)}{||\mathbf{w}||} = \frac{t_n (\mathbf{w}^T \phi(\mathbf{x}_n) + b)}{||\mathbf{w}||}
@@ -44,12 +44,12 @@ Assuming all data is classified correctly, the distance between any point $\math
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{svm_overlapping}
-  \caption{\textit{An elaborated \autoref{fig:svm_fitting} showing slack values of points based on its location in relation to the margin and decision boundary.}}
+  \caption{\textit{An elaborated \autoref{fig:svm_fitting} showing slack values of points based on their location in relation to the margin and decision boundary.}}
   \label{fig:svm_overlapping}
 \end{figure}
-In a realistic situation, classes may overlap. If we impose a hard separation between these classes, the classifier may become too specific and not be able to predict new data. Therefore, there needs to be a trade-off between splitting the classes and misclassifying some of the datapoints. 
+In a realistic situation, classes may overlap. If we impose a hard separation between these classes, the classifier may become too specific and not be able to predict new data. Therefore, there needs to be a trade-off between splitting the classes perfectly and misclassifying some of the datapoints. 
 
-The slack value describes the status of a datapoint. There are three types of values as illustrated in \autoref{fig:svm_overlapping} and \autoref{tab:slack}. Correctly classified points lie on or within the margin, whereas misclassified points are on the other side of the hyperplane. Some datapoints lie on the wrong side of the margin but within its side of the hyperplane causing margin violation.
+The slack value describes the status of a datapoint. There are three types of values as illustrated in \autoref{fig:svm_overlapping} and \autoref{tab:slack}. Correctly classified points lie on or within the margin, whereas misclassified points are on the other side of the decision boundary. Some datapoints lying on the wrong side of the margin but within its side of the boundary causes margin violation.
 
 % TABLE: slack values
 \parbox{\linewidth} {
@@ -86,21 +86,21 @@ This trade off between the margin and misclassification is controlled by the reg
     \hline
     \textbf{Cost ($C > 0 $)}	  & \textbf{Description}
     \\ \hline
-    Small $C$ 							    & Little contrained, large margin. 
+    Small $C$ 							    & A little constrained, large margin. 
     \\ \hline
-    Large $C$  	                & A more contrained, narrower margin.
+    Large $C$  	                & A more constrained, narrower margin.
 		\\ \hline
-    $C \rightarrow \infty$      & A hard margin where all contraint is in place.
+    $C \rightarrow \infty$      & A hard margin where all constraint is in place.
     \\ \hline
 
   \end{tabularx}
-	\captionof{table}{\textit{The effects of the values of $C$ on the margin.}}
+	\captionof{table}{\textit{The effects of different $C$ values on the margin.}}
 	\label{tab:c_vals}
 }
 
 
 \subsection{Kernels}
-By mapping datapoints to higher dimensional feature spaces, originally non-linearly separable datasets usually become separable linearly. Recall \autoref{svm_linear_max}, this feature space raising is represented as $\phi \left (\mathbf{x}_n \right)$ which could be of infinite dimensions and unable to be stored. Instead, in SVM, we can represent this complex decision boundary in efficient kernel representation without computing $\phi \left (\mathbf{x}_n \right)$. 
+By mapping datapoints to higher dimensional feature spaces, originally non-linearly separable datasets become separable linearly. Recall \autoref{eq:svm_linear_max}, this feature space raising is represented as $\phi \left (\mathbf{x}_n \right)$ which could be of infinite dimensions and unable to be stored. Instead, in SVM, we can represent this complex decision boundary in efficient kernel representation without computing $\phi \left (\mathbf{x}_n \right)$. 
 
 % TABLE: available kernels
 \parbox{\linewidth} {
@@ -119,14 +119,14 @@ By mapping datapoints to higher dimensional feature spaces, originally non-linea
     Sigmoid             & $k(\mathbf{x},\mathbf{x'}) = \tanh \left(a\mathbf{x}^T\mathbf{x'} + r\right)$
     \\ \hline
   \end{tabularx} 
-  \captionof{table}{\textit{Available SVM Classifier kernels in the }\texttt{scikit-learn} \textit{library.}}
+  \captionof{table}{\textit{Available kernels for SVM Classifiers in the }\texttt{scikit-learn} \textit{library.}}
   \label{tab:kernel_vals}
 }
 
 \subsubsection{The Gamma Parameter ($\gamma$)}
 By taking $C$ into account, we are able to create a more generalised classifier, but it would still be affected by outliers. The RBF kernel gives another parameter, $\gamma$, to control for the problem and shape of the decision boundary, as shown in \autoref{tab:kernel_vals}.
 
-$\gamma$ defines how far the influence of each datapoint reaches. The smaller $\gamma$ is, the further it reaches. The higher the value, the more the model tries to avoid misclassification. However, if the value is too high, the decision boundary become too specific, causing overfitting. Hence, the optimisation problem now includes the need to minimise $\gamma$ such that it finds the optimal decision boundary, as illustrated in \autoref{fig:svm_rbf_gamma}.
+$\gamma$ defines how far the influence of each datapoint reaches. The smaller $\gamma$ is, the further it reaches. The higher the value, the more the model tries to avoid misclassification. However, if the value is too high, the decision boundary become too specific, causing overfitting (illustrated in \autoref{fig:svm_rbf_gamma}). Hence, the optimisation problem now includes the need to minimise $\gamma$ so to find the optimal decision boundary.
 
 % FIG - SVM RBF gamma
 \begin{figure}[H]
@@ -138,19 +138,19 @@ $\gamma$ defines how far the influence of each datapoint reaches. The smaller $\
 
 
 \subsection{Multiclass Extension}
-Fundamentally, SVM is designed to split between two classes. Two approaches, namely \textit{one-versus-the-rest} and \textit{one-versus-one}, have been developed to allow SVM to work with more than two classes by combining multiple binary SVMs.
+Fundamentally, SVM is a binary classifier designed to split between two classes. Two approaches, namely \textit{one-versus-the-rest} and \textit{one-versus-one}, have been developed to allow SVM to work with more than two classes by combining multiple binary SVMs.
 
 \begin{itemize}
   \item \textbf{\underline{One-versus-the-Rest}} \\ \\
     The approach trains $K$ SVM classifiers for $C_K$ classes. Each SVM classifier $y_k(\mathbf{x})$ uses the $k$\textsuperscript{th} class $C_k$ as the positive class and the rest as the negative class. However, this approach has a few issues. 
 
-A major issue is that this causes an imbalance of classes as the positive class will be smaller than the rest of the classes. This problem is worsened as more classes are added to the classifier, as it skews the results to the negative class, giving a false impression that the classifier has a good performance.
+A major issue is that this causes an imbalance of classes as the positive class will be much smaller than the rest of the classes. This problem is worsened as more classes are added to the classifier, as it skews the results to the negative class, giving a false impression that the classifier has a good performance.
 \\
 
   \item \textbf{\underline{One-versus-One}} \\ \\
-Another approach is to train many SVMs with all possible pairs of classes (i.e. $K(K-1)/2$ SVM classifiers). The relevant classifiers then 'vote' to return the highest voted class to give a prediction.
+Another approach is to train many SVMs with all possible pairs of classes (i.e. $K(K-1)/2$ SVM classifiers). The relevant classifiers then `vote' to return the highest voted class to give a prediction.
 
-However, it takes significantly longer to converge than one-versus-the-rest due to the number of classifiers that needs to be trained. It trains in $O(K^2N^2)$ time compared to $O(KN)$ for one-versus-the-rest. It also takes a long time, $O(K^2N_{s})$, where $N_s$ is the number of support vectors \cite{mur-book}. 
+However, it takes significantly longer to converge than one-versus-the-rest due to the number of classifiers that need to be trained. It trains in $O(K^2N^2)$ time compared to $O(KN)$ for one-versus-the-rest. It also takes a long time to predict -- $O(K^2N_{s})$, where $N_s$ is the number of support vectors \cite{mur-book}. 
 
 \end{itemize}
 
@@ -169,20 +169,20 @@ Either way, it causes some ambiguity due to the separate evaluation of the class
 \newpage
 \section{Random Forest (RF)} \label{sec:tech-rf}
 
-We now look at a rather different classification algorithm, random forests. It is an ensemble method that combines results from different decision trees to give the final prediction. We start by understanding what decision trees are.
+We now look at a rather different classification algorithm, random forests. It is an ensemble method that combines results from different decision trees to give the final classifier. We start by understanding what decision trees are.
 
 \subsection{Decision Tree}
 % FIG - Decision Tree 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{dt}
-  \caption{\textit{A (classification) decision tree with two classes, A and B,  and 'colour', 'shape' and 'size' as features (adapted from \protect\citeasnoun{mur-book}).}}
+  \caption{\textit{A (classification) decision tree with two classes, A and B,  and `colour', `shape' and `size' as features (adapted from \protect\citeasnoun{mur-book}).}}
   \label{fig:dt}
 \end{figure}
 
 Decision trees, formally classification and regression trees (\textbf{CART}), obtain predictions by recursively splitting the input space and defining each region with a local model. Visually, this can be displayed as a tree, with each node representing a split by some threshold or criterion. 
 
-Illustrated in \autoref{fig:dt}, the distribution of class labels is stored at each leaf. This gives a probability for each class satisfying this criterion by using the number of positive and negative examples. For instance, the criterion 'if the \textit{colour} is red and the \textit{size} is less than 10' gives a prediction for class A $p(y=1|\mathbf{x}) = 4/4 = 1$ and $p(y=2|\mathbf{x}) = 0/4 = 0$ for class B. Practically, decision trees are binary such that the tree splits into 'yes' and 'no' according to some comparison criteria \cite{mur-book}.
+Illustrated in \autoref{fig:dt}, the distribution of class labels is stored at each leaf. This gives a probability for each class satisfying a set of criteria by using the number of positive and negative samples. For instance, the criteria 'if the \textit{colour} is red and the \textit{size} is less than 10' gives a prediction for class A $p(y=1|\mathbf{x}) = 4/4 = 1$ and $p(y=2|\mathbf{x}) = 0/4 = 0$ for class B. Practically, decision trees are binary such that each node splits into 'yes' and 'no' according to some comparison criteria \cite{mur-book}.
 
 For each point $\mathbf{x}$ to be predicted, it follows down the tree from the top, known as the root, to the resulting leaf node, according to the decision criteria learned from the training data.
 
@@ -197,7 +197,7 @@ Formally, this model is defined as \autoref{eq:dt}. $R_m$ is the $m$\textsupersc
   f(\mathbf{x}) = w_0 + \sum_{m=1}^{M} w_m\phi_m(\mathbf{x})
 \end{equation}
 
-This is essentially an adaptive basis-function model (ABM) (\autoref{eq:abm}) which tries to learn kernel rather than having to be specified manually like that in SVM. Without the need to estimate the kernel parameter which is computationally expensive, Random Forest learns much quicker than kernel methods such as SVM \cite{mur-book}. Compare equations \ref{eq:dt} and \ref{eq:abm} to see the similarities.
+This is essentially an adaptive basis-function model (ABM) (compare equations \ref{eq:dt} and \ref{eq:abm}) which tries to learn about the kernel rather than having to be specified manually like that in SVM. Without the need to estimate the kernel parameter which is computationally expensive, random forest learns much quicker than kernel methods such as SVM \cite{mur-book}. 
 
 \subsubsection{Growing a Tree}
 \begin{equation} \label{eq:dt_split_fn}
@@ -210,9 +210,9 @@ This is essentially an adaptive basis-function model (ABM) (\autoref{eq:abm}) wh
 
 We require some methods to decide which feature and what value to use for splitting. The split function in \autoref{eq:dt_split_fn} returns the best feature and best value by comparing a feature $x_{ij}$ to a numeric value $t$. This $t$ value is bounded by the feature values from the rest of the datapoints, stored as $\tau_{j}$ for each feature $j$.
 
-As seen in the equation, we want to minimise the cost of picking this feature. Cost is measured in several ways, namely, \textit{misclassification rate}, \textit{cross-entropy} and \textit{Gini index}. We can minimise the \textit{misclassification rate}; we can maximise the information gained through the split by minimising the \textit{cross-entropy}; and, we can minimise the \textit{Gini index}, which is the expected error rate. 
+As seen in the equation, we want to minimise the cost of picking this feature. Cost is measured in several ways, namely, \textit{misclassification rate}, \textit{cross-entropy} and \textit{Gini index}. We can minimise the \textit{misclassification rate}; we can maximise the information gained through the split by minimising the \textit{cross-entropy}; or, we can minimise the \textit{Gini index}, which is the expected error rate. 
 
-Cross-entropy and Gini index are preferred because it would choose the feature that gives a pure split, i.e. contains only one class, in case of a draw in error rate \cite{mur-book}. Such a split is more desirable as the class choice is more definite. We also need to think about how deep the tree should go. If the tree becomes too deep, it causes overfitting, which we want to avoid as discussed \cite{mur-book}. 
+Cross-entropy and Gini index are preferred because it would choose the feature that gives a pure split, i.e. contains only one class, in case of a draw in the error rate \cite{mur-book}. Such a split is more desirable as the class choice is more definite. We also need to think about how deep the tree should go. If the tree becomes too deep, it causes overfitting, which we want to avoid as discussed \cite{mur-book}. 
 
 \subsection{Linking back to Random Forests}
 
@@ -220,7 +220,7 @@ Cross-entropy and Gini index are preferred because it would choose the feature t
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{rf}
-  \caption{\textit{Bagging or Boosting is used to obtain a prediction by combining the results of many trees.}}
+  \caption{\textit{The random forest model uses bagging to obtain a prediction by averaging the results from many decision trees.}}
   \label{fig:rf}
 \end{figure}
 
@@ -234,14 +234,14 @@ Decision tree is known to perform worse than other classifiers due to the instab
 
 Bagging attempts to reduce the variance by averaging the results from many noisy but approximately unbiased trees, created by a randomly selected subset of datapoints. Each tree in the forest casts a vote to decide on the predicted class through averaging the results of the trees in the forest, as illustrated in \autoref{eq:rf_ensemble}.
 
-However, simply by growing multiple trees with different sets of data would create highly correlated trees, which curbs the amount that the variance can go down. Random forests attempt to avoid this by not only randomising the dataset to be used, but also the features for building each tree. 
+However, simply growing multiple trees with different sets of data would create highly correlated trees, which curbs the amount that the variance can go down. Random forests attempt to avoid this by not only randomly selecting subsets to be used, but also the features for building each tree. 
 
-The randomness of data selection for each tree may introduce extra bias in the forest. But, the averaging of trees usually decrease the variance, which results in a better model.
+The randomness of the dataset for each tree may introduce extra bias in the forest. But, the averaging of trees usually decrease the variance, which results in a better model.
 
 
 %%%%%%%%%%%%%%%%%%
 \newpage
-\section{Boosted Trees} \label{sec:boosted}
+\section{Boosted Trees} \label{sec:tech-boosted}
 Boosted decision trees (BST-DT) is the best performing classifier according to \possessivecite{compare-supervised} comparisons, surpassing both decision trees and random forests in terms of misclassification error. In this section, we will look into the technical details of how boosted trees work.
 
 A notable example is AdaBoost, which we will discuss in this section. But first, we shall look at the concept of boosting. 
@@ -251,13 +251,13 @@ A notable example is AdaBoost, which we will discuss in this section. But first,
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\textwidth]{boosted}
-  \caption{\textit{Demonstration of how boosted trees function. For each iteration, misclassified points are given a higher weight. This new dataset is then used to train the next weak classifier, eventually resulting in a perfectly segmented classification space. (Adapted from \protect\citeasnoun{online-vision})}}
+  \caption{\textit{Demonstration of how boosted trees function. For each iteration, misclassified points are given a higher weight (points with a green border). This new dataset is then used to train the next weak classifier, eventually resulting in a perfectly segmented classification space. (Adapted from \protect\citeasnoun{online-vision})}}
   \label{fig:boosted}
 \end{figure}
 
-Commonly used in conjunction with decision trees, boosting attempts to boost the performance of weak learners ($\phi_m$ in \autoref{eq:abm}) by increasing the weight of misclassified datapoints after training each weak learner\cite{boosting}. The next weak learner will use the newly weighted dataset from the previous weak learner.
+Commonly used in conjunction with decision trees, boosting attempts to boost the performance of weak learners ($\phi_m$ in \autoref{eq:abm}) by increasing the weight of misclassified datapoints after training each weak learner \cite{boosting}. The next weak learner will use the newly weighted dataset from the previous weak learner.
 
-One criterion for this to function properly is that these trees much perform slightly better than random (e.g. if we have 500 classes, the classifier needs to have an accuracy score greater than 1/500 = 0.002). Also, boosting is very resistant to overfitting \cite{mur-book}.
+One criterion for this to function properly is that these trees must perform better than random (e.g. if we have 500 classes, the classifier needs to have an accuracy score greater than 1/500 = 0.002). Also, boosting is very resistant to overfitting \cite{mur-book}.
 
 % EQ - optimisation problem of Boosting
 \begin{equation} \label{eq:boost-optimise}
@@ -282,9 +282,9 @@ In order to optimise for \autoref{eq:boost-optimise}, we need to find the optima
   f_m(\mathbf{x}) &= f_{m-1}(\mathbf{x}) + \alpha_m\phi(\mathbf{x}_i;\gamma) \label{eq:optimise_f_set}
 \end{align}
 
-This is a hard optimisation problem and should be dealt with sequentially with the \textbf{method forward stagewise additive modelling} \cite{mur-book}. We start by assigning \textit{TODO: what is this??} as the initial estimate by \autoref{eq:optimise_f_init}. Then, we iterate for $M$ times. At each $m$, we compute $\alpha_m$ and $\gamma_m$ by \autoref{eq:optimise_f_loop} and use them to evaluate $f$ at $m$ by \autoref{eq:optimise_f_set}, without changing any parameter at previous $m$'s. We can \textit{early stop} once performance drops, even if we haven't reached $M$ iterations. By combining $f_m$'s, we will find the resultant strong classifier. 
+This is a hard optimisation problem and should be dealt with sequentially with the \textbf{method forward stagewise additive modelling} \cite{mur-book}. We start by assigning the loss function of the chosen algorithm as the initial estimate by \autoref{eq:optimise_f_init}. Then, we iterate for $M$ times. At each $m$, we compute $\alpha_m$ and $\gamma_m$ by \autoref{eq:optimise_f_loop} and use them to evaluate $f$ at $m$ by \autoref{eq:optimise_f_set}, without changing any parameter at previous $m$'s. We can \textit{early stop} once performance drops, even if we haven't reached $M$ iterations. By combining $f_m$'s, we will find the resultant strong classifier. 
 
-Note that each loss function computes \autoref{eq:optimise_f_loop} differently \cite{mur-book}. In large, there are four types of loss functions used in various boosting algorithms - squared error for L2Boosting, absolute error for gradient boosting, exponential loss for AdaBoost and logloss for LogitBoost.
+Note that each loss function computes \autoref{eq:optimise_f_loop} differently \cite{mur-book}. In large, there are four types of loss functions used in various boosting algorithms, notably, squared error for L2Boosting, absolute error for gradient boosting, exponential loss for AdaBoost and logloss for LogitBoost.
 
 Now that we have seen the general details of optimising the boosting problem, we shall see how this applies to AdaBoost. 
 
@@ -296,18 +296,18 @@ Now that we have seen the general details of optimising the boosting problem, we
   f(x) = \sum_{m=1}^{M} \alpha_m \phi_m (\mathbf{x})
 \end{equation}
 
-AdaBoost adapts the boosted algorithm by increasing the weight of each misclassified point at each iteration. For Like a normal decision tree, it is a linear classifier that attempts to split the input space into segments, as illustrated in \autoref{fig:boosted}. \autoref{eq:ada} shows how weak learners are combined to form a strong learner $f(x)$, which follows with the foward stagewise additive modelling method.
+AdaBoost adapts the boosted algorithm by increasing the weight of each misclassified point at each iteration. Usually, deicsion trees are used as weak learners, which segment into areas and use weighted datapoints to improve accuracy, as illustrated in \autoref{fig:boosted}. \autoref{eq:ada} shows how weak learners are combined to form a strong learner $f(x)$, which follows with the foward stagewise additive modelling method.
 
-There are two AdaBoost algorithms - \textbf{discrete AdaBoost} (\texttt{SAMME} in \texttt{scikit-learn}) and \textbf{real AdaBoost} (\texttt{SAMMME.R} in \texttt{scikit-learn}). Discrete AdaBoost, illustrated below, uses binary class labels from weak learners, whereas real AdaBoost uses probabilities instead \cite{mur-book}.
+There are two AdaBoost algorithms - \textbf{discrete AdaBoost} (\texttt{SAMME} in \texttt{scikit-learn}) and \textbf{continuous AdaBoost} (\texttt{SAMMME.R} in \texttt{scikit-learn}). Discrete AdaBoost, illustrated below, uses binary class labels from weak learners, whereas continuous AdaBoost uses probabilities instead \cite{mur-book}.
 
 % EQ - AdaBoost optimisation problem
 \begin{equation} \label{eq:ada-optimise}
   L_m(\phi) = \sum_{i=1}^{N} w_{i,m} \mathrm{exp}(-\alpha y_i \phi(\mathbf{x}_i))
 \end{equation}
 
-Again, we consider a binary classification problem for simplicity. It can be generalised for multiclass problems easily \cite{mur-book}. At each iteration $m$, the goal is to minimise the loss function for the corresponding weak learner, $\phi_m$, which requires the learning rate parameter, $\alpha_m$. 
+Again, we consider a binary classification problem here for simplicity. It can be generalised for multiclass problems easily \cite{mur-book}. At each iteration $m$, the goal is to minimise the loss function for the corresponding weak learner, $\phi_m$, which requires the learning rate parameter, $\alpha_m$. 
 
-Here, $w_{i,m}$ is the weight applied to the dataset $i$ and $y_i \in \{-1, 1\}$ as the two binary classes. We use \{-1, 1\} because it makes it possible to use the $\mathrm{sign}$ function to obtain the class labels in discrete AdaBoost.
+Here, $w_{i,m}$ is the weight applied to the dataset $i$ and $y_i \in \{-1, 1\}$ as the two binary classes. We use \{-1, 1\} because it makes it possible to use the $\mathrm{sign}$ function to obtain the class labels for discrete AdaBoost.
 
 \subsubsection{The Learning Rate Parameter ($\alpha$)} 
 
@@ -320,7 +320,7 @@ Here, $w_{i,m}$ is the weight applied to the dataset $i$ and $y_i \in \{-1, 1\}$
 \end{align}
 
 
-$\alpha$ is the main parameter of AdaBoost. It manages how influence each weak learner is, based on the error rate, as illustrated in \autoref{eq:ada-alpha} \cite{ada-improved}. We want to minimise this while to avoid overfitting. By using weight and the weighted samples, we obtain the error rate, as illustrated in \autoref{eq:ada-alpha-err}.
+$\alpha$ is the main parameter of AdaBoost. It manages how influence each weak learner is to the resultant classifier, based on the error rate, as illustrated in \autoref{eq:ada-alpha} \cite{ada-improved}. We want to minimise this while to avoid overfitting. By using weight and the weighted samples, we obtain the error rate, as illustrated in \autoref{eq:ada-alpha-err}.
 
 
 
@@ -332,7 +332,7 @@ $\alpha$ is the main parameter of AdaBoost. It manages how influence each weak l
 \section{$K$-means Clustering} \label{sec:tech-kmeans}
 %TODO: referencing back to lit review
 %TODO: change reference to section rather than subsections
-Recall that we briefly looked at unsupervised classifiers in section \ref{sec:classification}. Rather than learning from a labelled dataset, the algorithm compares values between points and creates $K$ groups, or clusters, in a multi-dimensional space as specified.
+Recall that we briefly looked at unsupervised classifiers in section \ref{sec:classification}. Rather than learning from a labelled dataset, the algorithm compares values between points and creates $K$ groups, or clusters, in a multi-dimensional spacei, as specified by the user.
 
 Later on, in Section \ref{ssec:datapoint-reduction}, we will look at how $K$-means clustering is utilised to downsize the training dataset so that we can perform tests with the aforementioned classification models. But first, let us understand the mathematical basis of $K$-means clustering.
 
@@ -340,7 +340,7 @@ Later on, in Section \ref{ssec:datapoint-reduction}, we will look at how $K$-mea
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{k-means}
-  \caption{\textit{An example of two clusters found with centroids $\mathbf{\mu}_1$ and $\mathbf{\mu}_2$.}}
+  \caption{\textit{An example of two clusters found with centroids $\mathbf{\mu}_1$ and $\mathbf{\mu}_2$ using $K$-means clustering.}}
   \label{fig:k-means}
 \end{figure}
 
@@ -352,7 +352,7 @@ Formally, we have to minimise the distortion measure, shown as \autoref{eq:k-mea
   J = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk}||\mathbf{x}_n - \mathbf{\mu}_k||^2
 \end{equation}
 
-\autoref{eq:k-means_minimise} is a two-stage optimisation problem, first by finding $r_{nk}$ by fixing $\mathbf{\mu}_k$ (the expectation stage, \textbf{E}) and vice versa (the maximisation stage, \textbf{M}):
+\autoref{eq:k-means_minimise} can be posed as a two-stage optimisation problem. We first find $r_{nk}$ by fixing $\mathbf{\mu}_k$ (the expectation stage, \textbf{E}) and vice versa (the maximisation stage, \textbf{M}):
 
 \newpage
 \begin{itemize}
@@ -380,15 +380,17 @@ Formally, we have to minimise the distortion measure, shown as \autoref{eq:k-mea
   These potential clusters might not be optimised to minimise \autoref{eq:k-means_minimise}. So, We have to do so by computing the derivative with respective to $\mathbf{\mu}_k$ as illustrated in \autoref{eq:k-means_mu_min}. Also, notice that by finding $\mathbf{\mu}_k$, we find out that they are the means of all the datapoints assigned to them, i.e. the centroids of the groups.
 \end{itemize}
 
-The two stages are repeated until the model converges, meaning that no further reassignment happens. The end result will be $K$ groups governed by the mean values of their corresponding cluster, but note that these means may not necessarily be concrete datapoints from the dataset. 
+The two stages are repeated until the model converges, meaning that no further reassignment happens. The end result will be $K$ groups governed by the mean values of their corresponding cluster. Note that these means may not necessarily be concrete datapoints from the dataset, but the actual mean of the corresponding clusters. 
+
+Recall in \autoref{ssec:classifiers}, we mentioned about the Expectation Maximisation algorithm. Usually used in conjunction with DBSCAN, this can be used by most clustering problems like $K$-means as we discussed above.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Summary}
-So far, we have learnt that SVM contains a main parameter, $C$ that controls for the trade-off between the margin and misclassification. With an RBF kernel, we can control the shape of the decision boundary through the $\gamma$ parameter. By finding the appropriate parameters, we can obtain an optimal SVM classifier that gives the best possible accuracy with the given dataset.
+So far, we have learnt that SVM contains a main parameter, $C$, which controls the trade-off between the margin and misclassification. With an RBF kernel, we can control the shape of the decision boundary through the $\gamma$ parameter. By finding the appropriate parameters, we can obtain an optimal SVM classifier that gives the best possible accuracy with the given dataset.
 
-Also, we have learnt how the combination of randomising both data and features of random forests give a much better accuracy and prediction power than pure decision trees. Comparing with SVM, we have learnt that random forests can be trained faster. Rather than having to estimate the correct parameters for the base kernel, Random Forests learn it themselves. However, we do have choose an appropriate height of the tree and the number of the trees to train to avoid overfitting.
+Also, we have learnt how the combination of randomised data and features in random forests give a much better accuracy and prediction power than a single decision tree. Comparing with SVM, we have learnt that random forests can be trained faster. Rather than having to estimate the correct parameters for the base kernel, RF learns it themselves. However, we do have to choose an appropriate height of the tree and the number of the trees to train to avoid overfitting.
 
-Boosted algorithms such as AdaBoost uses a collection of weak classifiers and weights ill-classified datapoints to reduce the bias of the resultant classifier, whereas RF combines the results of more complex trees over a random set of datapoints and features. This means that boosted algorithms are theoretically more efficient, as it requires less tress and trees that are less complex.
+Boosted algorithms such as AdaBoost use a collection of weak classifiers and weight up ill-classified datapoints to reduce the bias of the resultant classifier, whereas RF averages the results of more complicated trees over a random set of datapoints and features. This means that boosted algorithms are theoretically more efficient, as they require fewer and simplier trees.
 
 We shall now discuss the overall process used for training these algorithms.

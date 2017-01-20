@@ -497,52 +497,6 @@ def merge_labels(filename, merge_file_info, path):
 
     save_data(dataset, 'combined_'+merge_file_info, 'np', path+'lbl/')
 
-# """
-# ENTRY
-#
-# generate the patches of some given coordinates
-# """
-# def entry_given_co(depths, labels, lbl, dim):
-#     co = get_object_coordinates(labels, lbl, dim)
-#     object_depth = get_object_depth(depths, co, dim)
-#     norm = get_norm_depth(object_depth, mean_val(object_depth))
-#
-#     return norm
-#
-#
-# """
-# AVAILABLE FUNCTION
-#
-# obtain and store the required object patches for the required image
-# """
-# def aggr_given_co(depths, labels, img_start, img_end, dim, path):
-#
-#     output_patches = []
-#     output_targets = []
-#
-#     # do this for each given image
-#     for img in range(img_start, img_end+1):
-#         img_depths = depths[img]
-#         img_labels = labels[img]
-#         x, y = img_labels.shape
-#         set_labels = list(set(img_labels.reshape(x*y,))) # the set of labels in the image
-#         print set_labels
-#
-#         # do this for all the labels
-#         for lbl in set_labels:
-#             patches = entry_given_co(img_depths, img_labels, lbl, dim)
-#
-#             # append only if not empty
-#             if patches:
-#                 output_patches.extend(patches)
-#                 output_targets.extend([lbl for l in range(len(patches))])
-#
-#         # store feature-target dictionary and reset outputs
-#         save_data(create_ft_dict(np.array(output_patches), np.array(output_targets)),'ft_co_'+str(img)+'.p', path)
-#         output_patches = []
-#         output_targets = []
-
-
 
 """
 command line argument parser

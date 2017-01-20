@@ -25,8 +25,6 @@ def get_strings(matlab, dataset):
         print 'row_data:', row_data
         data.append(row_data)
 
-    #return np.transpose(data)
-    #return np.ravel(data)
     return data
 
 

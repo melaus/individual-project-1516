@@ -1,0 +1,10 @@
+\chapter{Conclusion}
+Even with the help of a sophisticated and easy-to-use machine-learning library, the process of producing an accurate and precise classifier is rather complicated. The first hurdle is feature engineering. Much experimentation is required to Many factors contribute to creating a good classifier. 
+
+Through our tests, we found that our dataset is complex and closely-packed as it did not perform well with AdaBook algorithms we found that random forest was the most resilient to a complex and closely-packed dataset. 
+
+We have to bear in mind that a classification problem in the computer vision domain is inheiritly difficult due to the distribution of the data. The fact that random forest is able to achieve an accuracy score (with decent precision and recall rates) x\% higher than random means that we are heading to the right direction.
+
+
+One the other hand, we found that depth alone did not result in a highly accurate classifier that can distinguish between many classes of objects, at least with our approach.
+

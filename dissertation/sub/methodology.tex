@@ -1,63 +1,69 @@
 \chapter{Methodology} \label{chap:methodology}
 
-%TODO: linear SVM
-\begin{figure}[h]
+% FIG - methodology
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.9\textwidth]{methodology}
   \caption{\textit{The iterative process of building a resultant model for accurate prediction.}}
   \label{fig:methodology}
-\end{figure}
+\end{figure} 
 
 Building a successful classifier requires careful considerations from the beginning. The quality of the dataset used is crucial to producing quality results. We would want to avoid the computer science analogy of `garbage in, garbage out', in that given some poor input data, the results will be poor no matter what is done to it. 
 
-The NYU Depth Dataset, as discussed in \autoref{sec:lit-depth-data}, provides a good base dataset to work with. Using this base dataset, we can transform it into the our desired dataset format, which can then be used to train different classifiers. 
+The NYU Depth Dataset, as discussed in \autoref{sec:lit-depth-data}, provides a good base dataset to work with. Using this base dataset, we can transform it into our desired dataset format, which can then be used to train different classifiers. 
 
-In this section, we are going to discuss about these steps 1 and 2 in the iterative process we are using, as shown in \autoref{fig:methodology}. We will train and evaluate some classifiers in the next chapter.
+In this section, we are going to discuss steps 1 and 2 in the iterative process, as shown in \autoref{fig:methodology}. We will train and evaluate some classifiers in the next chapter. We will not explicitly describe how this is translated into code. Refer to the appendix for more information about the structure of the code (\autoref{sec:appx-desc}) and its documentation (\autoref{sec:appx-doc}). 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \section{Feature Engineering (Step 1)}
-Before we can run any supervised classification algorithm, we have to create a labelled dataset for it to learn from. Labels represent different classes of objects. Some examples of labels are 'chair', 'desk' and 'lamp'. For each label, we form data points, known as feature vectors, where each point contains information about an object belonging to that label. Much consideration is required to create a quality dataset that can create a generalised classifier that can predict unseen data properly.
+Before we can run any supervised classification algorithm, we have to create a labelled dataset for it to learn from. Labels represent different classes of objects. Some examples of labels are 'chair', 'desk' and 'lamp'. For each label, we form data points, known as feature vectors, where each point contains information about an object belonging to that label. Much consideration is required to create a quality dataset that can produce a generalised classifier that can predict unseen data properly.
 
-The NYU Depth Dataset provides as a great starting point for creating the training dataset required for this project. It contains useful data for many scans at many different scenes, which requires a variety of available scenes and time. Also, these images are already labelled per pixel, which makes it easier to form our dataset. Here, we are assuming that this densely labelled dataset is correct, as we are basing our results against this dataset.
+The NYU Depth Dataset provides a great starting point for creating the training dataset required for this project. It contains useful data of many scans at many different scenes. For instacne, these images are already labelled per pixel, which makes it easier to form our dataset. Here, we are assuming that this densely labelled dataset is correct, as we are going to measure the performance of our classifiers against this dataset.
 
 \subsection{Depth Patches as Features}
-Depth information of each image scan is used to form the feature vectors. In the NYU Depth Dataset, each pixel is given a depth value, which represents the distance between the camera and the pixel in the scene. A simple approach would be to use the depth value of each pixel as features. However, this would not form an effective classifier, as the distance of one point could not separate a label from another. For example, a red dot could mean many different classes of objects in the real world. We would need to consider the surroundings to that dot in order to differentiate between classes of objects.
+Depth information of each image scan is used to form the feature vectors. In the NYU Depth Dataset, each pixel is given a depth value, which represents the distance between the camera and the real-world position in the scene (as discussed in section \ref{ssec:lit-data_rep}). A simple approach would be to use the depth value of each pixel as features. However, this would not form an effective classifier, as the distance of one point could not separate a label from another. For example, a red dot could represent many different classes of objects in the real world. 
 
-The solution is to obtain a patch around a pixel. This would provide some context as to what that pixel might represent by taking its neighbours into account. However, the size of the patch should not be too small or too large. In both cases, it would be hard for the classifier to distinguish between labels due to too little information or the presence of too much noise. After all, machine learning algorithms attempt to create correct boundaries between data points so that they can be labelled as a class. Considering the size of the input images (640-by-480 pixels) and the sizes of objects in most scenes, a 15-by-15 pixels patch (7 neighbouring pixels at each direction) is chosen.
+The solution is to obtain a patch around each pixel. This provides some context as to what that pixel might represent by taking its neighbours into account. However, the size of the patch should not be too small or too large. In both cases, it would be hard for the classifier to distinguish between labels due to too little information or the presence of too much noise. After all, machine learning algorithms attempt to create correct boundaries between data points so that they can be labelled as a class. Considering the size of the input images (640-by-480 pixels) and the sizes of objects in most scenes, a 15-by-15 pixels patch (7 neighbouring pixels at each direction) is chosen.
+
 
 % TODO: illustrate depth
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{patches}
   \caption{\textit{Showing how each patch represents a window on the original image in this simplified view. Two classes, red and blue, are represented in this illustration. We shall illustrate the green patch in \protect\autoref{fig:patch_process}.}}
   \label{fig:patches}
 \end{figure}
 
-Each patch is then normalised by deducting the mean of the patch from each pixel. The aim is to remove the actual distance between the camera and the object, so that each patch is more or less independent of factors such as the angle of which the image is taken from and the actual distance between the object and the camera. 
+Each patch is then normalised by deducting the mean of the patch from each pixel. The aim is to remove the actual distance between the camera and the object, so that each patch is approximately independent of factors such as the angle of which the image is taken from and the actual distance between the object and the camera. 
 
 % illustrate process of picking 15*15
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{patch_process}
-  \caption{\textit{An example of how we obtain a patch around a pixel (coordinate) and normalise it.}}
+  \caption{\textit{An example of how we obtain a patch around a pixel (coordinate) and normalise it. Note that we are using $15*15$ patches rather than $5*5$ patches as shown in this figure.}}
   \label{fig:patch_process}
 \end{figure}
 
 \subsection{Reducing Number of Datapoints} \label{ssec:datapoint-reduction}
-Each image is composed of 640-by-480 pixels, meaning that more than 290 000 patches are generated from each image. If all 1449 images are used, 460 million patches are generated. A Support Vector Classifier would take months to train with this unrealistically large dataset. Given the time and technical limitations, a manageable dataset is required. 
+Each image is composed of 640-by-480 pixels, meaning that more than 290 000 patches are generated from each image. If all 1449 images are used, 460 million patches are generated. Even more efficient classifiers such as AdaBoost would take a very long time to train on this unrealistically large dataset. Given the time and technical limitations, a manageable dataset is required. 
+
+Let us consider two methods:
 
 \begin{itemize}
   \item \textbf{Randomly Select Datapoints} \\
-A method for reducing the number of datapoints is to to collect a random number of datapoints from a random selection of images possessing the label. In this way, we aim to collect a vast set of data from a wide range of images. The drawback is that it is uncertain what 'random' entails. Some valuable and important features may be missed out, making the classifier less powerful. \\
+A method for reducing the number of datapoints is to to collect a random number of datapoints from a random selection of images possessing the label. In this way, we aim to collect a vast set of data from a wide range of images. The drawback is that it is uncertain what `random' entails. Importantly, some valuable and important features may be missed out, making the classifier less powerful. \\
   
   \item \textbf{K-means Clustering} \\
-A better way is to spot the similarities in the data and extract those points of interest datapoints. By finding groups within the data, known as clusters, it is possible to generalise each of these groups by its centroid. The obtained points provide a more reliable dataset, as it does not throw away potentially important information about this label.
+A better way is to spot the similarities in the data and extract key interest datapoints. By finding groups within the data, known as clusters, it is possible to generalise each of them by its centroid. The obtained points provide a more reliable dataset, as it does not throw away potentially important information about a label.
 
-By doing so, we can be more certain that our dataset is representative. We want to represent datapoints and features across all images, rather than picking random points from a big pool of datapoints risking to miss out key features as we cannot guarantee these randomly picked points cover all images.
+By doing this, we can be more certain that our dataset is representative. We want to represent datapoints and features across all images, rather than picking random points from a big pool of datapoints and risking missing out key features as we cannot guarantee these randomly picked points cover all images.
 \end{itemize}
 
-Due to the number of patches present in some of the labels and computational limitations, both methods are used to obtain the datasets. $k$-means clustering is directly applied to labels with at least 1 000 and at most 120 000 datapoints, so to compute within the six-hour time limit on Balena as a free user. A random 100 000 datapoints are selected for classes with datapoints more than the limit. 
+Due to the number of patches present in some of the labels and computational limitations, both methods are used to obtain the datasets. $k$-means clustering is directly applied to labels with at least 1,000 and at most 120,000 datapoints, so to compute within the six-hour time limit on Balena as a free user. A random 100,000 datapoints are selected for classes with datapoints more than the limit. 
 
-By running $k$-means on these classes, we obtain 1 000 datapoints for each of them. Classes with at most 1 000 datapoints are left as is to form a combined dataset.
+By running $k$-means on these classes, we obtain 1,000 datapoints for each of them. Classes with at most 1,000 datapoints are left as is to form a combined dataset.
 
 A few exceptions require a random number of images to be chosen before performing the random pick and clustering, due to the amount of images containing those labels and the number of patches that are generated for them.
 
@@ -66,45 +72,63 @@ A few exceptions require a random number of images to be chosen before performin
 	\centering
 	\begin{tabularx}{\textwidth}{|l|X|}
     \hline
-    \multicolumn{1}{|c|}{\textbf{Number of Datapoints}} & \multicolumn{1}{|c|}{\textbf{Operation}}
+    \multicolumn{1}{|c}{\textbf{Number of Datapoints}} & \multicolumn{1}{|c|}{\textbf{Operation}}
     \\ \hline
-    $<$ 1 000 & do nothing 
+    $<$ 1,000 & do nothing 
     \\ \hline
-    $>$ 1 000 \textit{and} $\leq$ 120 000 & run $k$-means to extract 1 000 datapoints 
+    $>$ 1,000 \textit{and} $\leq$ 120,000 & run $k$-means to extract 1,000 datapoints 
     \\ \hline
-    $>$ 120 000 & select random 100 000 points, then $k$-means to extract 1 000 datapoints 
+    $>$ 120,000 & select random 100,000 points, then $k$-means to extract 1,000 datapoints 
     \\ \hline
-    many images \textit{or} $\gg$ 120 000 & select random 250 images, select random 100 000 points, then $k$-means to extract 1 000 datapoints 
+    many images \textit{or} $\gg$ 120,000 & select random 250 images, select random 100,000 points, then $k$-means to extract 1,000 datapoints 
     \\ \hline
 	\end{tabularx}
   \captionof{table}{\textit{Summarising methods used to extract a representative subset for a class.}}
 \label{tab:extract-sum}
 }
 
-\subsection{Creating Datasets}
-\subsubsection*{Some Considerations}
-To train and measure the performance of the classifier, two datasets are created.The first dataset is the 'training dataset'. This dataset should be as large as possible to enable the classifier to learn the characteristics of the labels effectively. After all, we aim to obtain high recognition rate with the classifier. This dataset is further split into two parts - training and testing. The testing part enables the classifier to evaluate its performance.
+% FIG - Distribution of Classes
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{class_distribution_2}
+  \caption{\textit{Distribution of classes. (Blue) shows the distribution of our dataset before $K$-means clustering was used; (Red) shows the distribution after running $K$-means clustering on classes with more than 1,000 datapoints.}}
+  \label{fig:dis-classes}
+\end{figure} 
 
-A 'validation dataset' is created to measure a more realistic performance of the classifier. This dataset is not seen by the classifier during training and testing. It is important to avoid measuring performance of a machine-learning model with datapoints seen by the classifier. Otherwise, unrealistic prediction rates would be reported due to feature leakage (learning from \textit{future} datapoints). To avoid feature leakage during any stage of the process, all of these datasets should be mutually exclusive.
+In \autoref{fig:dis-classes}, we see a wide variation in the number of datapoints between classes before we used $K$-means to reduce our dataset. As we mentioned, this causes some practical issues given the resource we have. Also, the imbalance of classes would introduce bias into the classifier, making it more favourable towards the larger classes. By performing $K$-means on the very large classes, we aim to create a representative dataset that limits the number of datapoints, hence reducing the bias.
+
+\subsection{Creating Datasets} \label{ssec:creating-datasets}
+\subsubsection*{Some Considerations}
+To train and measure the performance of the classifier, two datasets are created. The first dataset is the `training dataset'. This dataset should be as large as possible to enable the classifier to learn the characteristics of the labels effectively. After all, we aim to obtain high recognition rate with the classifier. This dataset is further split into two parts - training and validation. The testing part enables the classifier to evaluate its performance.
+
+A `test dataset' is created to measure a more realistic performance of the classifier. This dataset is not seen by the classifier during training and testing. It is important to avoid measuring performance of a machine-learning model with datapoints seen by the classifier. Otherwise, unrealistic prediction rates would be reported due to feature leakage (learning from \textit{future} datapoints). To avoid feature leakage during any stage of the process, all of these datasets should be mutually exclusive.
 
 \subsubsection*{The Datasets} 
-After reducing datapoints to an amount manageable by $k$-means for some classes, we can create the three datasets by combining the datapoints of all the classes. This combined dataset is split into 'training and testing' and 'validation' in a 70\%-30\% split. Then, the 'training and testing' is split into 60\% training and 40\% testing. 
+After reducing datapoints to an amount manageable by $k$-means for some classes, we can create the three datasets by combining the datapoints of all the classes. This combined dataset is split into 'training and testing' and 'validation' in a 70\%-30\% split. Then, the 'training and testing' is split into 60\% training and 40\% testing. Here, we split the dataset using a \textit{stratified} approach, in which we try to retain the original ratio between classes in each subset. The \texttt{StratifiedShuffleSplit} function in \texttt{scikit-learn} enables us to do this easily.
 
-Some scenes are not used for any of the datasets above, so that they may be used as another way to assess the performance of the classifier in the end. This is discussed later in \autoref{chap:results}.
+Some scenes are not used for any of the datasets above, so that they may be used as another way to assess the performance of the classifier in the end. We will attempt to predict some of these images later in \autoref{chap:results}.
 
+We lost some classes as a consequence of not using some scenes. The total number of classes in the final dataset is 875, compared to 895 classes in the raw NYU Depth Dataset. With closer inspection, we see that these classes only exist in images in the same scene but of different angles. They would be of limited usefulness as there will not be enough data to test if the classifier can recognise that class of objects generally across different scenes.
 
+%To further limiting the scope of the project while maintaining a large and real-world dataset, we examine the class distirbution as shown in \autoref{fig:dis-classes} to see if we could reduce the number of classes. Classes that have been treated with $K$-means contain 1 000 datapoints (as mentioned above), while there are 159 classes containing many fewer datapoints which do not require the $K$-means treatment (the dotted blue box in the figure). 
+
+%Without enough datapoints, it makes it hard to split it into our aforementioned datasets to be used in our classification problem, as there will either be not enough datapoints for training or testing. To limit the scope and deal with this problem, our solution is to combine all these 159 classes and group them as a new class - more or less like a `background' class. Now we have a dataset with 717 classes, with one very large class. 
+
+%Although this might solve the problem of insufficient datapoints and limiting the scope of the dataset further, this imbalance of classes could be a problem (1 class with 80 000 datapoints and 716 classes with 1 000 datapoints each). We will see if this may cause any problem later in \autoref{chap:results}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 %TODO: information about how we get to 1000 samples and how are we going to split \\
 %TODO: graph to illustrate the split
-
+\newpage
 \section{Training a Classifier (Step 2)}
-A classifier is then trained using the obtained data. Although the datasets have been carefully crafted, there is no guarantee that the dataset would provide any useful results. Perhaps more features is required to provide enough information for the classifier to effectively split the labelled data correctly, or that our assumption that depth is a useful metric is ill-founded.
+A classifier is then trained using our dataset. Although the datasets have been carefully crafted, there is no guarantee that the dataset would provide any useful result. Perhaps more features are required to provide enough information for the classifier to effectively split the labelled data correctly, or that our assumption that depth is a useful metric is ill-founded. We can only find this out by performing tests, which we will be doing in \autoref{chap:results}.
 
-One of the important aspect is finding the correct parameters to enable optimal prediction power of our trained classifiers.
+One of the important tasks before training our final classifiers is to find the correct parameters to enable optimal prediction power.
 
 \subsection{Optimising Parameters}
-Each classifier has their own tunable parameters to achieve optimal results.  
+Each classifier has its own tunable parameters to achieve optimal results.  
 
-We will attempt two methods in finding an optimal set of parameters. The first way is to use grid search with a subset of the data with less classes. If these parameters become stable for a few relatively large subsets, we would assume this works best in general. The next best option is to perform manual grid search by training multiple classifiers with different parameters and examine their performance score. Note that this is bounded by the training time required. We will examine all of this in next chapter.
+We will attempt two methods for finding an optimal set of parameters. The first way is to use exhaustive search with a subset of the data with less classes. If these parameters become stable for a few relatively large subsets, we would assume this works best in general. The next best option is to perform a randomised search by training classifiers with a randomly selected subset of parameter combinations. Note that this is bounded by the training time required. \\
 
 Recall the parameters required to create useful classifiers of the corresponding algorithms:
 
@@ -117,26 +141,26 @@ Recall the parameters required to create useful classifiers of the corresponding
   \item \textbf{Random Forest} \\
     We need to obtain the optimal set of parameters to ensure that the forest does not overfit. There are numerous parameters required to be specified as discussed in \autoref{sec:tech-rf}. At the individual tree level, this includes maximum depth, maximum number of features and the minimum number of samples to allow for a split. At the forest level, we need to optimise the maximum number of estimators (the number of trees to be built).
 
-As Random Forest is a much more efficient algorithm, we expect that the classifier converge much quicker than SVM and be able to handle all the classes and data. Similarly, we could at least manually train a few classifiers with different parameters to find out the optimal settings. \\
+As Random Forest is a much more efficient algorithm, we expect that the classifier will converge much quicker than SVM and be able to handle all the classes and data. Similarly, we could at least manually train a few classifiers with different parameters to find out the optimal settings. \\
 
   \item \textbf{AdaBoost} \\
-    The main parameter for AdaBoost, as described in \autoref{sec:boosted}, is the learning rate parameter ($\alpha$). It controls how much each weak learner contributes to the strong final classifier. We also need to choose whether to use the discrete or real alogirhtm. 
+    The main parameter for AdaBoost, as described in \autoref{sec:tech-boosted}, is the learning rate parameter ($\alpha$). It controls how much each weak learner contributes to the strong final classifier. We also need to choose whether to use the discrete or real alogirhtm. 
     
     A less important but useful parameter is the maximum number of weak learners to train. It is less important as the algorithms can early stop when a perfect fit is obtained before the end.
 
     AdaBoost is known to be even more efficient than Random Forest, as it uses weaker learners and requires fewer estimators of less depth \cite{boosting}. 
 \end{itemize}
 
-\subsubsection{Finding Optimal Parameters}
-An \textbf{exhaustive search}, also known as grid search (\texttt{GridSearchCV} in \texttt{scikit-learn}), can be used to find the best parameters for classifiers that supports them. It trains classifiers on all combinations of a given list of testing parameters. It returns the parameters that produces the best score. Cross validation (defaults to 3 folds) is used to produce this score for comparison. 
+\subsubsection{Methods for Finding Optimal Parameters}
+An \textbf{exhaustive search}, also known as grid search (\texttt{GridSearchCV} in \texttt{scikit-learn}), can be used to find the best parameters for classifiers that supports them. It trains classifiers on all combinations of a given list of testing parameters. It returns the parameters that produce the best score. Cross validation (defaults to 3 folds) is used to produce this score for comparison. 
 
-Sometimes, a classification problem is too big that it is not possible to perform an exhaustive search. One solution is to run many classifiers each combination of testing parameters manually. However, this is a time-consuming task which uses a lot of computational power. 
+Sometimes, a classification problem is too big that it is not possible to perform an exhaustive search. One solution is to run many classifiers with each combination of testing parameters manually. However, this is a time-consuming task which uses a lot of computational power. 
 
-In such cases, a \textbf{randomised search} can be performed (\texttt{RandomizedSearchCV} \\in \texttt{scikit-learn}). It fits classfiers with a randomly chosen set of parameters from the list of testing parameters. The number of randomly chosen sets is user-specified. This is to enable the user to control the scope. Similarly, cross validation is applied to obtain the score each chosen set of parameters.
+In such cases, a \textbf{randomised search} can be performed (\texttt{RandomizedSearchCV} \\in \texttt{scikit-learn}). It fits classfiers with a randomly chosen set of parameters from the list of testing parameters. The number of randomly chosen sets is user-specified. This is to enable the user to control the scope. Similarly, cross validation is applied to obtain the score for each chosen set of parameters.
 
 It is obvious that there is a trade-off of quality of parameters and speed between grid and randomised search. To ensure the results are representative when performing randomised searches, one can run the randomised search for a few times and then obtain the best results.
 
-Later in \autoref{chap:results}, we are going to use randomised search for some classification problems. We are going to obtain 5 randomised sets per search, and perform this search for 3 times.
+Later in \autoref{chap:results}, we are going to use randomised search for some classification problems. We are going to obtain 5 randomised sets per search, and perform this search 3 times, and take the parameters from the test that gives the highest accuracy score.
 
 
 The next step is to train some SVM and Random Forest classifiers with our dataset. 

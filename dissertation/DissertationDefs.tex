@@ -21,9 +21,13 @@
 \usepackage{longtable}
 \usepackage{subfiles}
 \usepackage{float}
+\usepackage{longtable}
 
-\graphicspath{ {images/} {images/tech/} {images/methodology/} {lit_review/images/} }
+\graphicspath{ {images/} {lit_review/images/} {images/tech/} {images/methodology/} {images/results/} }
 \numberwithin{equation}{chapter}
+
+\let\subsectionautorefname\sectionautorefname
+\let\subsubsectionautorefname\sectionautorefname
 
 % % set margin
 % \geometry{
@@ -76,6 +80,7 @@
 %% 
 \newcolumntype{Z}{ >{\centering\arraybackslash}X }
 \newcolumntype{M}[1]{ >{\centering\arraybackslash}m{#1}}
+
 
 % declaration
 \newcommand{\declaration}[2]{
