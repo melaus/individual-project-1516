@@ -20,3 +20,5 @@
 
 ### ``dissertation/``
 - contains final dissertation write-up done with LaTeX
+
+`Update 20 Jan 2017: Migrated from Bitbucket to GitHub`
